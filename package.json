@@ -4,12 +4,19 @@
   "description": "",
   "author": "Reid Moffat <reid.moffat9@gmail.com>",
   "license": "MIT",
-  "main": "index.ts",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "tsc",
     "build": "tsup src/index.ts --format cjs,esm --dts --minify",
     "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd"
   },
+  "files": [
+    "CHANGELOG.md",
+    "dist"
+  ],
   "keywords": [],
   "devDependencies": {
     "tsup": "^8.2.4",
