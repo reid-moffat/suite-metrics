@@ -30,8 +30,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "tsc",
+    "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd",
     "build": "tsup src/index.ts --format cjs,esm --dts --minify",
-    "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd"
+    "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) npm run predeploy (verify it looks good) 5) npm run deploy\"",
+    "predeploy": "npm run build && npm publish --dry-run",
+    "deploy": "npm publish"
   },
   "files": [
     "CHANGELOG.md",
