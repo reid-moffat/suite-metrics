@@ -6,10 +6,13 @@
   "license": "MIT",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "tsc",
+    "build": "tsup src/index.ts --format cjs,esm --dts --minify",
+    "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd"
   },
   "keywords": [],
   "devDependencies": {
+    "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   }
 }
