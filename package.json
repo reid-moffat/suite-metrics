@@ -4,6 +4,9 @@
   "description": "",
   "author": "Reid Moffat <reid.moffat9@gmail.com>",
   "license": "MIT",
+  "keywords": [
+
+  ],
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -17,10 +20,15 @@
     "CHANGELOG.md",
     "dist"
   ],
-  "keywords": [],
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reid-moffat/suite-metrics.git"
+  },
+  "bugs": "https://github.com/reid-moffat/suite-metrics/issues",
+  "packageManager": "pnpm@9.5.0"
 }
