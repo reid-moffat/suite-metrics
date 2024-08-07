@@ -1,12 +1,12 @@
 import microtime from 'microtime';
 
 type Test = {
-    name: string;
+    readonly name: string;
     startTimestamp: number;
     endTimestamp: number;
-    pass: boolean;
-    testNumber: number;
-    suiteTestNumber: number;
+    completed: boolean;
+    readonly testNumber: number;
+    readonly suiteTestNumber: number;
 };
 
 type Suite = {
@@ -43,13 +43,7 @@ abstract class SuiteMetrics {
         }
     }
 
-    private createSuite(name: string): Suite {
-        return {
-            name: name,
-            tests: [],
-            subSuites: null
-        };
-    }
+    private createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
 
     private addSuite(name: string[]): Suite {
         let suite: Suite = this._topLevelSuite;
@@ -78,7 +72,7 @@ abstract class SuiteMetrics {
             name: name[name.length - 1],
             startTimestamp: microtime.now(),
             endTimestamp: 0,
-            pass: false,
+            completed: false,
             testNumber: ++this._currentTestNum,
             suiteTestNumber: this._currentSuite.tests.length + 1
         };
@@ -90,16 +84,13 @@ abstract class SuiteMetrics {
         const endTimestamp = microtime.now();
 
         if (!this._currentSuite) {
-            throw new Error('No test currently being measured');
+            throw new Error('No test currently being measured - run startTest() first');
         }
 
-        // const test: Test = {
-        //     name: testName,
-        //     startTimestamp: this._currentTime,
-        //     endTimestamp,
-        //     pass: !error,
-        //     error
-        // };
+        const test: Test = this._currentSuite.tests[this._currentSuite.tests.length - 1];
+
+        test.endTimestamp = endTimestamp;
+        test.completed = true;
 
         this._currentSuite = null;
     }
