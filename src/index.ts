@@ -64,6 +64,13 @@ abstract class SuiteMetrics {
         return suite;
     }
 
+    /**
+     * Starts a new test. Call directly before the test for maximum accuracy
+     *
+     * @param name Suites the test is part of, then the test name (in order). E.g. ['suite1', 'suite2', 'test1'] means
+     * there is a top-level suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it
+     * named 'test1' which we want to measure
+     */
     public startTest(name: string[]): void {
         this.validateName(name);
 
@@ -82,6 +89,9 @@ abstract class SuiteMetrics {
         this._currentTime = microtime.now(); // Do this last to ensure the time is as accurate as possible
     }
 
+    /**
+     * Stops the current test (the last time startTest() was called). Call directly after the test for maximum accuracy
+     */
     public stopTest(): void {
         const endTimestamp = microtime.now();
 
