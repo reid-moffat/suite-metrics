@@ -43,23 +43,6 @@ abstract class SuiteMetrics {
         }
     }
 
-    // private addTest(name: string[]): void {
-    //     if (!this._currentSuite) {
-    //         throw new Error('No suite currently being measured');
-    //     }
-    //
-    //     const test: Test = {
-    //         name: name[name.length - 1],
-    //         startTimestamp: this._currentTime,
-    //         endTimestamp: 0,
-    //         pass: false,
-    //         executionOrder: this._currentSuite.tests.length,
-    //         suiteExecutionOrder: this._suite.get(this._currentSuite.name).tests.length
-    //     };
-    //
-    //     this._currentSuite.tests.push(test);
-    // }
-
     private createSuite(name: string): Suite {
         return {
             name: name,
@@ -80,24 +63,6 @@ abstract class SuiteMetrics {
             if (subSuite === undefined) {
                 suite.subSuites.set(name[i], this.createSuite(name[i]));
                 subSuite = suite.subSuites.get(name[i]) as Suite;
-            }
-            suite = subSuite;
-        }
-
-        return suite;
-    }
-
-    private getSuite(name: string[]): false | Suite {
-        const topLevelSuite = this._suite.get(name[0]);
-        if (topLevelSuite === undefined) {
-            return false;
-        }
-
-        let suite: Suite = topLevelSuite;
-        for (let i = 1; i < name.length - 1; ++i) {
-            const subSuite = suite.subSuites.get(name[i]);
-            if (subSuite === undefined) {
-                return false;
             }
             suite = subSuite;
         }
