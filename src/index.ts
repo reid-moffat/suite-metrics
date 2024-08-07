@@ -52,7 +52,7 @@ abstract class SuiteMetrics {
 
     private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
-        name: "__top_level_suite_do_not_use__",
+        name: "<Top-Level suite>",
         tests: [],
         subSuites: this._suite
     };
@@ -225,7 +225,7 @@ abstract class SuiteMetrics {
         let subTotalTime = 0;
 
         if (suite.subSuites) {
-            for (let subSuite of suite.subSuites.values()) {
+            for (const subSuite of suite.subSuites.values()) {
                 const [num, total] = this._subSuiteMetrics(subSuite);
                 subNumTests += num;
                 subTotalTime += total;
@@ -252,5 +252,34 @@ abstract class SuiteMetrics {
                 averageTime: (directTotalTime + subTotalTime) / (directNumTests + subNumTests),
             }
         };
+    }
+
+    private _printSuiteHelper(suite: Suite, lines: string[], indent: number): void {
+
+        const indentStr = ' '.repeat(indent);
+        lines.push(`${indentStr}Suite: ${suite.name}`);
+        lines.push(`${indentStr}  Tests: ${suite.tests.length}`);
+
+        for (const test of suite.tests) {
+            lines.push(`${indentStr}    Test: ${test.name}`);
+            lines.push(`${indentStr}    Duration: ${test.duration}`);
+        }
+
+        if (suite.subSuites !== null) {
+            for (const subSuite of suite.subSuites.values() ) {
+                this._printSuiteHelper(subSuite, lines, indent + 2);
+            }
+        }
+    }
+
+    /**
+     * Returns a formatted string of all the test suite metrics
+     */
+    public printAllSuiteMetrics(): string {
+        const lines: string[] = [];
+
+        this._printSuiteHelper(this._topLevelSuite, lines, 0);
+
+        return lines.join('\n');
     }
 }
