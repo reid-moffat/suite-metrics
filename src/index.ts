@@ -78,17 +78,24 @@ abstract class SuiteMetrics {
 
     private createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
 
-    // Gets a suite by name, creating it (and any parent suites) if they don't exist
-    private getSuite(name: string[]): Suite {
+    private getSuite(name: string[], createIfAbsent: boolean): Suite {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - 1; ++i) {
 
+            // If substitutes don't exist, create them or throw an error is not allowed
             if (suite.subSuites === null) {
+                if (!createIfAbsent) {
+                    throw new Error(`Suite ${name.slice(0, -1).toString()} does not exist`);
+                }
                 suite.subSuites = new Map<string, Suite>();
             }
 
+            // Create this suite in the hierarchy if it doesn't exist, or throw an error if not allowed to
             let subSuite = suite.subSuites.get(name[i]);
             if (subSuite === undefined) {
+                if (!createIfAbsent) {
+                    throw new Error(`Suite ${name.slice(0, -1).toString()} does not exist`);
+                }
                 suite.subSuites.set(name[i], this.createSuite(name[i]));
                 subSuite = suite.subSuites.get(name[i]) as Suite;
             }
@@ -108,7 +115,7 @@ abstract class SuiteMetrics {
     public startTest(name: string[]): void {
         this.validateName(name, true);
 
-        this._currentSuite = this.getSuite(name);
+        this._currentSuite = this.getSuite(name, true);
         const test: Test = {
             name: name[name.length - 1],
             startTimestamp: -1,
@@ -157,7 +164,7 @@ abstract class SuiteMetrics {
     public getSuiteMetrics(name: string[]): SuiteData {
         this.validateName(name, false);
 
-        const suite: Suite = this.getSuite(name);
+        const suite: Suite = this.getSuite(name, false);
 
         const directNumTests = suite.tests.length;
         const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
@@ -174,11 +181,67 @@ abstract class SuiteMetrics {
         };
     }
 
-    private _subSuiteMetrics(suite: Suite): void {
-        ;
+    // Recursive helper for getSuiteMetricsRecursive()
+    private _subSuiteMetrics(suite: Suite): [number, number] {
+        let numTests = suite.tests.length;
+        let totalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+
+        if (suite.subSuites) {
+            for (let subSuite of suite.subSuites.values()) {
+                const [subNumTests, subTotalTime] = this._subSuiteMetrics(subSuite);
+                numTests += subNumTests;
+                totalTime += subTotalTime;
+            }
+        }
+
+        return [numTests, totalTime];
     }
 
-    private getSuiteMetricsRecursive(name: string[]): void {
-        ;
+    /**
+     * Gets the metrics for a suite (metadata - name, parents, children) and metrics for all its sub-suite's tests
+     * (number of tests, total time, average time)
+     *
+     * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
+     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
+     */
+    public getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
+        this.validateName(name, false);
+
+        const suite: Suite = this.getSuite(name, false);
+
+        const directNumTests = suite.tests.length;
+        const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+
+        let subNumTests = 0;
+        let subTotalTime = 0;
+
+        if (suite.subSuites) {
+            for (let subSuite of suite.subSuites.values()) {
+                const [num, total] = this._subSuiteMetrics(subSuite);
+                subNumTests += num;
+                subTotalTime += total;
+            }
+        }
+
+        return {
+            name: suite.name,
+            parentSuites: name.slice(0, name.length - 1),
+            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
+            directTestMetrics: {
+                numTests: directNumTests,
+                totalTime: directTotalTime,
+                averageTime: directTotalTime / directNumTests,
+            },
+            subTestMetrics: {
+                numTests: subNumTests,
+                totalTime: subTotalTime,
+                averageTime: subTotalTime / subNumTests,
+            },
+            totalTestMetrics: {
+                numTests: directNumTests + subNumTests,
+                totalTime: directTotalTime + subTotalTime,
+                averageTime: (directTotalTime + subTotalTime) / (directNumTests + subNumTests),
+            }
+        };
     }
 }
