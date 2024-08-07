@@ -10,8 +10,8 @@ type Test = {
 };
 
 type Suite = {
-    name: string;
-    tests: Test[];
+    readonly name: string;
+    readonly tests: Test[];
     subSuites: Map<string, Suite> | null;
 };
 
