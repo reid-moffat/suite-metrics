@@ -40,9 +40,13 @@
     "CHANGELOG.md",
     "dist"
   ],
+  "dependencies": {
+    "microtime": "^3.1.1"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "@types/chai": "^4.3.17",
+    "@types/microtime": "^2.1.2",
     "@types/mocha": "^10.0.7",
     "chai": "^5.1.1",
     "cross-env": "^7.0.3",
@@ -58,5 +62,5 @@
     "url": "https://github.com/reid-moffat/suite-metrics.git"
   },
   "bugs": "https://github.com/reid-moffat/suite-metrics/issues",
-  "packageManager": "pnpm@9.5.0"
+  "packageManager": "pnpm@9.5.0",
 }
