@@ -62,5 +62,5 @@
     "url": "https://github.com/reid-moffat/suite-metrics.git"
   },
   "bugs": "https://github.com/reid-moffat/suite-metrics/issues",
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@9.5.0"
 }
