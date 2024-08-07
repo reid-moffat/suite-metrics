@@ -70,7 +70,7 @@ abstract class SuiteMetrics {
         this._currentSuite = this.addSuite(name);
         const test: Test = {
             name: name[name.length - 1],
-            startTimestamp: microtime.now(),
+            startTimestamp: 0,
             endTimestamp: 0,
             completed: false,
             testNumber: ++this._currentTestNum,
@@ -78,6 +78,8 @@ abstract class SuiteMetrics {
         };
 
         this._currentSuite.tests.push(test);
+
+        this._currentTime = microtime.now(); // Do this last to ensure the time is as accurate as possible
     }
 
     public stopTest(): void {
@@ -89,6 +91,7 @@ abstract class SuiteMetrics {
 
         const test: Test = this._currentSuite.tests[this._currentSuite.tests.length - 1];
 
+        test.startTimestamp = this._currentTime;
         test.endTimestamp = endTimestamp;
         test.completed = true;
 
