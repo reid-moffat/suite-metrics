@@ -4,6 +4,7 @@ type Test = {
     readonly name: string;
     startTimestamp: number;
     endTimestamp: number;
+    duration: number;
     completed: boolean;
     readonly testNumber: number;
     readonly suiteTestNumber: number;
@@ -13,6 +14,38 @@ type Suite = {
     readonly name: string;
     readonly tests: Test[];
     subSuites: Map<string, Suite> | null;
+};
+
+type SuiteData = {
+    readonly name: string;
+    readonly parentSuites: string[];
+    readonly childSuites: string[] | null;
+    readonly testMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number;
+        readonly averageTime: number;
+    }
+};
+
+type RecursiveSuiteData = {
+    readonly name: string;
+    readonly parentSuites: string[] | null;
+    readonly childSuites: string[] | null;
+    readonly directTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number;
+        readonly averageTime: number;
+    }
+    readonly subTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number;
+        readonly averageTime: number;
+    }
+    readonly totalTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number;
+        readonly averageTime: number;
+    }
 };
 
 abstract class SuiteMetrics {
@@ -25,7 +58,7 @@ abstract class SuiteMetrics {
 
     private _currentTestNum: number = 0;
 
-    private validateName(name: string[]): void {
+    private validateName(name: string[], test: boolean): void {
         if (!Array.isArray(name)) {
             throw new Error('Invalid test/suite name - must be a delimiter string or an array of strings');
         }
@@ -34,7 +67,7 @@ abstract class SuiteMetrics {
             throw new Error('Test/suite name cannot be empty - must define a path');
         }
 
-        if (name.length === 1) {
+        if (test && name.length === 1) {
             throw new Error('Test must be inside at least one suite - i.e. name should be at least two strings (suite + test)');
         }
 
@@ -45,7 +78,8 @@ abstract class SuiteMetrics {
 
     private createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
 
-    private addSuite(name: string[]): Suite {
+    // Gets a suite by name, creating it (and any parent suites) if they don't exist
+    private getSuite(name: string[]): Suite {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - 1; ++i) {
 
@@ -72,13 +106,14 @@ abstract class SuiteMetrics {
      * named 'test1' which we want to measure
      */
     public startTest(name: string[]): void {
-        this.validateName(name);
+        this.validateName(name, true);
 
-        this._currentSuite = this.addSuite(name);
+        this._currentSuite = this.getSuite(name);
         const test: Test = {
             name: name[name.length - 1],
-            startTimestamp: 0,
-            endTimestamp: 0,
+            startTimestamp: -1,
+            endTimestamp: -1,
+            duration: -1,
             completed: false,
             testNumber: ++this._currentTestNum,
             suiteTestNumber: this._currentSuite.tests.length + 1
@@ -103,8 +138,47 @@ abstract class SuiteMetrics {
 
         test.startTimestamp = this._currentTime;
         test.endTimestamp = endTimestamp;
+        test.duration = test.endTimestamp - test.startTimestamp
         test.completed = true;
 
         this._currentSuite = null;
+    }
+
+    /**
+     * Gets the metrics for a suite - suite metadata (name, parents, children) and test metrics (number of tests,
+     * total time, average time)
+     *
+     * This method only calculates test metrics for tests directly in this suite. To include tests that are in
+     * sub-suites of this suite, use getSuiteMetricsRecursive() instead
+     *
+     * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
+     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
+     */
+    public getSuiteMetrics(name: string[]): SuiteData {
+        this.validateName(name, false);
+
+        const suite: Suite = this.getSuite(name);
+
+        const directNumTests = suite.tests.length;
+        const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+
+        return {
+            name: suite.name,
+            parentSuites: name.slice(0, name.length - 1),
+            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
+            testMetrics: {
+                numTests: directNumTests,
+                totalTime: directTotalTime,
+                averageTime: directTotalTime / directNumTests,
+            }
+        };
+    }
+
+    private _subSuiteMetrics(suite: Suite): void {
+        ;
+    }
+
+    private getSuiteMetricsRecursive(name: string[]): void {
+        ;
     }
 }
