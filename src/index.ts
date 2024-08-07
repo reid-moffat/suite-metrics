@@ -5,8 +5,8 @@ type Test = {
     startTimestamp: number;
     endTimestamp: number;
     pass: boolean;
-    executionOrder: number;
-    suiteExecutionOrder: number;
+    testNumber: number;
+    suiteTestNumber: number;
 };
 
 type Suite = {
@@ -73,17 +73,17 @@ abstract class SuiteMetrics {
     public startTest(name: string[]): void {
         this.validateName(name);
 
-        const suite = this.addSuite(name);
+        this._currentSuite = this.addSuite(name);
         const test: Test = {
             name: name[name.length - 1],
             startTimestamp: microtime.now(),
             endTimestamp: 0,
             pass: false,
-            executionOrder: ++this._currentTestNum,
-            suiteExecutionOrder: suite.tests.length + 1
+            testNumber: ++this._currentTestNum,
+            suiteTestNumber: this._currentSuite.tests.length + 1
         };
 
-        suite.tests.push(test);
+        this._currentSuite.tests.push(test);
     }
 
     public stopTest(): void {
@@ -92,8 +92,6 @@ abstract class SuiteMetrics {
         if (!this._currentSuite) {
             throw new Error('No test currently being measured');
         }
-
-        // get current test
 
         // const test: Test = {
         //     name: testName,
