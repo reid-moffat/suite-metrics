@@ -179,10 +179,26 @@ abstract class SuiteMetrics {
         this._currentSuite = null;
     }
 
+    /**
+     * Returns true if a suite currently exists, false otherwise
+     *
+     * @param name Name of the suite to check for. E.g. ['suite1', 'suite2'] means there is a top-level suite named
+     * 'suite1', which has a suite inside it named 'suite2' which we want to check if it exists
+     */
     public static suiteExists(name: string[]): boolean {
         this._validateName(name, false);
-
         return this._exists(name, false);
+    }
+
+    /**
+     * Returns true if a test currently exists, false otherwise
+     * @param name Name of the test to check for. E.g. ['suite1', 'suite2', 'test1'] means there is a top-level suite
+     * named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which we want
+     * to check if it exists
+     */
+    public static testExists(name: string[]): boolean {
+        this._validateName(name, true);
+        return this._exists(name, true);
     }
 
     /**
