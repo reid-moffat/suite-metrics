@@ -40,9 +40,9 @@ class SuiteMetrics implements ISuiteMetrics {
     private _createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
-    private _getSuite(name: string[], createIfAbsent: boolean): Suite {
+    private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
         let suite: Suite = this._topLevelSuite;
-        for (let i = 0; i < name.length - 1; ++i) {
+        for (let i = 0; i < name.length - (test ? 1 : 0); ++i) {
 
             // If substitutes don't exist, create them or throw an error is not allowed
             if (suite.subSuites === null) {
@@ -96,7 +96,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public startTest(name: string[]): void {
         this._validateName(name, true);
 
-        this._currentSuite = this._getSuite(name, true);
+        this._currentSuite = this._getSuite(name, true, true);
         const test: Test = {
             name: name[name.length - 1],
             startTimestamp: -1,
@@ -167,7 +167,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public getSuiteMetrics(name: string[]): SuiteData {
         this._validateName(name, false);
 
-        const suite: Suite = this._getSuite(name, false);
+        const suite: Suite = this._getSuite(name, false, false);
 
         const directNumTests = suite.tests.length;
         const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
@@ -210,7 +210,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
         this._validateName(name, false);
 
-        const suite: Suite = this._getSuite(name, false);
+        const suite: Suite = this._getSuite(name, false, false);
 
         const directNumTests = suite.tests.length;
         const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
