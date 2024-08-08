@@ -114,6 +114,25 @@ abstract class SuiteMetrics {
         return suite;
     }
 
+    // Checks if a given suite/test exists
+    private static _exists(name: string[], test: boolean): boolean {
+        let suite: Suite = this._topLevelSuite;
+        for (let i = 0; i < name.length - (test ? 0 : 1); ++i) {
+
+            if (test && i === name.length - 1) {
+                return suite.tests.some((test) => test.name === name[i]);
+            }
+
+            let subSuite = suite.subSuites?.get(name[i]);
+            if (!subSuite) {
+                return false;
+            }
+            suite = subSuite;
+        }
+
+        return true;
+    }
+
     /**
      * Starts a new test. Call directly before the test for maximum accuracy
      *
@@ -158,6 +177,12 @@ abstract class SuiteMetrics {
         test.completed = true;
 
         this._currentSuite = null;
+    }
+
+    public static suiteExists(name: string[]): boolean {
+        this._validateName(name, false);
+
+        return this._exists(name, false);
     }
 
     /**
