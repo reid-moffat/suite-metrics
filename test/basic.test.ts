@@ -30,9 +30,9 @@ suite("Basic test suite", () => {
         expect(recursiveSuiteData.directTestMetrics.totalTime).to.be.a("number");
         expect(recursiveSuiteData.directTestMetrics.averageTime).to.be.a("number");
 
-        expect(recursiveSuiteData.subTestMetrics.numTests).to.equal(1);
-        expect(recursiveSuiteData.subTestMetrics.totalTime).to.be.a("number");
-        expect(recursiveSuiteData.subTestMetrics.averageTime).to.be.a("number");
+        expect(recursiveSuiteData.subTestMetrics.numTests).to.equal(0);
+        expect(recursiveSuiteData.subTestMetrics.totalTime).to.equal(0);
+        expect(recursiveSuiteData.subTestMetrics.averageTime).to.equal(null);
 
         expect(recursiveSuiteData.totalTestMetrics.numTests).to.equal(1);
         expect(recursiveSuiteData.totalTestMetrics.totalTime).to.be.a("number");
