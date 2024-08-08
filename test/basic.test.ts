@@ -14,14 +14,14 @@ suite("Basic test suite", () => {
         const suiteData = metrics.getSuiteMetrics(["Basic test suite"]);
         console.log("Suite metrics: " + JSON.stringify(suiteData, null, 4));
         expect(suiteData.name).to.equal("Basic test suite");
-        expect(suiteData.parentSuites).to.equal(null);
+        expect(suiteData.parentSuites).to.deep.equal([]);
         expect(suiteData.childSuites).to.equal(null);
         expect(suiteData.testMetrics.numTests).to.equal(1);
         expect(suiteData.testMetrics.totalTime).to.be.a("number");
         expect(suiteData.testMetrics.averageTime).to.be.a("number");
 
         const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite"]);
-        console.log("Recursive suite metrics: " + JSON.stringify(recursiveSuiteData, null, 4));
+        console.log("\nRecursive suite metrics: " + JSON.stringify(recursiveSuiteData, null, 4));
         expect(recursiveSuiteData.name).to.equal("Basic test suite");
         expect(recursiveSuiteData.parentSuites).to.equal(null);
         expect(recursiveSuiteData.childSuites).to.equal(null);
