@@ -23,7 +23,7 @@ suite("Basic test suite", () => {
         const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite"]);
         console.log("\nRecursive suite metrics: " + JSON.stringify(recursiveSuiteData, null, 4));
         expect(recursiveSuiteData.name).to.equal("Basic test suite");
-        expect(recursiveSuiteData.parentSuites).to.equal(null);
+        expect(recursiveSuiteData.parentSuites).to.deep.equal([]);
         expect(recursiveSuiteData.childSuites).to.equal(null);
 
         expect(recursiveSuiteData.directTestMetrics.numTests).to.equal(1);
@@ -39,7 +39,7 @@ suite("Basic test suite", () => {
         expect(recursiveSuiteData.totalTestMetrics.averageTime).to.be.a("number");
 
         const metricsString = metrics.printAllSuiteMetrics();
-        console.log("Metrics string: " + metricsString);
+        console.log("\nMetrics string: " + metricsString);
         expect(metricsString).to.be.a("string");
     });
 });
