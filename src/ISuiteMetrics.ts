@@ -58,4 +58,4 @@ interface ISuiteMetrics {
     printAllSuiteMetrics(): string;
 }
 
-export { ISuiteMetrics as default, Test, Suite, SuiteData, RecursiveSuiteData };
+export { ISuiteMetrics, Test, Suite, SuiteData, RecursiveSuiteData };

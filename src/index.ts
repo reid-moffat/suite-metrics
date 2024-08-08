@@ -1,4 +1,4 @@
-import ISuiteMetrics, { Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.ts";
+import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.ts";
 import SuiteMetrics from "./SuiteMetrics.ts";
 
 export default SuiteMetrics;
