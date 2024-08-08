@@ -1,71 +1,24 @@
 import microtime from 'microtime';
+import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.js";
 
-type Test = {
-    readonly name: string;
-    startTimestamp: number;
-    endTimestamp: number;
-    duration: number;
-    completed: boolean;
-    readonly testNumber: number;
-    readonly suiteTestNumber: number;
-};
+class SuiteMetrics implements ISuiteMetrics {
 
-type Suite = {
-    readonly name: string;
-    readonly tests: Test[];
-    subSuites: Map<string, Suite> | null;
-};
-
-type SuiteData = {
-    readonly name: string;
-    readonly parentSuites: string[];
-    readonly childSuites: string[] | null;
-    readonly testMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-};
-
-type RecursiveSuiteData = {
-    readonly name: string;
-    readonly parentSuites: string[] | null;
-    readonly childSuites: string[] | null;
-    readonly directTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-    readonly subTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-    readonly totalTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-};
-
-abstract class SuiteMetrics {
-
-    private static readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
-    private static readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
+    private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
+    private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
         name: "<Top-Level suite>",
         tests: [],
         subSuites: this._suite
     };
 
     // Tracks current test from startTest() to simplify stopTest() logic + increase accuracy
-    private static _currentSuite: Suite | null = null;
-    private static _currentTime: number = 0;
+    private _currentSuite: Suite | null = null;
+    private _currentTime: number = 0;
 
     // How many tests have occurred so far
-    private static _currentTestNum: number = 0;
+    private _currentTestNum: number = 0;
 
     // Throws an error if the given name is invalid
-    private static _validateName(name: string[], test: boolean): void {
+    private _validateName(name: string[], test: boolean): void {
         if (!Array.isArray(name)) {
             throw new Error('Invalid test/suite name - must be a delimiter string or an array of strings');
         }
@@ -84,10 +37,10 @@ abstract class SuiteMetrics {
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
-    private static _createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
+    private _createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
-    private static _getSuite(name: string[], createIfAbsent: boolean): Suite {
+    private _getSuite(name: string[], createIfAbsent: boolean): Suite {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - 1; ++i) {
 
@@ -115,7 +68,7 @@ abstract class SuiteMetrics {
     }
 
     // Checks if a given suite/test exists
-    private static _exists(name: string[], test: boolean): boolean {
+    private _exists(name: string[], test: boolean): boolean {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - (test ? 0 : 1); ++i) {
 
@@ -140,7 +93,7 @@ abstract class SuiteMetrics {
      * there is a top-level suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it
      * named 'test1' which we want to measure
      */
-    public static startTest(name: string[]): void {
+    public startTest(name: string[]): void {
         this._validateName(name, true);
 
         this._currentSuite = this._getSuite(name, true);
@@ -162,7 +115,7 @@ abstract class SuiteMetrics {
     /**
      * Stops the current test (the last time startTest() was called). Call directly after the test for maximum accuracy
      */
-    public static stopTest(): void {
+    public stopTest(): void {
         const endTimestamp = microtime.now();
 
         if (!this._currentSuite) {
@@ -185,7 +138,7 @@ abstract class SuiteMetrics {
      * @param name Name of the suite to check for. E.g. ['suite1', 'suite2'] means there is a top-level suite named
      * 'suite1', which has a suite inside it named 'suite2' which we want to check if it exists
      */
-    public static suiteExists(name: string[]): boolean {
+    public suiteExists(name: string[]): boolean {
         this._validateName(name, false);
         return this._exists(name, false);
     }
@@ -196,7 +149,7 @@ abstract class SuiteMetrics {
      * named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which we want
      * to check if it exists
      */
-    public static testExists(name: string[]): boolean {
+    public testExists(name: string[]): boolean {
         this._validateName(name, true);
         return this._exists(name, true);
     }
@@ -211,7 +164,7 @@ abstract class SuiteMetrics {
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
      * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
      */
-    public static getSuiteMetrics(name: string[]): SuiteData {
+    public getSuiteMetrics(name: string[]): SuiteData {
         this._validateName(name, false);
 
         const suite: Suite = this._getSuite(name, false);
@@ -232,7 +185,7 @@ abstract class SuiteMetrics {
     }
 
     // Recursive helper for getSuiteMetricsRecursive()
-    private static _subSuiteMetrics(suite: Suite): [number, number] {
+    private _subSuiteMetrics(suite: Suite): [number, number] {
         let numTests = suite.tests.length;
         let totalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
 
@@ -254,7 +207,7 @@ abstract class SuiteMetrics {
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
      * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
      */
-    public static getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
+    public getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
         this._validateName(name, false);
 
         const suite: Suite = this._getSuite(name, false);
@@ -295,7 +248,7 @@ abstract class SuiteMetrics {
         };
     }
 
-    private static _printSuiteHelper(suite: Suite, lines: string[], indent: number): void {
+    private _printSuiteHelper(suite: Suite, lines: string[], indent: number): void {
 
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
@@ -316,7 +269,7 @@ abstract class SuiteMetrics {
     /**
      * Returns a formatted string of all the test suite metrics
      */
-    public static printAllSuiteMetrics(): string {
+    public printAllSuiteMetrics(): string {
         const lines: string[] = [];
 
         this._printSuiteHelper(this._topLevelSuite, lines, 0);
