@@ -233,17 +233,17 @@ class SuiteMetrics implements ISuiteMetrics {
             directTestMetrics: {
                 numTests: directNumTests,
                 totalTime: directTotalTime,
-                averageTime: directTotalTime / directNumTests,
+                averageTime: directNumTests ? directTotalTime / directNumTests : null,
             },
             subTestMetrics: {
                 numTests: subNumTests,
                 totalTime: subTotalTime,
-                averageTime: subTotalTime / subNumTests,
+                averageTime: subNumTests ? subTotalTime / subNumTests : null,
             },
             totalTestMetrics: {
                 numTests: directNumTests + subNumTests,
                 totalTime: directTotalTime + subTotalTime,
-                averageTime: (directTotalTime + subTotalTime) / (directNumTests + subNumTests),
+                averageTime: (directNumTests + subNumTests) ? (directTotalTime + subTotalTime) / (directNumTests + subNumTests) : null,
             }
         };
     }
