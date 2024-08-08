@@ -21,7 +21,7 @@ type SuiteData = {
     readonly testMetrics: {
         readonly numTests: number;
         readonly totalTime: number;
-        readonly averageTime: number;
+        readonly averageTime: number | null; // Null for no tests (avoid NaN for dividing by 0)
     }
 };
 
@@ -32,7 +32,7 @@ type RecursiveSuiteData = {
     readonly directTestMetrics: {
         readonly numTests: number;
         readonly totalTime: number;
-        readonly averageTime: number | null; // Null for no tests (avoid NaN for dividing by 0)
+        readonly averageTime: number | null;
     }
     readonly subTestMetrics: {
         readonly numTests: number;
