@@ -4,9 +4,64 @@
   "description": "",
   "author": "Reid Moffat <reid.moffat9@gmail.com>",
   "license": "MIT",
-  "main": "index.js",
+  "keywords": [
+    "test",
+    "metrics",
+    "suite",
+    "benchmark",
+    "performance",
+    "time",
+    "test metrics",
+    "suite metrics",
+    "test-metrics",
+    "suite-metrics",
+    "mocha",
+    "jest",
+    "recursive",
+    "nested",
+    "many tests",
+    "many suites",
+    "many test suites",
+    "many test cases"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "tsc",
+    "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd",
+    "build": "tsup src/index.ts --format cjs,esm --dts --minify",
+    "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) npm run predeploy (verify it looks good) 5) npm run deploy\"",
+    "predeploy": "npm run build && npm publish --dry-run",
+    "deploy": "npm publish"
   },
-  "keywords": []
+  "files": [
+    "CHANGELOG.md",
+    "dist"
+  ],
+  "dependencies": {
+    "microtime": "^3.1.1"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.7",
+    "@types/chai": "^4.3.17",
+    "@types/microtime": "^2.1.2",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.1.0",
+    "chai": "^5.1.1",
+    "cross-env": "^7.0.3",
+    "generate-arrays": "^1.0.0",
+    "mocha": "^10.7.0",
+    "nyc": "^17.0.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reid-moffat/suite-metrics.git"
+  },
+  "bugs": "https://github.com/reid-moffat/suite-metrics/issues",
+  "packageManager": "pnpm@9.5.0"
 }
