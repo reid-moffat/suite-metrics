@@ -38,8 +38,12 @@ suite("Basic test suite", () => {
         expect(recursiveSuiteData.totalTestMetrics.totalTime).to.be.a("number");
         expect(recursiveSuiteData.totalTestMetrics.averageTime).to.be.a("number");
 
-        const metricsString = metrics.printAllSuiteMetrics();
-        console.log("\nMetrics string: " + metricsString);
+        const metricsStringTL = metrics.printAllSuiteMetrics(true);
+        console.log("\nMetrics string (with top-level suite):\n" + metricsStringTL);
+        expect(metricsStringTL).to.be.a("string");
+
+        const metricsString = metrics.printAllSuiteMetrics(false);
+        console.log("\nMetrics string:\n" + metricsString);
         expect(metricsString).to.be.a("string");
     });
 });

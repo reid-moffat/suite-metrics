@@ -268,11 +268,19 @@ class SuiteMetrics implements ISuiteMetrics {
 
     /**
      * Returns a formatted string of all the test suite metrics
+     *
+     * @param topLevelSuite Include the default top-level suite, summarizing all other suites inside it
      */
-    public printAllSuiteMetrics(): string {
+    public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
         const lines: string[] = [];
 
-        this._printSuiteHelper(this._topLevelSuite, lines, 0);
+        if (topLevelSuite) {
+            this._printSuiteHelper(this._topLevelSuite, lines, 0);
+        } else {
+            for (const suite of this._suite.values()) {
+                this._printSuiteHelper(suite, lines, 0);
+            }
+        }
 
         return lines.join('\n');
     }
