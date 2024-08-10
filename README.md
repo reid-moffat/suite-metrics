@@ -26,6 +26,9 @@ yarn add suite-metrics -D
 ```typescript
 import SuiteMetrics from 'suite-metrics';
 
+// Singleton (easy for many files)
+const metrics = SuiteMetrics.getInstance();
+// Or new instance (if ou need separate metrics)
 const metrics = new SuiteMetrics();
 
 metrics.startTest(["Suite Name", "Sub-suite name", "Test Name"]);
