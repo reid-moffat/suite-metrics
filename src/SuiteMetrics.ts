@@ -89,6 +89,39 @@ class SuiteMetrics implements ISuiteMetrics {
         return true;
     }
 
+    // Adds a new test (suite can not exist)
+    private _addTest(name: string[]): void {
+
+        let suite: Suite = this._topLevelSuite;
+
+        for (let i = 0; i < name.length - 1; ++i) {
+
+            suite.numSubTests++;
+
+            if (suite.subSuites === null) {
+                suite.subSuites = new Map<string, Suite>();
+            }
+            if (!suite.subSuites.has(name[i])) {
+                suite.subSuites.set(name[i], this._createSuite(name[i]));
+            }
+
+            suite = suite.subSuites.get(name[i]) as Suite;
+        }
+        this._currentSuite = suite;
+
+        const test: Test = {
+            name: name[name.length - 1],
+            startTimestamp: -1,
+            endTimestamp: -1,
+            duration: -1,
+            completed: false,
+            testNumber: ++this._currentTestNum,
+            suiteTestNumber: suite.tests.length + 1
+        };
+
+        suite.tests.push(test);
+    }
+
     /**
      * Gets an instance on this class. Simplifies having one accessible metrics instance for many classes
      */
@@ -106,20 +139,9 @@ class SuiteMetrics implements ISuiteMetrics {
     public startTest(name: string[]): void {
         this._validateName(name, true);
 
-        this._currentSuite = this._getSuite(name, true, true);
-        const test: Test = {
-            name: name[name.length - 1],
-            startTimestamp: -1,
-            endTimestamp: -1,
-            duration: -1,
-            completed: false,
-            testNumber: ++this._currentTestNum,
-            suiteTestNumber: this._currentSuite.tests.length + 1
-        };
+        this._addTest(name);
 
-        this._currentSuite.tests.push(test);
-
-        this._currentTime = microtime.now(); // Do this last to ensure the time is as accurate as possible
+        this._currentTime = microtime.now(); // Last to ensure the time is as accurate as possible
     }
 
     /**
