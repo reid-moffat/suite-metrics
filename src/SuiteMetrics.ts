@@ -9,6 +9,7 @@ class SuiteMetrics implements ISuiteMetrics {
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
         name: "<Top-Level suite>",
         tests: [],
+        numSubTests: 0,
         subSuites: this._suite
     };
 
@@ -39,7 +40,7 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
-    private _createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
+    private _createSuite = (name: string): Suite => ({ name: name, tests: [], numSubTests: 0, subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
     private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
@@ -261,7 +262,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
-        lines.push(`${indentStr}  Tests: ${suite.tests.length}`);
+        lines.push(`${indentStr}  Direct Tests: ${suite.tests.length}`);
 
         for (const test of suite.tests) {
             lines.push(`${indentStr}    Test: ${test.name}`);

@@ -11,6 +11,7 @@ type Test = {
 type Suite = {
     readonly name: string;
     readonly tests: Test[];
+    numSubTests: number;
     subSuites: Map<string, Suite> | null;
 };
 
