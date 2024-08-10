@@ -285,6 +285,7 @@ class SuiteMetrics implements ISuiteMetrics {
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
         lines.push(`${indentStr}  Direct Tests: ${suite.tests.length}`);
+        lines.push(`${indentStr}  Sub-Suite Tests:: ${suite.numSubTests}`);
 
         for (const test of suite.tests) {
             lines.push(`${indentStr}    Test: ${test.name}`);
