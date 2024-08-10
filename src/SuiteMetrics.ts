@@ -3,7 +3,7 @@ import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISu
 
 class SuiteMetrics implements ISuiteMetrics {
 
-    private readonly _instance: SuiteMetrics = new SuiteMetrics();
+    private static _instance: SuiteMetrics;
 
     private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
@@ -126,7 +126,10 @@ class SuiteMetrics implements ISuiteMetrics {
      * Gets an instance on this class. Simplifies having one accessible metrics instance for many classes
      */
     public getInstance(): SuiteMetrics {
-        return this._instance;
+        if (!SuiteMetrics._instance) {
+            SuiteMetrics._instance = new SuiteMetrics();
+        }
+        return SuiteMetrics._instance;
     }
 
     /**
