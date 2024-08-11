@@ -125,7 +125,7 @@ class SuiteMetrics implements ISuiteMetrics {
     /**
      * Gets an instance on this class. Simplifies having one accessible metrics instance for many classes
      */
-    public getInstance(): SuiteMetrics {
+    public static getInstance(): SuiteMetrics {
         if (!SuiteMetrics._instance) {
             SuiteMetrics._instance = new SuiteMetrics();
         }
