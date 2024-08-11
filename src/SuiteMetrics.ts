@@ -3,10 +3,13 @@ import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISu
 
 class SuiteMetrics implements ISuiteMetrics {
 
+    private static _instance: SuiteMetrics;
+
     private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
         name: "<Top-Level suite>",
         tests: [],
+        numSubTests: 0,
         subSuites: this._suite
     };
 
@@ -37,7 +40,7 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
-    private _createSuite = (name: string): Suite => ({ name: name, tests: [], subSuites: null })
+    private _createSuite = (name: string): Suite => ({ name: name, tests: [], numSubTests: 0, subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
     private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
@@ -86,6 +89,49 @@ class SuiteMetrics implements ISuiteMetrics {
         return true;
     }
 
+    // Adds a new test (suite can not exist)
+    private _addTest(name: string[]): void {
+
+        let suite: Suite = this._topLevelSuite;
+
+        for (let i = 0; i < name.length - 1; ++i) {
+
+            suite.numSubTests++;
+
+            if (suite.subSuites === null) {
+                suite.subSuites = new Map<string, Suite>();
+            }
+            if (!suite.subSuites.has(name[i])) {
+                suite.subSuites.set(name[i], this._createSuite(name[i]));
+            }
+
+            suite = suite.subSuites.get(name[i]) as Suite;
+        }
+        this._currentSuite = suite;
+
+        const test: Test = {
+            name: name[name.length - 1],
+            startTimestamp: -1,
+            endTimestamp: -1,
+            duration: -1,
+            completed: false,
+            testNumber: ++this._currentTestNum,
+            suiteTestNumber: suite.tests.length + 1
+        };
+
+        suite.tests.push(test);
+    }
+
+    /**
+     * Gets an instance on this class. Simplifies having one accessible metrics instance for many classes
+     */
+    public getInstance(): SuiteMetrics {
+        if (!SuiteMetrics._instance) {
+            SuiteMetrics._instance = new SuiteMetrics();
+        }
+        return SuiteMetrics._instance;
+    }
+
     /**
      * Starts a new test. Call directly before the test for maximum accuracy
      *
@@ -96,20 +142,9 @@ class SuiteMetrics implements ISuiteMetrics {
     public startTest(name: string[]): void {
         this._validateName(name, true);
 
-        this._currentSuite = this._getSuite(name, true, true);
-        const test: Test = {
-            name: name[name.length - 1],
-            startTimestamp: -1,
-            endTimestamp: -1,
-            duration: -1,
-            completed: false,
-            testNumber: ++this._currentTestNum,
-            suiteTestNumber: this._currentSuite.tests.length + 1
-        };
+        this._addTest(name);
 
-        this._currentSuite.tests.push(test);
-
-        this._currentTime = microtime.now(); // Do this last to ensure the time is as accurate as possible
+        this._currentTime = microtime.now(); // Last to ensure the time is as accurate as possible
     }
 
     /**
@@ -252,7 +287,8 @@ class SuiteMetrics implements ISuiteMetrics {
 
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
-        lines.push(`${indentStr}  Tests: ${suite.tests.length}`);
+        lines.push(`${indentStr}  Sub-Suite Tests: ${suite.numSubTests}`);
+        lines.push(`${indentStr}  Direct Tests: ${suite.tests.length}`);
 
         for (const test of suite.tests) {
             lines.push(`${indentStr}    Test: ${test.name}`);
@@ -269,7 +305,8 @@ class SuiteMetrics implements ISuiteMetrics {
     /**
      * Returns a formatted string of all the test suite metrics
      *
-     * @param topLevelSuite Include the default top-level suite, summarizing all other suites inside it
+     * @param topLevelSuite (Defaults to true) Include the default top-level suite, summarizing all other suites
+     * inside it
      */
     public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
         const lines: string[] = [];
