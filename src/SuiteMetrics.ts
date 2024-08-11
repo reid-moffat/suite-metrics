@@ -190,6 +190,28 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     /**
+     * Gets the metrics for a test (name, start/stop, duration, completion, order). Throws an error if the test does not
+     * exist
+     *
+     * @param name Name of the test to get metrics for. E.g. ['suite1', 'suite2', 'test1'] means there is a top-level
+     * suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which
+     * we want to get metrics for
+     */
+    public getTestMetrics(name: string[]): Test {
+        this._validateName(name, true);
+
+        const suite: Suite = this._getSuite(name, false, true);
+
+        const test: Test | undefined = suite.tests.find((test) => test.name === name[name.length - 1]);
+
+        if (!test) {
+            throw new Error(`Test ${name.toString()} does not exist`);
+        }
+
+        return test;
+    }
+
+    /**
      * Gets the metrics for a suite - suite metadata (name, parents, children) and test metrics (number of tests,
      * total time, average time)
      *
