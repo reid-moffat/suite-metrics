@@ -121,7 +121,10 @@ class SuiteMetrics implements ISuiteMetrics {
             suiteTestNumber: (suite.tests?.size ?? 0) + 1
         };
 
-        suite.tests?.set(test.name, test);
+        if (!suite.tests) {
+            suite.tests = new Map<string, Test>();
+        }
+        suite.tests.set(test.name, test);
     }
 
     /**
