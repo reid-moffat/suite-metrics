@@ -8,17 +8,18 @@ class SuiteMetrics implements ISuiteMetrics {
     private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
         name: "<Top-Level suite>",
-        tests: [],
+        tests: null,
         numSubTests: 0,
         subSuites: this._suite
     };
 
     // Tracks current test from startTest() to simplify stopTest() logic + increase accuracy
     private _currentSuite: Suite | null = null;
+    private _currentTest: string | null = null;
     private _currentTime: number = 0;
 
     // How many tests have occurred so far
-    private _currentTestNum: number = 0;
+    private _numTests: number = 0;
 
     // Throws an error if the given name is invalid
     private _validateName(name: string[], test: boolean): void {
@@ -40,7 +41,7 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
-    private _createSuite = (name: string): Suite => ({ name: name, tests: [], numSubTests: 0, subSuites: null })
+    private _createSuite = (name: string): Suite => ({ name: name, tests: null, numSubTests: 0, subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
     private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
@@ -76,10 +77,10 @@ class SuiteMetrics implements ISuiteMetrics {
         for (let i = 0; i < name.length - (test ? 0 : 1); ++i) {
 
             if (test && i === name.length - 1) {
-                return suite.tests.some((test) => test.name === name[i]);
+                return suite.tests?.has(name[i]) ?? false;
             }
 
-            let subSuite = suite.subSuites?.get(name[i]);
+            let subSuite: Suite | undefined = suite.subSuites?.get(name[i]);
             if (!subSuite) {
                 return false;
             }
@@ -108,6 +109,7 @@ class SuiteMetrics implements ISuiteMetrics {
             suite = suite.subSuites.get(name[i]) as Suite;
         }
         this._currentSuite = suite;
+        this._currentTest = name[name.length - 1];
 
         const test: Test = {
             name: name[name.length - 1],
@@ -115,17 +117,20 @@ class SuiteMetrics implements ISuiteMetrics {
             endTimestamp: -1,
             duration: -1,
             completed: false,
-            testNumber: ++this._currentTestNum,
-            suiteTestNumber: suite.tests.length + 1
+            testNumber: ++this._numTests,
+            suiteTestNumber: (suite.tests?.size ?? 0) + 1
         };
 
-        suite.tests.push(test);
+        if (!suite.tests) {
+            suite.tests = new Map<string, Test>();
+        }
+        suite.tests.set(test.name, test);
     }
 
     /**
      * Gets an instance on this class. Simplifies having one accessible metrics instance for many classes
      */
-    public getInstance(): SuiteMetrics {
+    public static getInstance(): SuiteMetrics {
         if (!SuiteMetrics._instance) {
             SuiteMetrics._instance = new SuiteMetrics();
         }
@@ -157,7 +162,7 @@ class SuiteMetrics implements ISuiteMetrics {
             throw new Error('No test currently being measured - run startTest() first');
         }
 
-        const test: Test = this._currentSuite.tests[this._currentSuite.tests.length - 1];
+        const test: Test = this._currentSuite.tests?.get(this._currentTest as string) as Test;
 
         test.startTimestamp = this._currentTime;
         test.endTimestamp = endTimestamp;
@@ -190,6 +195,27 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     /**
+     * Gets the metrics for a test (name, start/stop, duration, completion, order). Throws an error if the test does not
+     * exist
+     *
+     * @param name Name of the test to get metrics for. E.g. ['suite1', 'suite2', 'test1'] means there is a top-level
+     * suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which
+     * we want to get metrics for
+     */
+    public getTestMetrics(name: string[]): Test {
+        this._validateName(name, true);
+
+        const suite: Suite = this._getSuite(name, false, true);
+
+        const test: Test | undefined = suite.tests?.get(name[name.length - 1]);
+        if (!test) {
+            throw new Error(`Test ${name.toString()} does not exist`);
+        }
+
+        return test;
+    }
+
+    /**
      * Gets the metrics for a suite - suite metadata (name, parents, children) and test metrics (number of tests,
      * total time, average time)
      *
@@ -204,8 +230,9 @@ class SuiteMetrics implements ISuiteMetrics {
 
         const suite: Suite = this._getSuite(name, false, false);
 
-        const directNumTests = suite.tests.length;
-        const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+        const directNumTests: number = suite.tests?.size ?? 0;
+        let directTotalTime: number = 0;
+        suite.tests?.forEach((test) => directTotalTime += test.duration);
 
         return {
             name: suite.name,
@@ -221,8 +248,9 @@ class SuiteMetrics implements ISuiteMetrics {
 
     // Recursive helper for getSuiteMetricsRecursive()
     private _subSuiteMetrics(suite: Suite): [number, number] {
-        let numTests = suite.tests.length;
-        let totalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+        let numTests = suite.tests?.size ?? 0;
+        let totalTime = 0;
+        suite.tests?.forEach((test) => totalTime += test.duration);
 
         if (suite.subSuites) {
             for (let subSuite of suite.subSuites.values()) {
@@ -247,8 +275,9 @@ class SuiteMetrics implements ISuiteMetrics {
 
         const suite: Suite = this._getSuite(name, false, false);
 
-        const directNumTests = suite.tests.length;
-        const directTotalTime = suite.tests.reduce((acc, test) => acc + test.duration, 0);
+        const directNumTests: number = suite.tests?.size ?? 0;
+        let directTotalTime: number = 0;
+        suite.tests?.forEach((test) => directTotalTime += test.duration);
 
         let subNumTests = 0;
         let subTotalTime = 0;
@@ -285,19 +314,31 @@ class SuiteMetrics implements ISuiteMetrics {
 
     private _printSuiteHelper(suite: Suite, lines: string[], indent: number): void {
 
+        let duration = 0;
+        if (suite.tests !== null) {
+            suite.tests.forEach((test) => duration += test.duration);
+        }
+
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
-        lines.push(`${indentStr}  Sub-Suite Tests: ${suite.numSubTests}`);
-        lines.push(`${indentStr}  Direct Tests: ${suite.tests.length}`);
+        lines.push(`${indentStr}  Summary:`);
+        lines.push(`${indentStr}    - Total direct tests: ${suite.tests?.size ?? 0}`);
+        lines.push(`${indentStr}      Total duration: ${(duration / 1000).toFixed(2)} ms`);
+        lines.push(`${indentStr}    - Total direct Sub-Suites: ${suite.subSuites?.size ?? 0}`);
+        lines.push(`${indentStr}    - Total Sub-Suite tests: ${suite.numSubTests}`);
 
-        for (const test of suite.tests) {
-            lines.push(`${indentStr}    Test: ${test.name}`);
-            lines.push(`${indentStr}    Duration: ${test.duration}`);
+        if (suite.tests !== null) {
+            lines.push(`\n${indentStr}  Tests:`);
+            let num = 1;
+            for (const test of suite.tests.values()) {
+                lines.push(`${indentStr}    ${num++}) '${test.name}': ${(test.duration / 1000).toFixed(2)} ms`);
+            }
         }
 
         if (suite.subSuites !== null) {
+            lines.push(`\n${indentStr}  Sub-Suites:`);
             for (const subSuite of suite.subSuites.values() ) {
-                this._printSuiteHelper(subSuite, lines, indent + 2);
+                this._printSuiteHelper(subSuite, lines, indent + 4);
             }
         }
     }

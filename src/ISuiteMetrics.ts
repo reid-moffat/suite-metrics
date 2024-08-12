@@ -10,7 +10,7 @@ type Test = {
 
 type Suite = {
     readonly name: string;
-    readonly tests: Test[];
+    tests: Map<string, Test> | null;
     numSubTests: number;
     subSuites: Map<string, Suite> | null;
 };
