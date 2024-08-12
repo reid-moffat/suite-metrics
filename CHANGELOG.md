@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 1.2.0
+
+### Minor Changes
+
+- f611f21: Fixed singleton bug (should be static). Added method to get metrics for a specific test. Improved printed metrics formatting + data.
+
 ## 1.1.0
 
 ### Minor Changes
