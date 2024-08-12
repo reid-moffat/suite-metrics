@@ -316,19 +316,22 @@ class SuiteMetrics implements ISuiteMetrics {
 
         const indentStr = ' '.repeat(indent);
         lines.push(`${indentStr}Suite: ${suite.name}`);
-        lines.push(`${indentStr}  Sub-Suite Tests: ${suite.numSubTests}`);
-        lines.push(`${indentStr}  Direct Tests: ${suite.tests?.size ?? 0}`);
+        lines.push(`${indentStr}  Summary:`);
+        lines.push(`${indentStr}    - Tests in this Suite: ${suite.tests?.size ?? 0}`);
+        lines.push(`${indentStr}    - Tests in Sub-Suites: ${suite.numSubTests}`);
 
         if (suite.tests !== null) {
+            lines.push(`\n${indentStr}  Tests:`);
+            let num = 1;
             for (const test of suite.tests.values()) {
-                lines.push(`${indentStr}    Test: ${test.name}`);
-                lines.push(`${indentStr}    Duration: ${test.duration}`);
+                lines.push(`${indentStr}    ${num++}) '${test.name}': ${(test.duration / 1000).toFixed(2)} ms`);
             }
         }
 
         if (suite.subSuites !== null) {
+            lines.push(`\n${indentStr}  Sub-Suites:`);
             for (const subSuite of suite.subSuites.values() ) {
-                this._printSuiteHelper(subSuite, lines, indent + 2);
+                this._printSuiteHelper(subSuite, lines, indent + 4);
             }
         }
     }
