@@ -139,6 +139,13 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     /**
+     * Resets the singleton instance of this class, wiping all data on it to start fresh
+     */
+    public static resetInstance(): void {
+        SuiteMetrics._instance = new SuiteMetrics();
+    }
+
+    /**
      * Gets the path of a suite/test from the given Mocha suite, allowing you to just pass 'this' and generate a
      * valid name for this package instead of maintaining literal arrays of strings
      *
