@@ -154,7 +154,7 @@ class SuiteMetrics implements ISuiteMetrics {
      *
      * @param suite Mocha context to get the path from (call with 'this' from inside a Mocha suite/test)
      */
-    public static getNameFromSuite(suite: Mocha.Suite | Mocha.Context): string[] {
+    public static getNameFromMocha(suite: Mocha.Suite | Mocha.Context): string[] {
 
         if (!(suite instanceof Mocha.Suite) && !(suite instanceof Mocha.Context)) {
             throw new Error("Suite parameter of getNameFromSuite is not a Mocha Suite or Context - make sure this is" +
