@@ -56,7 +56,7 @@ suite("Basic test suite", () => {
         expect(metricsString).to.be.a("string");
 
 
-        console.log(metrics.getSuiteMetricsRecursive([]));
+        console.log(JSON.stringify(metrics.getSuiteMetricsRecursive([]), null, 4));
     });
 
     suite("Sub-suite", () => {
