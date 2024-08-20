@@ -1,7 +1,7 @@
 {
   "name": "suite-metrics",
   "version": "1.2.0",
-  "description": "",
+  "description": "Easily keep track of metrics for many nested test suites",
   "author": "Reid Moffat <reid.moffat9@gmail.com>",
   "license": "MIT",
   "keywords": [
@@ -11,18 +11,17 @@
     "benchmark",
     "performance",
     "time",
-    "test metrics",
-    "suite metrics",
-    "test-metrics",
-    "suite-metrics",
+    "microseconds",
+    "microtime",
     "mocha",
+    "mocha-metrics",
     "jest",
     "recursive",
     "nested",
-    "many tests",
-    "many suites",
-    "many test suites",
-    "many test cases"
+    "performance-tracking",
+    "benchmarking",
+    "execution-time",
+    "performance-metrics"
   ],
   "type": "module",
   "main": "dist/index.js",
@@ -33,20 +32,20 @@
     "test": "cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha --ui tdd",
     "build": "tsup src/index.ts --format cjs,esm --dts --minify",
     "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) npm run deploy (verify files look good)\"",
-    "deploy": "npm run build && npm publish"
+    "deploy": "git checkout main && git pull && npm run build && npm publish"
   },
   "files": [
     "CHANGELOG.md",
     "dist"
   ],
   "dependencies": {
-    "microtime": "^3.1.1"
+    "microtime": "^3.1.1",
+    "@types/mocha": "^10.0.7"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "@types/chai": "^4.3.17",
     "@types/microtime": "^2.1.2",
-    "@types/mocha": "^10.0.7",
     "@types/node": "^22.1.0",
     "chai": "^5.1.1",
     "cross-env": "^7.0.3",

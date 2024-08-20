@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.js";
+import * as Mocha from 'mocha';
 
 class SuiteMetrics implements ISuiteMetrics {
 
@@ -22,15 +23,23 @@ class SuiteMetrics implements ISuiteMetrics {
     private _numTests: number = 0;
 
     // Throws an error if the given name is invalid
-    private _validateName(name: string[], test: boolean): void {
+    private _validateName({ name, test = false, topLevelAllowed = false } : { name: string[] | Mocha.Context, test?: boolean, topLevelAllowed?: boolean }): string[] {
+
+        // Convert Mocha context -> name array
+        if (name instanceof Mocha.Context) {
+            name = SuiteMetrics.getNameFromMocha(name);
+        }
+
         if (!Array.isArray(name)) {
             throw new Error('Invalid test/suite name - must be a delimiter string or an array of strings');
         }
 
-        if (name.length === 0) {
+        if (topLevelAllowed && test) {
+            throw new Error('Cannot call _validateName with both topLevelAllowed and test as both');
+        }
+        if (!topLevelAllowed && name.length === 0) {
             throw new Error('Test/suite name cannot be empty - must define a path');
         }
-
         if (test && name.length === 1) {
             throw new Error('Test must be inside at least one suite - i.e. name should be at least two strings (suite + test)');
         }
@@ -38,13 +47,15 @@ class SuiteMetrics implements ISuiteMetrics {
         if (!name.every((value) => typeof value === 'string')) {
             throw new Error('Invalid test/suite name - must be an array of strings');
         }
+
+        return name;
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
     private _createSuite = (name: string): Suite => ({ name: name, tests: null, numSubTests: 0, subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
-    private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
+    private _getSuite({ name, createIfAbsent = false, test = false } : { name: string[], createIfAbsent?: boolean, test?: boolean }): Suite {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - (test ? 1 : 0); ++i) {
 
@@ -138,16 +149,51 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     /**
+     * Resets the singleton instance of this class, wiping all data on it to start fresh
+     */
+    public static resetInstance(): void {
+        SuiteMetrics._instance = new SuiteMetrics();
+    }
+
+    /**
+     * Gets the path of a suite/test from the given Mocha suite. Allows you to just pass 'this' from a test and
+     * generate a valid name for this package instead of maintaining literal arrays of strings
+     *
+     * Note: For this to work, the suite/test this was directly called from must be using the function() {} notation,
+     * not the arrow function notation () => {}
+     *
+     * @param suite Mocha context to get the path from (call with 'this' from inside a Mocha suite/test)
+     */
+    public static getNameFromMocha(suite: Mocha.Suite | Mocha.Context): string[] {
+
+        if (!(suite instanceof Mocha.Suite) && !(suite instanceof Mocha.Context)) {
+            throw new Error("Suite parameter of getNameFromSuite is not a Mocha Suite or Context - make sure this is" +
+                " being called from a Mocha suite/test and it's using the function() {} notation, not () => {}");
+        }
+
+        const path = [];
+        let current: Mocha.Suite | Mocha.Runnable | undefined = suite instanceof Mocha.Context ? suite.test : suite;
+
+        while (current && current.title) {
+            path.unshift(current.title);
+            current = current.parent;
+        }
+
+        return path;
+    }
+
+    /**
      * Starts a new test. Call directly before the test for maximum accuracy
      *
      * @param name Suites the test is part of, then the test name (in order). E.g. ['suite1', 'suite2', 'test1'] means
      * there is a top-level suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it
-     * named 'test1' which we want to measure
+     * named 'test1' which we want to measure. Can also pass a Mocha context ('this') to get the name from it
      */
-    public startTest(name: string[]): void {
-        this._validateName(name, true);
+    public startTest(name: string[] | Mocha.Context): void {
 
-        this._addTest(name);
+        const path = this._validateName({ name: name, test: true });
+
+        this._addTest(path);
 
         this._currentTime = microtime.now(); // Last to ensure the time is as accurate as possible
     }
@@ -179,7 +225,7 @@ class SuiteMetrics implements ISuiteMetrics {
      * 'suite1', which has a suite inside it named 'suite2' which we want to check if it exists
      */
     public suiteExists(name: string[]): boolean {
-        this._validateName(name, false);
+        this._validateName({ name: name, topLevelAllowed: true });
         return this._exists(name, false);
     }
 
@@ -190,7 +236,7 @@ class SuiteMetrics implements ISuiteMetrics {
      * to check if it exists
      */
     public testExists(name: string[]): boolean {
-        this._validateName(name, true);
+        this._validateName({ name: name, test: true });
         return this._exists(name, true);
     }
 
@@ -200,19 +246,27 @@ class SuiteMetrics implements ISuiteMetrics {
      *
      * @param name Name of the test to get metrics for. E.g. ['suite1', 'suite2', 'test1'] means there is a top-level
      * suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which
-     * we want to get metrics for
+     * we want to get metrics for. Can also pass a Mocha context ('this') to get the name from it
      */
-    public getTestMetrics(name: string[]): Test {
-        this._validateName(name, true);
+    public getTestMetrics(name: string[] | Mocha.Context): Test {
 
-        const suite: Suite = this._getSuite(name, false, true);
+        const path = this._validateName({ name: name, test: true });
+        const suite: Suite = this._getSuite({ name: path, test: true });
 
-        const test: Test | undefined = suite.tests?.get(name[name.length - 1]);
+        const test: Test | undefined = suite.tests?.get(path[path.length - 1]);
         if (!test) {
             throw new Error(`Test ${name.toString()} does not exist`);
         }
 
-        return test;
+        return {
+            name: test.name,
+            startTimestamp: test.startTimestamp,
+            endTimestamp: test.endTimestamp,
+            duration: test.duration,
+            completed: test.completed,
+            testNumber: test.testNumber,
+            suiteTestNumber: test.suiteTestNumber
+        };
     }
 
     /**
@@ -223,12 +277,13 @@ class SuiteMetrics implements ISuiteMetrics {
      * sub-suites of this suite, use getSuiteMetricsRecursive() instead
      *
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
-     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
+     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for. Can also pass a
+     * Mocha context ('this') to get the name from it, or an empty array to get metrics for the top-level suite
      */
-    public getSuiteMetrics(name: string[]): SuiteData {
-        this._validateName(name, false);
+    public getSuiteMetrics(name: string[] | Mocha.Context): SuiteData {
 
-        const suite: Suite = this._getSuite(name, false, false);
+        const path = this._validateName({ name: name, topLevelAllowed: true });
+        const suite: Suite = this._getSuite({ name: path });
 
         const directNumTests: number = suite.tests?.size ?? 0;
         let directTotalTime: number = 0;
@@ -236,7 +291,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: name.slice(0, name.length - 1),
+            parentSuites: path.slice(0, path.length - 1),
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             testMetrics: {
                 numTests: directNumTests,
@@ -268,12 +323,13 @@ class SuiteMetrics implements ISuiteMetrics {
      * (number of tests, total time, average time)
      *
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
-     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
+     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for. Can also pass a
+     * Mocha context ('this') to get the name from it, or an empty array to get metrics for the top-level suite
      */
-    public getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
-        this._validateName(name, false);
+    public getSuiteMetricsRecursive(name: string[] | Mocha.Context): RecursiveSuiteData {
 
-        const suite: Suite = this._getSuite(name, false, false);
+        const path = this._validateName({ name: name, topLevelAllowed: true });
+        const suite: Suite = this._getSuite({ name: path });
 
         const directNumTests: number = suite.tests?.size ?? 0;
         let directTotalTime: number = 0;
@@ -292,7 +348,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: name.slice(0, name.length - 1),
+            parentSuites: path.slice(0, path.length - 1),
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             directTestMetrics: {
                 numTests: directNumTests,
@@ -346,8 +402,7 @@ class SuiteMetrics implements ISuiteMetrics {
     /**
      * Returns a formatted string of all the test suite metrics
      *
-     * @param topLevelSuite (Defaults to true) Include the default top-level suite, summarizing all other suites
-     * inside it
+     * @param topLevelSuite (Defaults to true) Include the default top-level suite, providing a summary of all suites
      */
     public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
         const lines: string[] = [];

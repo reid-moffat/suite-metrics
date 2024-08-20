@@ -4,14 +4,21 @@ import SuiteMetrics from "../src/index.ts";
 const metrics = new SuiteMetrics();
 
 suite("Basic test suite", () => {
-    test("Simple test", () => {
 
-        metrics.startTest(["Basic test suite", "start test"]);
+    test("get name", function() {
+        const name = SuiteMetrics.getNameFromMocha(this);
+
+        expect(name).to.deep.equal(["Basic test suite", "get name"]);
+    });
+
+    test("Simple test", function() {
+
+        metrics.startTest(this);
         expect(true).to.equal(true);
         metrics.stopTest();
 
         expect(metrics.suiteExists(["Basic test suite"])).to.equal(true);
-        expect(metrics.testExists(["Basic test suite", "start test"])).to.equal(true);
+        expect(metrics.testExists(["Basic test suite", "Simple test"])).to.equal(true);
 
         const suiteData = metrics.getSuiteMetrics(["Basic test suite"]);
         console.log("Suite metrics: " + JSON.stringify(suiteData, null, 4));
@@ -47,6 +54,9 @@ suite("Basic test suite", () => {
         const metricsString = metrics.printAllSuiteMetrics(false);
         console.log("\nMetrics string:\n" + metricsString);
         expect(metricsString).to.be.a("string");
+
+
+        console.log(JSON.stringify(metrics.getSuiteMetricsRecursive([]), null, 4));
     });
 
     suite("Sub-suite", () => {
