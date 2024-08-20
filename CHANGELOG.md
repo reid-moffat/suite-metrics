@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 1.3.1
+
+### Patch Changes
+
+- 9574848: Removed buggy Mocha context validation. Can be done relatively easily with a helper method if desired.
+
 ## 1.3.0
 
 ### Minor Changes
