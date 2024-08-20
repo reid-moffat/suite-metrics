@@ -154,7 +154,7 @@ class SuiteMetrics implements ISuiteMetrics {
      *
      * @param name Suites the test is part of, then the test name (in order). E.g. ['suite1', 'suite2', 'test1'] means
      * there is a top-level suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it
-     * named 'test1' which we want to measure. Can also pass a Mocha context ('this') to get the name from it
+     * named 'test1' which we want to measure
      */
     public startTest(name: string[]): void {
 
@@ -213,7 +213,7 @@ class SuiteMetrics implements ISuiteMetrics {
      *
      * @param name Name of the test to get metrics for. E.g. ['suite1', 'suite2', 'test1'] means there is a top-level
      * suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which
-     * we want to get metrics for. Can also pass a Mocha context ('this') to get the name from it
+     * we want to get metrics for
      */
     public getTestMetrics(name: string[]): Test {
 
@@ -290,8 +290,8 @@ class SuiteMetrics implements ISuiteMetrics {
      * (number of tests, total time, average time)
      *
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
-     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for. Can also pass a
-     * Mocha context ('this') to get the name from it, or an empty array to get metrics for the top-level suite
+     * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for. Can also pass an
+     * empty array to get metrics for the top-level suite
      */
     public getSuiteMetricsRecursive(name: string[]): RecursiveSuiteData {
 
