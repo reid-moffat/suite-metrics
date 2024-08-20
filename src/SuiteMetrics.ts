@@ -23,7 +23,13 @@ class SuiteMetrics implements ISuiteMetrics {
     private _numTests: number = 0;
 
     // Throws an error if the given name is invalid
-    private _validateName(name: string[], test: boolean): void {
+    private _validateName(name: string[] | Mocha.Context, test: boolean): string[] {
+
+        // Convert Mocha context -> name array
+        if (name instanceof Mocha.Context) {
+            name = SuiteMetrics.getNameFromMocha(name);
+        }
+
         if (!Array.isArray(name)) {
             throw new Error('Invalid test/suite name - must be a delimiter string or an array of strings');
         }
@@ -39,6 +45,8 @@ class SuiteMetrics implements ISuiteMetrics {
         if (!name.every((value) => typeof value === 'string')) {
             throw new Error('Invalid test/suite name - must be an array of strings');
         }
+
+        return name;
     }
 
     // Creates a default suite (given name, no tests and no sub-suites)
@@ -181,8 +189,7 @@ class SuiteMetrics implements ISuiteMetrics {
      */
     public startTest(name: string[] | Mocha.Context): void {
 
-        const path = name instanceof Mocha.Context ? SuiteMetrics.getNameFromMocha(name) : name;
-        this._validateName(path, true);
+        const path = this._validateName(name, true);
 
         this._addTest(path);
 
