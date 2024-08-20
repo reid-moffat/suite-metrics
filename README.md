@@ -1,5 +1,9 @@
 # suite-metrics
 
+[![npm](https://img.shields.io/npm/v/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
+[![npm](https://img.shields.io/npm/dt/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
+[![npm](https://img.shields.io/npm/l/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
+
 Easily keep track of metrics for many nested test suites
 
 Features:
@@ -7,7 +11,8 @@ Features:
 - **Flexible Nesting**: Organize tests in any number of nested suites with any structure
 - **Comprehensive Metrics**: Collect data for top-level suites, sub-suites, and individual tests
 - **Simple Interface**: Easily integrate into your testing workflow with only a few lines of code
-- **Concurrency Support**: Allows for tracking of multiple concurrent tests
+
+[comment]: <> (**Concurrency Support**: Allows for tracking of multiple concurrent tests)
 
 ## 📦 Installation
 
