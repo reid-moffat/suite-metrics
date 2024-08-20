@@ -1,6 +1,6 @@
 {
   "name": "suite-metrics",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Easily keep track of metrics for many nested test suites",
   "author": "Reid Moffat <reid.moffat9@gmail.com>",
   "license": "MIT",
