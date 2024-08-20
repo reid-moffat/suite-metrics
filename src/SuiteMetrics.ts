@@ -278,10 +278,11 @@ class SuiteMetrics implements ISuiteMetrics {
      * @param name Name of the suite to get metrics for. E.g. ['suite1', 'suite2'] means there is a top-level suite
      * named 'suite1', which has a suite inside it named 'suite2' which we want to get metrics for
      */
-    public getSuiteMetrics(name: string[]): SuiteData {
-        this._validateName(name, false);
+    public getSuiteMetrics(name: string[] | Mocha.Context): SuiteData {
 
-        const suite: Suite = this._getSuite(name, false, false);
+        const path = this._validateName(name, false);
+
+        const suite: Suite = this._getSuite(path, false, false);
 
         const directNumTests: number = suite.tests?.size ?? 0;
         let directTotalTime: number = 0;
@@ -289,7 +290,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: name.slice(0, name.length - 1),
+            parentSuites: path.slice(0, path.length - 1),
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             testMetrics: {
                 numTests: directNumTests,
