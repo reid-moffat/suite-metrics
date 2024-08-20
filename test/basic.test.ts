@@ -4,6 +4,11 @@ import SuiteMetrics from "../src/index.ts";
 const metrics = new SuiteMetrics();
 
 suite("Basic test suite", () => {
+
+    test("get name", function() {
+        SuiteMetrics.getNameFromSuite(this);
+    });
+
     test("Simple test", () => {
 
         metrics.startTest(["Basic test suite", "start test"]);

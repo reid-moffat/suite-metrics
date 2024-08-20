@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.js";
+import * as Mocha from 'mocha';
 
 class SuiteMetrics implements ISuiteMetrics {
 
@@ -135,6 +136,32 @@ class SuiteMetrics implements ISuiteMetrics {
             SuiteMetrics._instance = new SuiteMetrics();
         }
         return SuiteMetrics._instance;
+    }
+
+    /**
+     * Gets the path of a suite/test from the given Mocha suite, allowing you to just pass 'this' and generate a
+     * valid name for this package instead of maintaining literal arrays of strings
+     *
+     * Note: For this to work, the suite/test this was directly called from must be using the function() {} notation,
+     * not the arrow function notation () => {}
+     *
+     * @param suite Mocha context to get the path from (call with 'this' from inside a Mocha suite/test)
+     */
+    public static getNameFromSuite(suite: Mocha.Suite | Mocha.Context): string[] {
+        if (suite === undefined) {
+            throw new Error("Suite is undefined in getPath - make sure the suite this is being called from is using the" +
+                " function() {} notation, not () => {}");
+        }
+
+        const suites = [];
+        let current: Mocha.Suite | Mocha.Runnable | undefined = suite instanceof Mocha.Context ? suite.test : suite;
+
+        while (current && current.title) {
+            suites.unshift(current.title);
+            current = current.parent;
+        }
+
+        return suites;
     }
 
     /**
