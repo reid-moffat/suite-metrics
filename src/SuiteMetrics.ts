@@ -146,8 +146,8 @@ class SuiteMetrics implements ISuiteMetrics {
     }
 
     /**
-     * Gets the path of a suite/test from the given Mocha suite, allowing you to just pass 'this' and generate a
-     * valid name for this package instead of maintaining literal arrays of strings
+     * Gets the path of a suite/test from the given Mocha suite. Allows you to just pass 'this' from a test and
+     * generate a valid name for this package instead of maintaining literal arrays of strings
      *
      * Note: For this to work, the suite/test this was directly called from must be using the function() {} notation,
      * not the arrow function notation () => {}
@@ -155,20 +155,21 @@ class SuiteMetrics implements ISuiteMetrics {
      * @param suite Mocha context to get the path from (call with 'this' from inside a Mocha suite/test)
      */
     public static getNameFromSuite(suite: Mocha.Suite | Mocha.Context): string[] {
-        if (suite === undefined) {
-            throw new Error("Suite is undefined in getPath - make sure the suite this is being called from is using the" +
-                " function() {} notation, not () => {}");
+
+        if (!(suite instanceof Mocha.Suite) && !(suite instanceof Mocha.Context)) {
+            throw new Error("Suite parameter of getNameFromSuite is not a Mocha Suite or Context - make sure this is" +
+                " being called from a Mocha suite/test and it's using the function() {} notation, not () => {}");
         }
 
-        const suites = [];
+        const path = [];
         let current: Mocha.Suite | Mocha.Runnable | undefined = suite instanceof Mocha.Context ? suite.test : suite;
 
         while (current && current.title) {
-            suites.unshift(current.title);
+            path.unshift(current.title);
             current = current.parent;
         }
 
-        return suites;
+        return path;
     }
 
     /**

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@types/mocha':
+        specifier: ^10.0.7
+        version: 10.0.7
       microtime:
         specifier: ^3.1.1
         version: 3.1.1
@@ -21,9 +24,6 @@ importers:
       '@types/microtime':
         specifier: ^2.1.2
         version: 2.1.2
-      '@types/mocha':
-        specifier: ^10.0.7
-        version: 10.0.7
       '@types/node':
         specifier: ^22.1.0
         version: 22.1.0
