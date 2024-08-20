@@ -11,6 +11,7 @@ Features:
 - **Flexible Nesting**: Organize tests in any number of nested suites with any structure
 - **Comprehensive Metrics**: Collect data for top-level suites, sub-suites, and individual tests
 - **Simple Interface**: Easily integrate into your testing workflow with only a few lines of code
+- **Mocha integration**: Use 'this' in place of test/suite names in Mocha
 
 [comment]: <> (**Concurrency Support**: Allows for tracking of multiple concurrent tests)
 
@@ -38,12 +39,15 @@ const metrics = SuiteMetrics.getInstance();
 
 // Alternatively, create a new instance for isolated metrics
 const metrics = new SuiteMetrics();
+
+// Reset the singleton instance to clear data (not required for new instances)
+SuiteMetrics.resetInstance();
 ```
 
 ### Tracking Tests
 
 ```typescript
-// Start tracking a test (call directly before test logic for maximum accuracy)
+// Start tracking a test (directly before test logic for best accuracy)
 metrics.startTest(["Suite Name", "Sub-suite name", "Test Name"]);
 
 // Execute your test logic here...
@@ -55,13 +59,16 @@ metrics.endTest();
 ### Getting Metrics
 
 ```typescript
-// Simple summary of all suites and tests - number of tests/suites, total/average time, etc.
+// Simple summary of all suites and tests - # test/suites, total/avg time
 console.log(metrics.printAllSuiteMetrics());
 
-// Detailed metrics for a specific suite
+// Detailed metrics for a specific test
+metrics.getTestMetrics(["Suite Name", "Test Name"]);
+
+// Detailed metrics for a specific suite and its direct tests
 metrics.getSuiteMetrics(["Suite Name"]);
 
-// Detailed metrics for a specific suite and all sub-suites
+// Detailed metrics for a specific suite and all sub-suites & sub-tests
 metrics.getSuiteMetricsRecursive(["Suite Name"]);
 
 // Helpers
