@@ -39,11 +39,11 @@
     "dist"
   ],
   "dependencies": {
-    "microtime": "^3.1.1",
-    "@types/mocha": "^10.0.7"
+    "microtime": "^3.1.1"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
+    "@types/mocha": "^10.0.7",
     "@types/chai": "^4.3.17",
     "@types/microtime": "^2.1.2",
     "@types/node": "^22.1.0",
