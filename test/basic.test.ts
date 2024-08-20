@@ -54,6 +54,9 @@ suite("Basic test suite", () => {
         const metricsString = metrics.printAllSuiteMetrics(false);
         console.log("\nMetrics string:\n" + metricsString);
         expect(metricsString).to.be.a("string");
+
+
+        console.log(metrics.getSuiteMetricsRecursive([]));
     });
 
     suite("Sub-suite", () => {
