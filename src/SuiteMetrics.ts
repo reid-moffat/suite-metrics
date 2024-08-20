@@ -246,12 +246,13 @@ class SuiteMetrics implements ISuiteMetrics {
      * suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it named 'test1' which
      * we want to get metrics for
      */
-    public getTestMetrics(name: string[]): Test {
-        this._validateName(name, true);
+    public getTestMetrics(name: string[] | Mocha.Context): Test {
 
-        const suite: Suite = this._getSuite(name, false, true);
+        const path = this._validateName(name, true);
 
-        const test: Test | undefined = suite.tests?.get(name[name.length - 1]);
+        const suite: Suite = this._getSuite(path, false, true);
+
+        const test: Test | undefined = suite.tests?.get(path[path.length - 1]);
         if (!test) {
             throw new Error(`Test ${name.toString()} does not exist`);
         }
