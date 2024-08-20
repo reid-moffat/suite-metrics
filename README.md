@@ -11,7 +11,6 @@ Features:
 - **Flexible Nesting**: Organize tests in any number of nested suites with any structure
 - **Comprehensive Metrics**: Collect data for top-level suites, sub-suites, and individual tests
 - **Simple Interface**: Easily integrate into your testing workflow with only a few lines of code
-- **Mocha integration**: Use 'this' in place of test/suite names in Mocha
 
 [comment]: <> (**Concurrency Support**: Allows for tracking of multiple concurrent tests)
 

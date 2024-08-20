@@ -3,17 +3,11 @@ import SuiteMetrics from "../src/index.ts";
 
 const metrics = new SuiteMetrics();
 
-suite("Basic test suite", () => {
-
-    test("get name", function() {
-        const name = SuiteMetrics.getNameFromMocha(this);
-
-        expect(name).to.deep.equal(["Basic test suite", "get name"]);
-    });
+suite("Basic test suite", function() {
 
     test("Simple test", function() {
 
-        metrics.startTest(this);
+        metrics.startTest(["Basic test suite", "Simple test"]);
         expect(true).to.equal(true);
         metrics.stopTest();
 
