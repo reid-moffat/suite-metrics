@@ -6,7 +6,9 @@ const metrics = new SuiteMetrics();
 suite("Basic test suite", () => {
 
     test("get name", function() {
-        SuiteMetrics.getNameFromSuite(this);
+        const name = SuiteMetrics.getNameFromSuite(this);
+
+        expect(name).to.deep.equal(["Basic test suite", "get name"]);
     });
 
     test("Simple test", () => {
