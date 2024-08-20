@@ -55,7 +55,7 @@ class SuiteMetrics implements ISuiteMetrics {
     private _createSuite = (name: string): Suite => ({ name: name, tests: null, numSubTests: 0, subSuites: null })
 
     // Gets a suite by name, with an option to create it if it doesn't exist
-    private _getSuite(name: string[], createIfAbsent: boolean, test: boolean): Suite {
+    private _getSuite({ name, createIfAbsent = false, test = false } : { name: string[], createIfAbsent?: boolean, test?: boolean }): Suite {
         let suite: Suite = this._topLevelSuite;
         for (let i = 0; i < name.length - (test ? 1 : 0); ++i) {
 
@@ -251,8 +251,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public getTestMetrics(name: string[] | Mocha.Context): Test {
 
         const path = this._validateName({ name: name, test: true });
-
-        const suite: Suite = this._getSuite(path, false, true);
+        const suite: Suite = this._getSuite({ name: path, test: true });
 
         const test: Test | undefined = suite.tests?.get(path[path.length - 1]);
         if (!test) {
@@ -284,8 +283,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public getSuiteMetrics(name: string[] | Mocha.Context): SuiteData {
 
         const path = this._validateName({ name: name, topLevelAllowed: true });
-
-        const suite: Suite = this._getSuite(path, false, false);
+        const suite: Suite = this._getSuite({ name: path });
 
         const directNumTests: number = suite.tests?.size ?? 0;
         let directTotalTime: number = 0;
@@ -331,8 +329,7 @@ class SuiteMetrics implements ISuiteMetrics {
     public getSuiteMetricsRecursive(name: string[] | Mocha.Context): RecursiveSuiteData {
 
         const path = this._validateName({ name: name, topLevelAllowed: true });
-
-        const suite: Suite = this._getSuite(path, false, false);
+        const suite: Suite = this._getSuite({ name: path });
 
         const directNumTests: number = suite.tests?.size ?? 0;
         let directTotalTime: number = 0;
