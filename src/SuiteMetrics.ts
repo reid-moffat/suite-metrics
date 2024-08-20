@@ -177,12 +177,14 @@ class SuiteMetrics implements ISuiteMetrics {
      *
      * @param name Suites the test is part of, then the test name (in order). E.g. ['suite1', 'suite2', 'test1'] means
      * there is a top-level suite named 'suite1', which has a suite inside it named 'suite2', which has a test inside it
-     * named 'test1' which we want to measure
+     * named 'test1' which we want to measure. Can also pass a Mocha context ('this') to get the name from it
      */
-    public startTest(name: string[]): void {
-        this._validateName(name, true);
+    public startTest(name: string[] | Mocha.Context): void {
 
-        this._addTest(name);
+        const path = name instanceof Mocha.Context ? SuiteMetrics.getNameFromMocha(name) : name;
+        this._validateName(path, true);
+
+        this._addTest(path);
 
         this._currentTime = microtime.now(); // Last to ensure the time is as accurate as possible
     }
