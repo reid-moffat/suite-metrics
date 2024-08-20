@@ -247,7 +247,15 @@ class SuiteMetrics implements ISuiteMetrics {
             throw new Error(`Test ${name.toString()} does not exist`);
         }
 
-        return test;
+        return {
+            name: test.name,
+            startTimestamp: test.startTimestamp,
+            endTimestamp: test.endTimestamp,
+            duration: test.duration,
+            completed: test.completed,
+            testNumber: test.testNumber,
+            suiteTestNumber: test.suiteTestNumber
+        };
     }
 
     /**
