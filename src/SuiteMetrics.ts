@@ -23,7 +23,7 @@ class SuiteMetrics implements ISuiteMetrics {
     private _numTests: number = 0;
 
     // Throws an error if the given name is invalid
-    private _validateName(name: string[] | Mocha.Context, test: boolean): string[] {
+    private _validateName({ name, test = false, topLevelAllowed = false } : { name: string[] | Mocha.Context, test?: boolean, topLevelAllowed?: boolean }): string[] {
 
         // Convert Mocha context -> name array
         if (name instanceof Mocha.Context) {
@@ -34,10 +34,12 @@ class SuiteMetrics implements ISuiteMetrics {
             throw new Error('Invalid test/suite name - must be a delimiter string or an array of strings');
         }
 
-        if (name.length === 0) {
+        if (topLevelAllowed && test) {
+            throw new Error('Cannot call _validateName with both topLevelAllowed and test as both');
+        }
+        if (!topLevelAllowed && name.length === 0) {
             throw new Error('Test/suite name cannot be empty - must define a path');
         }
-
         if (test && name.length === 1) {
             throw new Error('Test must be inside at least one suite - i.e. name should be at least two strings (suite + test)');
         }
@@ -189,7 +191,7 @@ class SuiteMetrics implements ISuiteMetrics {
      */
     public startTest(name: string[] | Mocha.Context): void {
 
-        const path = this._validateName(name, true);
+        const path = this._validateName({ name: name, test: true });
 
         this._addTest(path);
 
@@ -223,7 +225,7 @@ class SuiteMetrics implements ISuiteMetrics {
      * 'suite1', which has a suite inside it named 'suite2' which we want to check if it exists
      */
     public suiteExists(name: string[]): boolean {
-        this._validateName(name, false);
+        this._validateName({ name: name, topLevelAllowed: true });
         return this._exists(name, false);
     }
 
@@ -234,7 +236,7 @@ class SuiteMetrics implements ISuiteMetrics {
      * to check if it exists
      */
     public testExists(name: string[]): boolean {
-        this._validateName(name, true);
+        this._validateName({ name: name, test: true });
         return this._exists(name, true);
     }
 
@@ -248,7 +250,7 @@ class SuiteMetrics implements ISuiteMetrics {
      */
     public getTestMetrics(name: string[] | Mocha.Context): Test {
 
-        const path = this._validateName(name, true);
+        const path = this._validateName({ name: name, test: true });
 
         const suite: Suite = this._getSuite(path, false, true);
 
@@ -281,7 +283,7 @@ class SuiteMetrics implements ISuiteMetrics {
      */
     public getSuiteMetrics(name: string[] | Mocha.Context): SuiteData {
 
-        const path = this._validateName(name, false);
+        const path = this._validateName({ name: name, topLevelAllowed: true });
 
         const suite: Suite = this._getSuite(path, false, false);
 
@@ -328,7 +330,7 @@ class SuiteMetrics implements ISuiteMetrics {
      */
     public getSuiteMetricsRecursive(name: string[] | Mocha.Context): RecursiveSuiteData {
 
-        const path = this._validateName(name, false);
+        const path = this._validateName({ name: name, topLevelAllowed: true });
 
         const suite: Suite = this._getSuite(path, false, false);
 
