@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../src/index.ts";
+import { GenerateArray } from "generate-arrays";
 
 const metrics = new SuiteMetrics();
 
