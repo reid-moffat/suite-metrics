@@ -4,6 +4,7 @@ import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISu
 class ConcurrentSuiteMetrics implements ISuiteMetrics {
 
     private static _instance: ConcurrentSuiteMetrics;
+
     private readonly _suite: Map<string, Suite> = new Map<string, Suite>(); // All the suites stored here
     private readonly _topLevelSuite: Suite = { // Helper for iterating through suites (same structure as Suite)
         name: "<Top-Level suite>",
@@ -22,8 +23,6 @@ class ConcurrentSuiteMetrics implements ISuiteMetrics {
 
     // Lock for concurrent operations
     private _lock: Mutex = new Mutex();
-
-    // helper functions (_validateName, _addTest, etc - assume they work as expected, don't need to edit them)...
 
     private _validateName({ name, test = false, topLevelAllowed = false } : { name: string[], test?: boolean, topLevelAllowed?: boolean }): string[] {
 
