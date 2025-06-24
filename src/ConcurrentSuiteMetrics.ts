@@ -70,7 +70,7 @@ class ConcurrentSuiteMetrics implements ISuiteMetrics {
             suite = suite.subSuites.get(name[i]) as Suite;
         }
         this._currentSuite = suite;
-        this._currentTests.set(name[name.length - 1]);
+        this._currentTests.set(name.slice(0, -1), { suite: suite, test: name[name.length - 1] });
 
         const test: Test = {
             name: name[name.length - 1],
