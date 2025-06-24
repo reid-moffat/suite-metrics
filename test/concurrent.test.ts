@@ -8,7 +8,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 suite("ConcurrentSuiteMetrics Tests", function() {
     let metrics: ConcurrentSuiteMetrics;
 
-    beforeEach(function() {
+    setup(function() {
         metrics = new ConcurrentSuiteMetrics();
     });
 

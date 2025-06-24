@@ -4,11 +4,39 @@ import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISu
 class ConcurrentSuiteMetrics implements ISuiteMetrics {
 
     getSuiteMetrics(suitePath: string[]): SuiteData {
-        return undefined;
+        return {
+            name: "",
+            parentSuites: [],
+            childSuites: null,
+            testMetrics: {
+                numTests: 0,
+                totalTime: 0,
+                averageTime: null
+            }
+        };
     }
 
     getSuiteMetricsRecursive(suitePath: string[]): RecursiveSuiteData {
-        return undefined;
+        return {
+            name: "",
+            parentSuites: [],
+            childSuites: null,
+            directTestMetrics: {
+                numTests: 0,
+                totalTime: 0,
+                averageTime: null
+            },
+            subTestMetrics: {
+                numTests: 0,
+                totalTime: 0,
+                averageTime: null
+            },
+            totalTestMetrics: {
+                numTests: 0,
+                totalTime: 0,
+                averageTime: null
+            }
+        };
     }
 
     printAllSuiteMetrics(): string {
