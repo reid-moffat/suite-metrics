@@ -95,7 +95,7 @@ class SuiteMetrics implements ISuiteMetrics {
         return true;
     }
 
-    // Adds a new test (suite can not exist)
+    // Adds a new test (creating the suite if it doesn't exist)
     private _addTest(name: string[]): void {
 
         let suite: Suite = this._topLevelSuite;

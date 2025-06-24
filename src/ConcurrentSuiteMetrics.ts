@@ -24,6 +24,7 @@ class ConcurrentSuiteMetrics implements ISuiteMetrics {
     // Lock for concurrent operations
     private _lock: Mutex = new Mutex();
 
+    // Throws an error if the given name is invalid
     private _validateName({ name, test = false, topLevelAllowed = false } : { name: string[], test?: boolean, topLevelAllowed?: boolean }): string[] {
 
         if (!Array.isArray(name)) {
@@ -47,8 +48,10 @@ class ConcurrentSuiteMetrics implements ISuiteMetrics {
         return name;
     }
 
+    // Creates a default suite (given name, no tests and no sub-suites)
     private _createSuite = (name: string): Suite => ({ name: name, tests: null, numSubTests: 0, subSuites: null })
 
+    // Adds a new test (creating the suite if it doesn't exist)
     private _addTest(name: string[], time: number): void {
 
         let suite: Suite = this._topLevelSuite;
