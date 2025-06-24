@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import ConcurrentSuiteMetrics from "../src/ConcurrentSuiteMetrics.ts";
+import { SuiteData } from "../src/ISuiteMetrics.ts";
 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -142,7 +143,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             try {
                 await metrics.startTest([]);
                 expect.fail("Should have thrown error for empty test name");
-            } catch (error) {
+            } catch (error: any) {
                 expect(error.message).to.contain("empty");
             }
         });
@@ -151,7 +152,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             try {
                 await metrics.startTest(["OnlyTestName"]);
                 expect.fail("Should have thrown error for test without suite");
-            } catch (error) {
+            } catch (error: any) {
                 expect(error.message).to.contain("inside at least one suite");
             }
         });
@@ -161,7 +162,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 // @ts-ignore - intentionally passing invalid types for testing
                 await metrics.startTest(["ValidSuite", 123, "TestName"]);
                 expect.fail("Should have thrown error for non-string elements");
-            } catch (error) {
+            } catch (error: any) {
                 expect(error.message).to.contain("array of strings");
             }
         });
@@ -171,7 +172,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 // @ts-ignore - intentionally passing invalid type for testing
                 await metrics.startTest("NotAnArray");
                 expect.fail("Should have thrown error for non-array input");
-            } catch (error) {
+            } catch (error: any) {
                 expect(error.message).to.contain("must be a delimiter string or an array");
             }
         });
@@ -180,7 +181,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             try {
                 await metrics.stopTest(["Error Handling", "Non-existent test"]);
                 expect.fail("Should have thrown error for stopping non-existent test");
-            } catch (error) {
+            } catch (error: any) {
                 expect(error.message).to.contain("No test currently being measured");
             }
         });
@@ -194,7 +195,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 await metrics.startTest(path); // Should this be allowed or throw an error?
                 // Behavior depends on implementation - might overwrite or throw
                 await metrics.stopTest(path);
-            } catch (error) {
+            } catch (error: any) {
                 // If it throws, that's also valid behavior
                 console.log("Duplicate test start threw error:", error.message);
             }
@@ -297,10 +298,10 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 await metrics.stopTest(testPath);
             }
 
-            const suiteMetrics = metrics.getSuiteMetrics(suitePath);
+            const suiteMetrics: SuiteData = metrics.getSuiteMetrics(suitePath);
             expect(suiteMetrics).to.exist;
             expect(suiteMetrics.name).to.equal("Sample Suite");
-            expect(suiteMetrics.totalTests).to.equal(2);
+            expect(suiteMetrics.testMetrics.numTests).to.equal(2);
         });
 
         test("Get recursive suite metrics", async function() {
@@ -353,7 +354,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 await metrics.startTest(["Edge Cases", "", "Test"]);
                 // Some implementations might allow empty strings, others might not
                 await metrics.stopTest(["Edge Cases", "", "Test"]);
-            } catch (error) {
+            } catch (error: any) {
                 console.log("Empty suite name threw error:", error.message);
                 expect(error).to.exist;
             }
