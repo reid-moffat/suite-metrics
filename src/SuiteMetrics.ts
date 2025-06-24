@@ -1,5 +1,5 @@
 import microtime from 'microtime';
-import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.js";
+import { ISuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData } from "./ISuiteMetrics.ts";
 
 class SuiteMetrics implements ISuiteMetrics {
 
