@@ -48,9 +48,6 @@ type RecursiveSuiteData = {
 };
 
 interface ISuiteMetrics {
-    startTest(testPath: string[]): void;
-    stopTest(): void;
-
     suiteExists(suitePath: string[]): boolean;
     testExists(testPath: string[]): boolean;
 
