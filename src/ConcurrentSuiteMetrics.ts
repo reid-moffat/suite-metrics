@@ -219,15 +219,6 @@ class ConcurrentSuiteMetrics implements ISuiteMetrics {
     //     this._currentTests.delete(testID);
     // }
 
-
-    // public startTest(testPath: string[]): void {
-    //     throw new Error("Method not implemented.");
-    // }
-    //
-    // public stopTest(): void {
-    //     throw new Error("Method not implemented.");
-    // }
-
     public suiteExists(suitePath: string[]): boolean {
         throw new Error("Method not implemented.");
     }
