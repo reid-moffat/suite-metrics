@@ -27,6 +27,9 @@ importers:
       '@types/node':
         specifier: ^22.1.0
         version: 22.1.0
+      bias-random:
+        specifier: ^1.0.2
+        version: 1.0.2
       chai:
         specifier: ^5.1.1
         version: 5.1.1
@@ -578,6 +581,9 @@ packages:
   better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
+
+  bias-random@1.0.2:
+    resolution: {integrity: sha512-EDEzQslDs/5e9NEroXEe3t2fy0jXf5vFzZdzfIGVticsXdHd5Dvrdt4mNQUekFQsGZRdojqihiamX7dO5SQhcA==}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -2247,6 +2253,8 @@ snapshots:
   better-path-resolve@1.0.0:
     dependencies:
       is-windows: 1.0.2
+
+  bias-random@1.0.2: {}
 
   binary-extensions@2.3.0: {}
 
