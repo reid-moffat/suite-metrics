@@ -253,18 +253,26 @@ class SuiteMetrics implements ISuiteMetrics {
         const suite: Suite = this._getSuite({ name: path });
 
         const directNumTests: number = suite.tests?.size ?? 0;
-        let directTotalTime: number = 0;
-        suite.tests?.forEach((test) => directTotalTime += test.duration);
+
+        const testMetrics: { numTests: number, totalTime: number | null, averageTime: number | null } = {
+            numTests: 0,
+            totalTime: null,
+            averageTime: null
+        };
+        if (directNumTests) {
+            // @ts-ignore
+            const tests = suite.tests.values();
+
+            testMetrics.numTests = directNumTests;
+            testMetrics.totalTime = Array.from(tests).reduce((sum, test) => sum + test.duration, 0);
+            testMetrics.averageTime = testMetrics.totalTime / directNumTests;
+        }
 
         return {
             name: suite.name,
             parentSuites: path.slice(0, path.length - 1),
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
-            testMetrics: {
-                numTests: directNumTests,
-                totalTime: directTotalTime,
-                averageTime: directNumTests ? directTotalTime / directNumTests : null,
-            }
+            testMetrics: testMetrics
         };
     }
 
