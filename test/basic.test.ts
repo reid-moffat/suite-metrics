@@ -71,15 +71,15 @@ suite("Basic test suite", function() {
             expect(topLevelSuiteData.name).to.equal("Basic test suite");
             expect(topLevelSuiteData.parentSuites).to.deep.equal([]);
             expect(topLevelSuiteData.childSuites).to.deep.equal(["Sub-suite"]);
-            expect(topLevelSuiteData.directTestMetrics.numTests).to.equal(1);
-            expect(topLevelSuiteData.directTestMetrics.totalTime).to.be.a("number");
-            expect(topLevelSuiteData.directTestMetrics.averageTime).to.be.a("number");
+            expect(topLevelSuiteData.directTestMetrics.numTests).to.equal(0);
+            expect(topLevelSuiteData.directTestMetrics.totalTime).to.equal(0);
+            expect(topLevelSuiteData.directTestMetrics.averageTime).to.equal(null);
 
             expect(topLevelSuiteData.subTestMetrics.numTests).to.equal(1);
             expect(topLevelSuiteData.subTestMetrics.totalTime).to.be.a("number");
             expect(topLevelSuiteData.subTestMetrics.averageTime).to.be.a("number");
 
-            expect(topLevelSuiteData.totalTestMetrics.numTests).to.equal(2);
+            expect(topLevelSuiteData.totalTestMetrics.numTests).to.equal(1);
             expect(topLevelSuiteData.totalTestMetrics.totalTime).to.be.a("number");
             expect(topLevelSuiteData.totalTestMetrics.averageTime).to.be.a("number");
 
