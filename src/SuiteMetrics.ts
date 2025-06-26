@@ -270,7 +270,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: path.slice(0, path.length - 1),
+            parentSuites: path.length > 1 ? path.slice(0, path.length - 1) : null,
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             testMetrics: testMetrics
         };
@@ -323,7 +323,7 @@ class SuiteMetrics implements ISuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: path.slice(0, path.length - 1),
+            parentSuites: path.length > 1 ? path.slice(0, path.length - 1) : null,
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             directTestMetrics: {
                 numTests: directNumTests,

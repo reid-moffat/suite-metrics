@@ -17,7 +17,7 @@ type Suite = {
 
 type SuiteData = {
     name: string;
-    parentSuites: string[];
+    parentSuites: string[] | null;
     childSuites: string[] | null;
     testMetrics: {
         numTests: number;
