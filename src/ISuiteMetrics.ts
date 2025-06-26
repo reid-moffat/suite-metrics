@@ -21,8 +21,8 @@ type SuiteData = {
     childSuites: string[] | null;
     testMetrics: {
         numTests: number;
-        totalTime: number;
-        averageTime: number | null; // Null for no tests (avoid NaN for dividing by 0)
+        totalTime: number | null;
+        averageTime: number | null;
     }
 };
 
@@ -32,17 +32,17 @@ type RecursiveSuiteData = {
     childSuites: string[] | null;
     directTestMetrics: {
         numTests: number;
-        totalTime: number;
+        totalTime: number | null;
         averageTime: number | null;
     }
     subTestMetrics: {
         numTests: number;
-        totalTime: number;
+        totalTime: number | null;
         averageTime: number | null;
     }
     totalTestMetrics: {
         numTests: number;
-        totalTime: number;
+        totalTime: number | null;
         averageTime: number | null;
     }
 };
