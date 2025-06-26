@@ -408,33 +408,4 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             console.log(metrics.printAllSuiteMetrics());
         });
     });
-
-    // Keep the original tests for compatibility
-    suite("Original Tests", function() {
-        suite("top-level suite", function() {
-            suite("sub-suite", function() {
-                test("Concurrent test 1", async function() {
-                    const path = ["top-level suite", "sub-suite", "Concurrent test 1"];
-                    console.log(`Running test: ${path.join(" > ")}`);
-
-                    await metrics.startTest(path);
-                    expect(true).to.equal(true);
-                    await metrics.stopTest(path);
-
-                    console.log(metrics.printAllSuiteMetrics());
-                });
-
-                test("Concurrent test 2", async function() {
-                    const path = ["top-level suite", "sub-suite", "Concurrent test 2"];
-                    console.log(`Running test: ${path.join(" > ")}`);
-
-                    await metrics.startTest(path);
-                    expect(true).to.equal(true);
-                    await metrics.stopTest(path);
-
-                    console.log(metrics.printAllSuiteMetrics());
-                });
-            });
-        });
-    });
 });
