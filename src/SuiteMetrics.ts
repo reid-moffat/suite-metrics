@@ -327,17 +327,17 @@ class SuiteMetrics implements ISuiteMetrics {
             childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
             directTestMetrics: {
                 numTests: directNumTests,
-                totalTime: directTotalTime,
+                totalTime: directTotalTime === 0 ? null : directTotalTime,
                 averageTime: directNumTests ? directTotalTime / directNumTests : null,
             },
             subTestMetrics: {
                 numTests: subNumTests,
-                totalTime: subTotalTime,
+                totalTime: subTotalTime === 0 ? null : subTotalTime,
                 averageTime: subNumTests ? subTotalTime / subNumTests : null,
             },
             totalTestMetrics: {
                 numTests: directNumTests + subNumTests,
-                totalTime: directTotalTime + subTotalTime,
+                totalTime: directTotalTime + subTotalTime  === 0 ? null : directTotalTime + subTotalTime,
                 averageTime: (directNumTests + subNumTests) ? (directTotalTime + subTotalTime) / (directNumTests + subNumTests) : null,
             }
         };
