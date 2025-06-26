@@ -1,119 +1,412 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../src/index.ts";
-import {
-    RecursiveSuiteDataValidate,
-    SuiteDataValidate,
-    validateRecursiveSuiteData,
-    validateSuiteData
-} from "./validators.ts";
 
-suite("Basic test suite", function() {
-
+suite("SuiteMetrics - Comprehensive Test Coverage", function() {
     let metrics: SuiteMetrics;
 
     setup(function() {
-        metrics = new SuiteMetrics();
+        SuiteMetrics.resetInstance(); // Ensure clean state
+        metrics = SuiteMetrics.getInstance();
     });
 
-    test("Simple test", function() {
+    suite("Singleton Pattern", function() {
+        test("getInstance returns same instance", function() {
+            const instance1 = SuiteMetrics.getInstance();
+            const instance2 = SuiteMetrics.getInstance();
+            expect(instance1).to.equal(instance2);
+        });
 
-        metrics.startTest(["Basic test suite", "Simple test"]);
-        expect(true).to.equal(true);
-        metrics.stopTest();
-
-        expect(metrics.suiteExists(["Basic test suite"])).to.equal(true);
-        expect(metrics.testExists(["Basic test suite", "Simple test"])).to.equal(true);
-
-        const suiteData = metrics.getSuiteMetrics(["Basic test suite"]);
-
-        const expected: SuiteDataValidate = {
-            name: "Basic test suite",
-            parentSuites: null,
-            childSuites: null,
-            testMetrics: {
-                numTests: 1
-            }
-        };
-        validateSuiteData(suiteData, expected);
-
-
-        const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite"]);
-
-        const expected2: RecursiveSuiteDataValidate = {
-            name: "Basic test suite",
-            parentSuites: null,
-            childSuites: null,
-            directTestMetrics: { numTests: 1 },
-            subTestMetrics: { numTests: 0 },
-            totalTestMetrics: { numTests: 1 }
-        };
-        validateRecursiveSuiteData(recursiveSuiteData, expected2);
-
-        const metricsStringTL = metrics.printAllSuiteMetrics(true);
-        console.log("\nMetrics string (with top-level suite):\n" + metricsStringTL);
-        expect(metricsStringTL).to.be.a("string");
-
-        const metricsString = metrics.printAllSuiteMetrics(false);
-        console.log("\nMetrics string:\n" + metricsString);
-        expect(metricsString).to.be.a("string");
-
-
-        console.log(JSON.stringify(metrics.getSuiteMetricsRecursive([]), null, 4));
+        test("resetInstance creates new instance", function() {
+            const instance1 = SuiteMetrics.getInstance();
+            SuiteMetrics.resetInstance();
+            const instance2 = SuiteMetrics.getInstance();
+            expect(instance1).to.not.equal(instance2);
+        });
     });
 
-    suite("Sub-suite", () => {
-        test("Sub-suite test", () => {
-            metrics.startTest(["Basic test suite", "Sub-suite", "Sub-suite test"]);
-            expect(false).to.equal(false);
+    suite("Input Validation", function() {
+        test("should throw error for non-array names", function() {
+            // @ts-ignore - Testing runtime validation
+            expect(() => metrics.startTest("not an array")).to.throw('Invalid test/suite name - must be a delimiter string or an array of strings');
+        });
+
+        test("should throw error for empty test name", function() {
+            expect(() => metrics.startTest([])).to.throw('Test/suite name cannot be empty - must define a path');
+        });
+
+        test("should throw error for single-element test name", function() {
+            expect(() => metrics.startTest(["just-test"])).to.throw('Test must be inside at least one suite - i.e. name should be at least two strings (suite + test)');
+        });
+
+        test("should throw error for non-string elements", function() {
+            // @ts-ignore - Testing runtime validation
+            expect(() => metrics.startTest(["suite", 123])).to.throw('Invalid test/suite name - must be an array of strings');
+        });
+
+        test("should allow empty suite name for top-level operations", function() {
+            expect(() => metrics.suiteExists([])).to.not.throw();
+            expect(() => metrics.getSuiteMetrics([])).to.not.throw();
+            expect(() => metrics.getSuiteMetricsRecursive([])).to.not.throw();
+        });
+    });
+
+    suite("Error Handling", function() {
+        test("should throw error when stopping test without starting", function() {
+            expect(() => metrics.stopTest()).to.throw('No test currently being measured - run startTest() first');
+        });
+
+        test("should throw error for non-existent suite", function() {
+            expect(() => metrics.getSuiteMetrics(["NonExistent"])).to.throw('Suite NonExistent does not exist');
+        });
+
+        test("should throw error for non-existent test", function() {
+            expect(() => metrics.getTestMetrics(["NonExistent", "Test"])).to.throw('Suite NonExistent does not exist');
+        });
+
+        test("should throw error for test in non-existent suite", function() {
+            metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
-            expect(metrics.suiteExists(["Basic test suite", "Sub-suite"])).to.equal(true);
-            expect(metrics.testExists(["Basic test suite", "Sub-suite", "Sub-suite test"])).to.equal(true);
+            expect(() => metrics.getTestMetrics(["Suite1", "NonExistentTest"])).to.throw('Test Suite1,NonExistentTest does not exist');
+        });
+    });
 
-            const topLevelSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite"]);
+    suite("Multiple Tests and Suites", function() {
+        test("should handle multiple tests in same suite", function() {
+            // Create multiple tests
+            metrics.startTest(["MultiTestSuite", "Test1"]);
+            metrics.stopTest();
 
-            const expected: RecursiveSuiteDataValidate = {
-                name: "Basic test suite",
-                parentSuites: null,
-                childSuites: ["Sub-suite"],
-                directTestMetrics: { numTests: 0 },
-                subTestMetrics: { numTests: 1 },
-                totalTestMetrics: { numTests: 1 }
-            };
-            validateRecursiveSuiteData(topLevelSuiteData, expected);
+            metrics.startTest(["MultiTestSuite", "Test2"]);
+            metrics.stopTest();
 
-            const suiteData = metrics.getSuiteMetrics(["Basic test suite", "Sub-suite"]);
+            metrics.startTest(["MultiTestSuite", "Test3"]);
+            metrics.stopTest();
 
-            const expected2: SuiteDataValidate = {
-                name: "Sub-suite",
-                parentSuites: ["Basic test suite"],
-                childSuites: null,
-                testMetrics: {
-                    numTests: 1
-                }
-            };
-            validateSuiteData(suiteData, expected2);
+            expect(metrics.testExists(["MultiTestSuite", "Test1"])).to.be.true;
+            expect(metrics.testExists(["MultiTestSuite", "Test2"])).to.be.true;
+            expect(metrics.testExists(["MultiTestSuite", "Test3"])).to.be.true;
 
+            const suiteData = metrics.getSuiteMetrics(["MultiTestSuite"]);
+            expect(suiteData.testMetrics.numTests).to.equal(3);
+            expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+            expect(suiteData.testMetrics.averageTime).to.equal(suiteData.testMetrics.totalTime! / 3);
+        });
 
-            const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite", "Sub-suite"]);
+        test("should handle multiple suites at same level", function() {
+            metrics.startTest(["Suite1", "Test1"]);
+            metrics.stopTest();
 
-            const expected3: RecursiveSuiteDataValidate = {
-                name: "Sub-suite",
-                parentSuites: ["Basic test suite"],
-                childSuites: null,
-                directTestMetrics: { numTests: 1 },
-                subTestMetrics: { numTests: 0 },
-                totalTestMetrics: { numTests: 1 }
-            };
-            validateRecursiveSuiteData(recursiveSuiteData, expected3);
+            metrics.startTest(["Suite2", "Test2"]);
+            metrics.stopTest();
 
-            const metricsStringTL = metrics.printAllSuiteMetrics(true);
-            console.log("\nMetrics string (with top-level suite):\n" + metricsStringTL);
-            expect(metricsStringTL).to.be.a("string");
+            metrics.startTest(["Suite3", "Test3"]);
+            metrics.stopTest();
 
-            const metricsString = metrics.printAllSuiteMetrics(false);
-            console.log("\nMetrics string:\n" + metricsString);
-            expect(metricsString).to.be.a("string");
+            expect(metrics.suiteExists(["Suite1"])).to.be.true;
+            expect(metrics.suiteExists(["Suite2"])).to.be.true;
+            expect(metrics.suiteExists(["Suite3"])).to.be.true;
+
+            const topLevelData = metrics.getSuiteMetricsRecursive([]);
+            expect(topLevelData.subTestMetrics.numTests).to.equal(3);
+            expect(topLevelData.childSuites).to.include.members(["Suite1", "Suite2", "Suite3"]);
+        });
+    });
+
+    suite("Complex Hierarchies", function() {
+        setup(function() {
+            // Create a complex hierarchy:
+            // TopSuite
+            //   ├── DirectTest1
+            //   ├── DirectTest2
+            //   ├── SubSuite1
+            //   │   ├── SubTest1
+            //   │   └── SubSubSuite
+            //   │       └── DeepTest1
+            //   └── SubSuite2
+            //       ├── SubTest2
+            //       └── SubTest3
+
+            metrics.startTest(["TopSuite", "DirectTest1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TopSuite", "DirectTest2"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TopSuite", "SubSuite1", "SubTest1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TopSuite", "SubSuite1", "SubSubSuite", "DeepTest1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TopSuite", "SubSuite2", "SubTest2"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TopSuite", "SubSuite2", "SubTest3"]);
+            metrics.stopTest();
+        });
+
+        test("should correctly report direct vs recursive metrics", function() {
+            const topSuiteData = metrics.getSuiteMetricsRecursive(["TopSuite"]);
+
+            expect(topSuiteData.directTestMetrics.numTests).to.equal(2); // DirectTest1, DirectTest2
+            expect(topSuiteData.subTestMetrics.numTests).to.equal(4); // SubTest1, DeepTest1, SubTest2, SubTest3
+            expect(topSuiteData.totalTestMetrics.numTests).to.equal(6);
+            expect(topSuiteData.childSuites).to.include.members(["SubSuite1", "SubSuite2"]);
+        });
+
+        test("should handle nested suite metrics correctly", function() {
+            const subSuite1Data = metrics.getSuiteMetricsRecursive(["TopSuite", "SubSuite1"]);
+
+            expect(subSuite1Data.directTestMetrics.numTests).to.equal(1); // SubTest1
+            expect(subSuite1Data.subTestMetrics.numTests).to.equal(1); // DeepTest1
+            expect(subSuite1Data.totalTestMetrics.numTests).to.equal(2);
+            expect(subSuite1Data.parentSuites).to.deep.equal(["TopSuite"]);
+            expect(subSuite1Data.childSuites).to.deep.equal(["SubSubSuite"]);
+        });
+
+        test("should handle deep nesting correctly", function() {
+            const deepSuiteData = metrics.getSuiteMetrics(["TopSuite", "SubSuite1", "SubSubSuite"]);
+
+            expect(deepSuiteData.testMetrics.numTests).to.equal(1);
+            expect(deepSuiteData.parentSuites).to.deep.equal(["TopSuite", "SubSuite1"]);
+            expect(deepSuiteData.childSuites).to.be.null;
+        });
+    });
+
+    suite("Test Metrics and Ordering", function() {
+        test("should track test numbers correctly", function() {
+            metrics.startTest(["Suite1", "Test1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["Suite2", "Test2"]);
+            metrics.stopTest();
+
+            metrics.startTest(["Suite1", "Test3"]);
+            metrics.stopTest();
+
+            const test1 = metrics.getTestMetrics(["Suite1", "Test1"]);
+            const test2 = metrics.getTestMetrics(["Suite2", "Test2"]);
+            const test3 = metrics.getTestMetrics(["Suite1", "Test3"]);
+
+            expect(test1.testNumber).to.equal(1);
+            expect(test2.testNumber).to.equal(2);
+            expect(test3.testNumber).to.equal(3);
+
+            expect(test1.suiteTestNumber).to.equal(1);
+            expect(test2.suiteTestNumber).to.equal(1);
+            expect(test3.suiteTestNumber).to.equal(2);
+        });
+
+        test("should return complete test metrics", function() {
+            metrics.startTest(["TestSuite", "DetailedTest"]);
+            // Add small delay to ensure measurable duration
+            const start = Date.now();
+            while (Date.now() - start < 1) { /* busy wait */ }
+            metrics.stopTest();
+
+            const testMetrics = metrics.getTestMetrics(["TestSuite", "DetailedTest"]);
+
+            expect(testMetrics.name).to.equal("DetailedTest");
+            expect(testMetrics.startTimestamp).to.be.a('number').and.be.above(0);
+            expect(testMetrics.endTimestamp).to.be.a('number').and.be.above(testMetrics.startTimestamp);
+            expect(testMetrics.duration).to.be.a('number').and.be.above(0);
+            expect(testMetrics.duration).to.equal(testMetrics.endTimestamp - testMetrics.startTimestamp);
+            expect(testMetrics.completed).to.be.true;
+            expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
+            expect(testMetrics.suiteTestNumber).to.be.a('number').and.be.above(0);
+        });
+
+        test("should calculate timing metrics accurately", function() {
+            // Create tests with measurable durations
+            metrics.startTest(["TimingSuite", "FastTest"]);
+            metrics.stopTest();
+
+            metrics.startTest(["TimingSuite", "SlowTest"]);
+            const start = Date.now();
+            while (Date.now() - start < 2) { /* busy wait longer */ }
+            metrics.stopTest();
+
+            const suiteData = metrics.getSuiteMetrics(["TimingSuite"]);
+            const fastTest = metrics.getTestMetrics(["TimingSuite", "FastTest"]);
+            const slowTest = metrics.getTestMetrics(["TimingSuite", "SlowTest"]);
+
+            expect(slowTest.duration).to.be.above(fastTest.duration);
+            expect(suiteData.testMetrics.totalTime).to.equal(fastTest.duration + slowTest.duration);
+            expect(suiteData.testMetrics.averageTime).to.equal((fastTest.duration + slowTest.duration) / 2);
+        });
+    });
+
+    suite("Existence Checks", function() {
+        test("should correctly identify existing and non-existing suites", function() {
+            metrics.startTest(["ExistingSuite", "Test1"]);
+            metrics.stopTest();
+
+            expect(metrics.suiteExists(["ExistingSuite"])).to.be.true;
+            expect(metrics.suiteExists(["NonExistingSuite"])).to.be.false;
+            expect(metrics.suiteExists(["ExistingSuite", "SubSuite"])).to.be.false;
+        });
+
+        test("should correctly identify existing and non-existing tests", function() {
+            metrics.startTest(["TestSuite", "ExistingTest"]);
+            metrics.stopTest();
+
+            expect(metrics.testExists(["TestSuite", "ExistingTest"])).to.be.true;
+            expect(metrics.testExists(["TestSuite", "NonExistingTest"])).to.be.false;
+            expect(metrics.testExists(["NonExistingSuite", "Test"])).to.be.false;
+        });
+    });
+
+    suite("Edge Cases", function() {
+        test("should handle empty suites (no tests)", function() {
+            // Create a test to create the suite structure, then check parent
+            metrics.startTest(["ParentSuite", "SubSuite", "Test1"]);
+            metrics.stopTest();
+
+            const parentData = metrics.getSuiteMetrics(["ParentSuite"]);
+            expect(parentData.testMetrics.numTests).to.equal(0);
+            expect(parentData.testMetrics.totalTime).to.be.null;
+            expect(parentData.testMetrics.averageTime).to.be.null;
+            expect(parentData.childSuites).to.deep.equal(["SubSuite"]);
+        });
+
+        test("should handle top-level suite operations", function() {
+            metrics.startTest(["Suite1", "Test1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["Suite2", "Test2"]);
+            metrics.stopTest();
+
+            const topLevelData = metrics.getSuiteMetricsRecursive([]);
+            expect(topLevelData.name).to.equal("<Top-Level suite>");
+            expect(topLevelData.parentSuites).to.be.null;
+            expect(topLevelData.directTestMetrics.numTests).to.equal(0);
+            expect(topLevelData.subTestMetrics.numTests).to.equal(2);
+            expect(topLevelData.totalTestMetrics.numTests).to.equal(2);
+        });
+
+        test("should handle suite with null times correctly", function() {
+            // Create suite with no direct tests
+            metrics.startTest(["EmptySuite", "SubSuite", "Test1"]);
+            metrics.stopTest();
+
+            const emptyData = metrics.getSuiteMetrics(["EmptySuite"]);
+            expect(emptyData.testMetrics.totalTime).to.be.null;
+            expect(emptyData.testMetrics.averageTime).to.be.null;
+
+            const recursiveData = metrics.getSuiteMetricsRecursive(["EmptySuite"]);
+            expect(recursiveData.directTestMetrics.totalTime).to.be.null;
+            expect(recursiveData.directTestMetrics.averageTime).to.be.null;
+            expect(recursiveData.subTestMetrics.totalTime).to.be.a('number').and.be.above(0);
+        });
+    });
+
+    suite("Print Output", function() {
+        test("should generate comprehensive print output", function() {
+            // Create a complex structure for printing
+            metrics.startTest(["PrintSuite", "DirectTest"]);
+            metrics.stopTest();
+
+            metrics.startTest(["PrintSuite", "SubSuite", "SubTest"]);
+            metrics.stopTest();
+
+            const output = metrics.printAllSuiteMetrics(true);
+            expect(output).to.be.a('string');
+            expect(output).to.include('Suite: <Top-Level suite>');
+            expect(output).to.include('Suite: PrintSuite');
+            expect(output).to.include('Suite: SubSuite');
+            expect(output).to.include("'DirectTest'");
+            expect(output).to.include("'SubTest'");
+
+            const outputWithoutTopLevel = metrics.printAllSuiteMetrics(false);
+            expect(outputWithoutTopLevel).to.be.a('string');
+            expect(outputWithoutTopLevel).to.not.include('Suite: <Top-Level suite>');
+            expect(outputWithoutTopLevel).to.include('Suite: PrintSuite');
+        });
+    });
+
+    suite("State Management", function() {
+        test("should maintain state across multiple operations", function() {
+            // Create initial state
+            metrics.startTest(["StateSuite", "Test1"]);
+            metrics.stopTest();
+
+            expect(metrics.testExists(["StateSuite", "Test1"])).to.be.true;
+
+            // Add more tests
+            metrics.startTest(["StateSuite", "Test2"]);
+            metrics.stopTest();
+
+            // State should persist
+            expect(metrics.testExists(["StateSuite", "Test1"])).to.be.true;
+            expect(metrics.testExists(["StateSuite", "Test2"])).to.be.true;
+
+            const suiteData = metrics.getSuiteMetrics(["StateSuite"]);
+            expect(suiteData.testMetrics.numTests).to.equal(2);
+        });
+
+        test("should handle reset correctly", function() {
+            metrics.startTest(["ResetSuite", "Test1"]);
+            metrics.stopTest();
+
+            expect(metrics.testExists(["ResetSuite", "Test1"])).to.be.true;
+
+            SuiteMetrics.resetInstance();
+            const newMetrics = SuiteMetrics.getInstance();
+
+            expect(newMetrics.testExists(["ResetSuite", "Test1"])).to.be.false;
+            expect(newMetrics.suiteExists(["ResetSuite"])).to.be.false;
+        });
+    });
+
+    suite("Data Integrity", function() {
+        test("should return immutable test metrics", function() {
+            metrics.startTest(["ImmutableSuite", "Test1"]);
+            metrics.stopTest();
+
+            const testMetrics1 = metrics.getTestMetrics(["ImmutableSuite", "Test1"]);
+            const testMetrics2 = metrics.getTestMetrics(["ImmutableSuite", "Test1"]);
+
+            expect(testMetrics1).to.deep.equal(testMetrics2);
+            expect(testMetrics1).to.not.equal(testMetrics2); // Different objects
+
+            // Verify all properties exist and are correct type
+            expect(testMetrics1.name).to.be.a('string');
+            expect(testMetrics1.startTimestamp).to.be.a('number');
+            expect(testMetrics1.endTimestamp).to.be.a('number');
+            expect(testMetrics1.duration).to.be.a('number');
+            expect(testMetrics1.completed).to.be.a('boolean');
+            expect(testMetrics1.testNumber).to.be.a('number');
+            expect(testMetrics1.suiteTestNumber).to.be.a('number');
+        });
+
+        test("should maintain data consistency in complex scenarios", function() {
+            // Create a complex scenario and verify all metrics are consistent
+            metrics.startTest(["Consistency", "Test1"]);
+            metrics.stopTest();
+
+            metrics.startTest(["Consistency", "SubSuite", "Test2"]);
+            metrics.stopTest();
+
+            metrics.startTest(["Consistency", "SubSuite", "Test3"]);
+            metrics.stopTest();
+
+            const topSuite = metrics.getSuiteMetricsRecursive(["Consistency"]);
+            const subSuite = metrics.getSuiteMetricsRecursive(["Consistency", "SubSuite"]);
+
+            // Verify consistency
+            expect(topSuite.directTestMetrics.numTests).to.equal(1);
+            expect(topSuite.subTestMetrics.numTests).to.equal(2);
+            expect(topSuite.totalTestMetrics.numTests).to.equal(3);
+
+            expect(subSuite.directTestMetrics.numTests).to.equal(2);
+            expect(subSuite.subTestMetrics.numTests).to.equal(0);
+            expect(subSuite.totalTestMetrics.numTests).to.equal(2);
+
+            // Verify time consistency
+            expect(topSuite.totalTestMetrics.totalTime).to.equal(
+                topSuite.directTestMetrics.totalTime! + topSuite.subTestMetrics.totalTime!
+            );
         });
     });
 });
