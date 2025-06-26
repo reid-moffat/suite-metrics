@@ -25,7 +25,7 @@ type RecursiveSuiteDataValidate = {
  */
 const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: RecursiveSuiteDataValidate) => {
 
-    console.log(`Validating recursive suite metrics.\nResult: ${JSON.stringify(data)}\nExpected: ${JSON.stringify(expected, null, 4)}`);
+    console.log(`Validating recursive suite metrics:\nResult: ${JSON.stringify(data, null, 4)}\nExpected: ${JSON.stringify(expected, null, 4)}`);
 
     expect(data).to.be.an('object');
     expect(data).to.have.all.keys(['name', 'parentSuites', 'childSuites', 'directTestMetrics', 'subTestMetrics', 'totalTestMetrics']);
@@ -74,4 +74,4 @@ const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: Recursiv
     console.log(`✅ Total test metrics validated`);
 }
 
-export { validateRecursiveSuiteData };
+export { validateRecursiveSuiteData, RecursiveSuiteDataValidate };
