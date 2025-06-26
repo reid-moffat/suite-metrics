@@ -1,9 +1,13 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../src/index.ts";
 
-const metrics = new SuiteMetrics();
-
 suite("Basic test suite", function() {
+
+    let metrics: SuiteMetrics;
+
+    setup(function() {
+        metrics = new SuiteMetrics();
+    });
 
     test("Simple test", function() {
 
