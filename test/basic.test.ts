@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../src/index.ts";
-import { RecursiveSuiteDataValidate, validateRecursiveSuiteData } from "./validators.ts";
+import {
+    RecursiveSuiteDataValidate,
+    SuiteDataValidate,
+    validateRecursiveSuiteData,
+    validateSuiteData
+} from "./validators.ts";
 
 suite("Basic test suite", function() {
 
@@ -20,17 +25,21 @@ suite("Basic test suite", function() {
         expect(metrics.testExists(["Basic test suite", "Simple test"])).to.equal(true);
 
         const suiteData = metrics.getSuiteMetrics(["Basic test suite"]);
-        console.log("Suite metrics: " + JSON.stringify(suiteData, null, 4));
-        expect(suiteData.name).to.equal("Basic test suite");
-        expect(suiteData.parentSuites).to.be.null;
-        expect(suiteData.childSuites).to.equal(null);
-        expect(suiteData.testMetrics.numTests).to.equal(1);
-        expect(suiteData.testMetrics.totalTime).to.be.a("number");
-        expect(suiteData.testMetrics.averageTime).to.be.a("number");
+
+        const expected: SuiteDataValidate = {
+            name: "Basic test suite",
+            parentSuites: null,
+            childSuites: null,
+            testMetrics: {
+                numTests: 1
+            }
+        };
+        validateSuiteData(suiteData, expected);
+
 
         const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite"]);
 
-        const expected: RecursiveSuiteDataValidate = {
+        const expected2: RecursiveSuiteDataValidate = {
             name: "Basic test suite",
             parentSuites: null,
             childSuites: null,
@@ -38,7 +47,7 @@ suite("Basic test suite", function() {
             subTestMetrics: { numTests: 0 },
             totalTestMetrics: { numTests: 1 }
         };
-        validateRecursiveSuiteData(recursiveSuiteData, expected);
+        validateRecursiveSuiteData(recursiveSuiteData, expected2);
 
         const metricsStringTL = metrics.printAllSuiteMetrics(true);
         console.log("\nMetrics string (with top-level suite):\n" + metricsStringTL);
@@ -74,17 +83,21 @@ suite("Basic test suite", function() {
             validateRecursiveSuiteData(topLevelSuiteData, expected);
 
             const suiteData = metrics.getSuiteMetrics(["Basic test suite", "Sub-suite"]);
-            console.log("Suite metrics: " + JSON.stringify(suiteData, null, 4));
-            expect(suiteData.name).to.equal("Sub-suite");
-            expect(suiteData.parentSuites).to.deep.equal(["Basic test suite"]);
-            expect(suiteData.childSuites).to.equal(null);
-            expect(suiteData.testMetrics.numTests).to.equal(1);
-            expect(suiteData.testMetrics.totalTime).to.be.a("number");
-            expect(suiteData.testMetrics.averageTime).to.be.a("number");
+
+            const expected2: SuiteDataValidate = {
+                name: "Sub-suite",
+                parentSuites: ["Basic test suite"],
+                childSuites: null,
+                testMetrics: {
+                    numTests: 1
+                }
+            };
+            validateSuiteData(suiteData, expected2);
+
 
             const recursiveSuiteData = metrics.getSuiteMetricsRecursive(["Basic test suite", "Sub-suite"]);
 
-            const expected2: RecursiveSuiteDataValidate = {
+            const expected3: RecursiveSuiteDataValidate = {
                 name: "Sub-suite",
                 parentSuites: ["Basic test suite"],
                 childSuites: null,
@@ -92,7 +105,7 @@ suite("Basic test suite", function() {
                 subTestMetrics: { numTests: 0 },
                 totalTestMetrics: { numTests: 1 }
             };
-            validateRecursiveSuiteData(recursiveSuiteData, expected2);
+            validateRecursiveSuiteData(recursiveSuiteData, expected3);
 
             const metricsStringTL = metrics.printAllSuiteMetrics(true);
             console.log("\nMetrics string (with top-level suite):\n" + metricsStringTL);
