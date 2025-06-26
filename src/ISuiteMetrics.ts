@@ -16,34 +16,34 @@ type Suite = {
 };
 
 type SuiteData = {
-    readonly name: string;
-    readonly parentSuites: string[];
-    readonly childSuites: string[] | null;
-    readonly testMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number | null; // Null for no tests (avoid NaN for dividing by 0)
+    name: string;
+    parentSuites: string[];
+    childSuites: string[] | null;
+    testMetrics: {
+        numTests: number;
+        totalTime: number;
+        averageTime: number | null; // Null for no tests (avoid NaN for dividing by 0)
     }
 };
 
 type RecursiveSuiteData = {
-    readonly name: string;
-    readonly parentSuites: string[] | null;
-    readonly childSuites: string[] | null;
-    readonly directTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number | null;
+    name: string;
+    parentSuites: string[] | null;
+    childSuites: string[] | null;
+    directTestMetrics: {
+        numTests: number;
+        totalTime: number;
+        averageTime: number | null;
     }
-    readonly subTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number | null;
+    subTestMetrics: {
+        numTests: number;
+        totalTime: number;
+        averageTime: number | null;
     }
-    readonly totalTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number | null;
+    totalTestMetrics: {
+        numTests: number;
+        totalTime: number;
+        averageTime: number | null;
     }
 };
 
