@@ -71,7 +71,7 @@ const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: Recursiv
         expect(data.totalTestMetrics.averageTime).to.be.a('number').and.be.above(0).and.satisfy((num: number) => Number.isInteger(num)); // @ts-ignore
         expect(data.totalTestMetrics.averageTime).to.equal(data.totalTestMetrics.totalTime / data.totalTestMetrics.numTests);
     }
-    console.log(`✅ Total test metrics validated`);
+    console.log(`✅ Total test metrics validated\n`);
 }
 
 export { validateRecursiveSuiteData, RecursiveSuiteDataValidate };
