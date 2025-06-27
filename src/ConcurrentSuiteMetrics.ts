@@ -42,7 +42,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async startTest(path: string[]): Promise<void> {
+    public startTest(path: string[]): void {
         this.validatePath(path, { isTest: true });
         const testKey = this.createTestKey(path);
 
@@ -63,7 +63,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async stopTest(path: string[]): Promise<void> {
+    public stopTest(path: string[]): void {
         const endTime = microtime.now();
         this.validatePath(path, { isTest: true });
         const testKey = this.createTestKey(path);
