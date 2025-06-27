@@ -2,7 +2,8 @@ import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.js';
 
 /**
- * Sequential suite metrics implementation - only one test can run at a time
+ * Sequential suite metrics implementation.
+ * Note: Only one test can run at a time, for concurrent tests use ConcurrentSuiteMetrics
  */
 class SuiteMetrics extends BaseSuiteMetrics {
 

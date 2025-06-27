@@ -5,8 +5,7 @@ suite("SuiteMetrics - Comprehensive Test Coverage", function() {
     let metrics: SuiteMetrics;
 
     setup(function() {
-        SuiteMetrics.resetInstance(); // Ensure clean state
-        metrics = SuiteMetrics.getInstance();
+        metrics = new SuiteMetrics();
     });
 
     suite("Singleton Pattern", function() {
