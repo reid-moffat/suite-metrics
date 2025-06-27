@@ -4,6 +4,7 @@ import { Suite, Test, SuiteData, RecursiveSuiteData } from "./types.ts";
  * Base class providing common functionality for suite metrics implementations
  */
 abstract class BaseSuiteMetrics {
+
     protected readonly suites: Map<string, Suite> = new Map<string, Suite>();
     protected readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
@@ -12,50 +13,145 @@ abstract class BaseSuiteMetrics {
         subSuites: this.suites
     };
 
-    protected testCounter: number = 0;
+    protected testCounter: number = 0; // Number of tests in this instance
+
 
     /**
-     * Validates and normalizes a test or suite path
+     * Returns true if a given suite exists in this instance, false if not
+     *
+     * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
+     */
+    public suiteExists(suitePath: string[]): boolean {
+        this.validatePath(suitePath, { allowTopLevel: true });
+        return this.pathExists(suitePath, false);
+    }
+
+    /**
+     * Returns true if a given test exists in this instance, false if not
+     *
+     * @param testPath Path to check for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     */
+    public testExists(testPath: string[]): boolean {
+        this.validatePath(testPath, { isTest: true });
+        return this.pathExists(testPath, true);
+    }
+
+    /**
+     * Gets metrics for a specific test
+     *
+     * @param path Path to get metrics for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     */
+    public getTestMetrics(path: string[]): Test {
+        this.validatePath(path, { isTest: true });
+        const suite = this.navigateToSuite(path, { isTestPath: true });
+        const testName = path[path.length - 1];
+
+        const test = suite.tests?.get(testName);
+        if (!test) {
+            throw new Error(`Test [${path.join(', ')}] does not exist`);
+        }
+
+        return { ...test }; // Return a copy to prevent external modification
+    }
+
+    /**
+     * Gets metrics (metadata plus number and time stats for tests) for a given suite
+     *
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     */
+    public getSuiteMetrics(path: string[]): SuiteData {
+        this.validatePath(path, { allowTopLevel: true });
+        const suite = this.navigateToSuite(path);
+        const testMetrics = this.calculateDirectTestMetrics(suite);
+
+        return {
+            name: suite.name,
+            parentSuites: path.length > 0 ? path.slice(0, -1) : null,
+            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
+            testMetrics
+        };
+    }
+
+    /**
+     * Gets metrics (metadata plus number and time stats for tests) for a given suite and its sub-suites
+     *
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     */
+    public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
+        this.validatePath(path, { allowTopLevel: true });
+        const suite = this.navigateToSuite(path);
+
+        const directMetrics = this.calculateDirectTestMetrics(suite);
+        const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
+        const subTests = totalTests - directMetrics.numTests;
+        const subTime = totalTime - (directMetrics.totalTime ?? 0);
+
+        return {
+            name: suite.name,
+            parentSuites: path.length > 0 ? path.slice(0, -1) : null,
+            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
+            directTestMetrics: directMetrics,
+            subTestMetrics: {
+                numTests: subTests,
+                totalTime: subTests > 0 ? subTime : null,
+                averageTime: subTests > 0 ? subTime / subTests : null
+            },
+            totalTestMetrics: {
+                numTests: totalTests,
+                totalTime: totalTests > 0 ? totalTime : null,
+                averageTime: totalTests > 0 ? totalTime / totalTests : null
+            }
+        };
+    }
+
+    /**
+     * Returns a formatted string with all suite's data regarding tests
+     *
+     * @param topLevelSuite Include a top-level suite with all suite data summed up at the top
+     */
+    public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
+        const lines: string[] = [];
+
+        if (topLevelSuite) {
+            this.formatSuiteForPrint(this.topLevelSuite, lines, 0);
+        } else {
+            for (const suite of this.suites.values()) {
+                this.formatSuiteForPrint(suite, lines, 0);
+            }
+        }
+
+        return lines.join('\n');
+    }
+
+
+    /**
+     * Validates a test or suite path
      */
     protected validatePath(path: string[], options: {
         isTest?: boolean;
         allowTopLevel?: boolean;
-    } = {}): string[] {
+    } = {}): void {
+
         const { isTest = false, allowTopLevel = false } = options;
 
+        // Ensure the path is an array of non-empty strings
         if (!Array.isArray(path)) {
             throw new Error('Path must be an array of strings');
         }
-
-        if (allowTopLevel && isTest) {
-            throw new Error('Cannot specify both allowTopLevel and isTest');
-        }
-
-        if (!allowTopLevel && path.length === 0) {
-            throw new Error('Path cannot be empty - must define a path');
-        }
-
-        if (isTest && path.length < 2) {
-            throw new Error('Test must be inside at least one suite - path should contain at least [suite, test]');
-        }
-
-        if (!path.every(segment => typeof segment === 'string' && segment.length > 0)) {
+        if (!path.every((segment) => typeof segment === 'string' && segment.length > 0)) {
             throw new Error('Path must be an array of non-empty strings');
         }
 
-        return path;
-    }
-
-    /**
-     * Creates a new suite with default values
-     */
-    protected createSuite(name: string): Suite {
-        return {
-            name,
-            tests: null,
-            numSubTests: 0,
-            subSuites: null
-        };
+        // Ensure the configuration is valid
+        if (allowTopLevel && isTest) {
+            throw new Error('Cannot specify both allowTopLevel and isTest');
+        }
+        if (!allowTopLevel && path.length === 0) {
+            throw new Error('Path cannot be empty - must define a path');
+        }
+        if (isTest && path.length < 2) {
+            throw new Error('A test must be inside at least one suite - it must contain at least [suite, test]');
+        }
     }
 
     /**
@@ -83,7 +179,12 @@ abstract class BaseSuiteMetrics {
                 if (!createIfMissing) {
                     throw new Error(`Suite path [${suitePath.join(', ')}] does not exist`);
                 }
-                targetSuite = this.createSuite(suiteName);
+                targetSuite = {
+                    name: suiteName,
+                    tests: null,
+                    numSubTests: 0,
+                    subSuites: null
+                };
                 currentSuite.subSuites.set(suiteName, targetSuite);
             }
             currentSuite = targetSuite;
@@ -95,7 +196,7 @@ abstract class BaseSuiteMetrics {
     /**
      * Checks if a suite or test exists at the given path
      */
-    protected pathExists(path: string[], isTest: boolean): boolean {
+    private pathExists(path: string[], isTest: boolean): boolean {
         try {
             if (isTest) {
                 const suite = this.navigateToSuite(path, { isTestPath: true });
@@ -154,7 +255,7 @@ abstract class BaseSuiteMetrics {
     /**
      * Calculates test metrics for a suite (direct tests only)
      */
-    protected calculateDirectTestMetrics(suite: Suite): {
+    private calculateDirectTestMetrics(suite: Suite): {
         numTests: number;
         totalTime: number | null;
         averageTime: number | null;
@@ -178,7 +279,7 @@ abstract class BaseSuiteMetrics {
     /**
      * Recursively calculates test metrics for a suite and all its sub-suites
      */
-    protected calculateRecursiveTestMetrics(suite: Suite): [number, number] {
+    private calculateRecursiveTestMetrics(suite: Suite): [number, number] {
         let totalTests = suite.tests?.size ?? 0;
         let totalTime = 0;
 
@@ -200,7 +301,7 @@ abstract class BaseSuiteMetrics {
     /**
      * Formats suite information for printing
      */
-    protected formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
+    private formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
         const indent = ' '.repeat(indentLevel);
         const directTestCount = suite.tests?.size ?? 0;
         const directTestDuration = Array.from(suite.tests?.values() ?? [])
@@ -227,71 +328,6 @@ abstract class BaseSuiteMetrics {
                 this.formatSuiteForPrint(subSuite, lines, indentLevel + 4);
             }
         }
-    }
-
-    // ISuiteMetrics interface implementation
-    public suiteExists(suitePath: string[]): boolean {
-        this.validatePath(suitePath, { allowTopLevel: true });
-        return this.pathExists(suitePath, false);
-    }
-
-    public testExists(testPath: string[]): boolean {
-        this.validatePath(testPath, { isTest: true });
-        return this.pathExists(testPath, true);
-    }
-
-    public getSuiteMetrics(suitePath: string[]): SuiteData {
-        const path = this.validatePath(suitePath, { allowTopLevel: true });
-        const suite = this.navigateToSuite(path);
-        const testMetrics = this.calculateDirectTestMetrics(suite);
-
-        return {
-            name: suite.name,
-            parentSuites: path.length > 0 ? path.slice(0, -1) : null,
-            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
-            testMetrics
-        };
-    }
-
-    public getSuiteMetricsRecursive(suitePath: string[]): RecursiveSuiteData {
-        const path = this.validatePath(suitePath, { allowTopLevel: true });
-        const suite = this.navigateToSuite(path);
-
-        const directMetrics = this.calculateDirectTestMetrics(suite);
-        const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
-        const subTests = totalTests - directMetrics.numTests;
-        const subTime = totalTime - (directMetrics.totalTime ?? 0);
-
-        return {
-            name: suite.name,
-            parentSuites: path.length > 0 ? path.slice(0, -1) : null,
-            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
-            directTestMetrics: directMetrics,
-            subTestMetrics: {
-                numTests: subTests,
-                totalTime: subTests > 0 ? subTime : null,
-                averageTime: subTests > 0 ? subTime / subTests : null
-            },
-            totalTestMetrics: {
-                numTests: totalTests,
-                totalTime: totalTests > 0 ? totalTime : null,
-                averageTime: totalTests > 0 ? totalTime / totalTests : null
-            }
-        };
-    }
-
-    public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
-        const lines: string[] = [];
-
-        if (topLevelSuite) {
-            this.formatSuiteForPrint(this.topLevelSuite, lines, 0);
-        } else {
-            for (const suite of this.suites.values()) {
-                this.formatSuiteForPrint(suite, lines, 0);
-            }
-        }
-
-        return lines.join('\n');
     }
 }
 

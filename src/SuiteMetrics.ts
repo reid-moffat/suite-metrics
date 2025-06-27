@@ -1,11 +1,11 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.js';
-import { Test } from './types.js';
 
 /**
  * Sequential suite metrics implementation - only one test can run at a time
  */
 class SuiteMetrics extends BaseSuiteMetrics {
+
     private static instance: SuiteMetrics;
 
     private currentTestContext: {
@@ -24,25 +24,28 @@ class SuiteMetrics extends BaseSuiteMetrics {
     }
 
     /**
-     * Resets the singleton instance, clearing all data
+     * Resets the singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
         SuiteMetrics.instance = new SuiteMetrics();
     }
 
     /**
-     * Starts timing a test - only one test can be active at a time
+     * Starts timing a new test
+     * Note: Only one test can be active at a time. For multiple concurrent tests, use ConcurrentSuiteMetrics
+     *
+     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public startTest(name: string[]): void {
+    public startTest(path: string[]): void {
         if (this.currentTestContext !== null) {
             throw new Error('Another test is already running - call stopTest() first');
         }
 
-        const testPath = this.validatePath(name, { isTest: true });
-        this.createTestInSuite(testPath);
+        this.validatePath(path, { isTest: true });
+        this.createTestInSuite(path);
 
         this.currentTestContext = {
-            testPath,
+            testPath: path,
             startTime: microtime.now()
         };
     }
@@ -68,22 +71,6 @@ class SuiteMetrics extends BaseSuiteMetrics {
         test.completed = true;
 
         this.currentTestContext = null;
-    }
-
-    /**
-     * Gets metrics for a specific test
-     */
-    public getTestMetrics(name: string[]): Test {
-        const testPath = this.validatePath(name, { isTest: true });
-        const suite = this.navigateToSuite(testPath, { isTestPath: true });
-        const testName = testPath[testPath.length - 1];
-
-        const test = suite.tests?.get(testName);
-        if (!test) {
-            throw new Error(`Test [${testPath.join(', ')}] does not exist`);
-        }
-
-        return { ...test }; // Return a copy to prevent external modification
     }
 }
 

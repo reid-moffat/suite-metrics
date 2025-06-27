@@ -1,11 +1,11 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.js';
-import { Test } from './types.js';
 
 /**
  * Concurrent suite metrics implementation - multiple tests can run simultaneously
  */
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
+
     private static instance: ConcurrentSuiteMetrics;
 
     private readonly activeTests = new Map<string, {
@@ -31,46 +31,50 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     }
 
     /**
-     * Resets the singleton instance, clearing all data
+     * Resets the singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
         ConcurrentSuiteMetrics.instance = new ConcurrentSuiteMetrics();
     }
 
     /**
-     * Starts timing a test - multiple tests can run concurrently
+     * Starts timing a new test (may be called when other tests are running)
+     *
+     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async startTest(testPath: string[]): Promise<void> {
-        const validatedPath = this.validatePath(testPath, { isTest: true });
-        const testKey = this.createTestKey(validatedPath);
+    public async startTest(path: string[]): Promise<void> {
+        this.validatePath(path, { isTest: true });
+        const testKey = this.createTestKey(path);
 
         if (this.activeTests.has(testKey)) {
-            throw new Error(`Test [${testPath.join(', ')}] is already running`);
+            throw new Error(`Test [${path.join(', ')}] is already running`);
         }
 
-        this.createTestInSuite(validatedPath);
+        this.createTestInSuite(path);
 
         this.activeTests.set(testKey, {
-            testPath: validatedPath,
+            testPath: path,
             startTime: microtime.now()
         });
     }
 
     /**
      * Stops timing a specific test
+     *
+     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async stopTest(testPath: string[]): Promise<void> {
+    public async stopTest(path: string[]): Promise<void> {
         const endTime = microtime.now();
-        const validatedPath = this.validatePath(testPath, { isTest: true });
-        const testKey = this.createTestKey(validatedPath);
+        this.validatePath(path, { isTest: true });
+        const testKey = this.createTestKey(path);
 
         const activeTest = this.activeTests.get(testKey);
         if (!activeTest) {
-            throw new Error(`Test [${testPath.join(', ')}] is not currently running - call startTest() first`);
+            throw new Error(`Test [${path.join(', ')}] is not currently running - call startTest() first`);
         }
 
-        const suite = this.navigateToSuite(validatedPath, { isTestPath: true });
-        const testName = validatedPath[validatedPath.length - 1];
+        const suite = this.navigateToSuite(path, { isTestPath: true });
+        const testName = path[path.length - 1];
         const test = suite.tests!.get(testName)!;
 
         test.startTimestamp = activeTest.startTime;
@@ -79,22 +83,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         test.completed = true;
 
         this.activeTests.delete(testKey);
-    }
-
-    /**
-     * Gets metrics for a specific test
-     */
-    public getTestMetrics(testPath: string[]): Test {
-        const validatedPath = this.validatePath(testPath, { isTest: true });
-        const suite = this.navigateToSuite(validatedPath, { isTestPath: true });
-        const testName = validatedPath[validatedPath.length - 1];
-
-        const test = suite.tests?.get(testName);
-        if (!test) {
-            throw new Error(`Test [${testPath.join(', ')}] does not exist`);
-        }
-
-        return { ...test }; // Return a copy to prevent external modification
     }
 }
 
