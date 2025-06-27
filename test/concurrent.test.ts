@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import ConcurrentSuiteMetrics from "../src/ConcurrentSuiteMetrics.ts";
-import { SuiteData } from "../src/ISuiteMetrics.ts";
+import { SuiteData } from "../src/types.ts";
 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

@@ -47,13 +47,4 @@ type RecursiveSuiteData = {
     }
 };
 
-interface ISuiteMetrics {
-    suiteExists(suitePath: string[]): boolean;
-    testExists(testPath: string[]): boolean;
-
-    getSuiteMetrics(suitePath: string[]): SuiteData;
-    getSuiteMetricsRecursive(suitePath: string[]): RecursiveSuiteData;
-    printAllSuiteMetrics(): string;
-}
-
-export { ISuiteMetrics, Test, Suite, SuiteData, RecursiveSuiteData };
+export { Test, Suite, SuiteData, RecursiveSuiteData };
