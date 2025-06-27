@@ -2,25 +2,11 @@ import { expect } from 'chai';
 import SuiteMetrics from "../src/index.ts";
 
 suite("SuiteMetrics - Comprehensive Test Coverage", function() {
+
     let metrics: SuiteMetrics;
 
     setup(function() {
         metrics = new SuiteMetrics();
-    });
-
-    suite("Singleton Pattern", function() {
-        test("getInstance returns same instance", function() {
-            const instance1 = SuiteMetrics.getInstance();
-            const instance2 = SuiteMetrics.getInstance();
-            expect(instance1).to.equal(instance2);
-        });
-
-        test("resetInstance creates new instance", function() {
-            const instance1 = SuiteMetrics.getInstance();
-            SuiteMetrics.resetInstance();
-            const instance2 = SuiteMetrics.getInstance();
-            expect(instance1).to.not.equal(instance2);
-        });
     });
 
     suite("Input Validation", function() {

@@ -6,6 +6,7 @@ import { SuiteData } from "../src/types.ts";
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 suite("ConcurrentSuiteMetrics Tests", function() {
+
     let metrics: ConcurrentSuiteMetrics;
 
     setup(function() {
