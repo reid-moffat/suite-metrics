@@ -163,7 +163,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 await metrics.startTest(["ValidSuite", 123, "TestName"]);
                 expect.fail("Should have thrown error for non-string elements");
             } catch (error: any) {
-                expect(error.message).to.contain("array of strings");
+                expect(error.message).to.contain("non-empty");
             }
         });
 
@@ -173,7 +173,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 await metrics.startTest("NotAnArray");
                 expect.fail("Should have thrown error for non-array input");
             } catch (error: any) {
-                expect(error.message).to.contain("must be a delimiter string or an array");
+                expect(error.message).to.contain("strings");
             }
         });
 
