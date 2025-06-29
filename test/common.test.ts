@@ -68,6 +68,40 @@ suite("Base class tests", function() {
             });
         });
 
+        suite("resetInstance idempotency", function() {
+            test("SuiteMetrics", function() {
+                const instance1: SuiteMetrics = SuiteMetrics.getInstance();
+                SuiteMetrics.resetInstance();
+                const instance2: SuiteMetrics = SuiteMetrics.getInstance();
+                SuiteMetrics.resetInstance();
+                const instance3: SuiteMetrics = SuiteMetrics.getInstance();
+
+                expect(instance1).to.be.an.instanceOf(SuiteMetrics);
+                expect(instance2).to.be.an.instanceOf(SuiteMetrics);
+                expect(instance3).to.be.an.instanceOf(SuiteMetrics);
+
+                expect(instance1).to.not.equal(instance2);
+                expect(instance2).to.not.equal(instance3);
+                expect(instance1).to.not.equal(instance3);
+            });
+
+            test("ConcurrentSuiteMetrics", function() {
+                const instance1: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                ConcurrentSuiteMetrics.resetInstance();
+                const instance2: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                ConcurrentSuiteMetrics.resetInstance();
+                const instance3: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+
+                expect(instance1).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                expect(instance2).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                expect(instance3).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+
+                expect(instance1).to.not.equal(instance2);
+                expect(instance2).to.not.equal(instance3);
+                expect(instance1).to.not.equal(instance3);
+            });
+        });
+
         suite("resetInstance doesn't affect future idempotency", function() {
             test("SuiteMetrics", function() {
                 SuiteMetrics.resetInstance();
@@ -175,40 +209,6 @@ suite("Base class tests", function() {
                 expect(initialInstance).to.be.an.instanceOf(ConcurrentSuiteMetrics);
                 expect(afterOperationsInstance).to.be.an.instanceOf(ConcurrentSuiteMetrics);
                 expect(initialInstance).to.equal(afterOperationsInstance);
-            });
-        });
-
-        suite("resetInstance multiple times", function() {
-            test("SuiteMetrics", function() {
-                const instance1: SuiteMetrics = SuiteMetrics.getInstance();
-                SuiteMetrics.resetInstance();
-                const instance2: SuiteMetrics = SuiteMetrics.getInstance();
-                SuiteMetrics.resetInstance();
-                const instance3: SuiteMetrics = SuiteMetrics.getInstance();
-
-                expect(instance1).to.be.an.instanceOf(SuiteMetrics);
-                expect(instance2).to.be.an.instanceOf(SuiteMetrics);
-                expect(instance3).to.be.an.instanceOf(SuiteMetrics);
-
-                expect(instance1).to.not.equal(instance2);
-                expect(instance2).to.not.equal(instance3);
-                expect(instance1).to.not.equal(instance3);
-            });
-
-            test("ConcurrentSuiteMetrics", function() {
-                const instance1: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
-                ConcurrentSuiteMetrics.resetInstance();
-                const instance2: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
-                ConcurrentSuiteMetrics.resetInstance();
-                const instance3: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
-
-                expect(instance1).to.be.an.instanceOf(ConcurrentSuiteMetrics);
-                expect(instance2).to.be.an.instanceOf(ConcurrentSuiteMetrics);
-                expect(instance3).to.be.an.instanceOf(ConcurrentSuiteMetrics);
-
-                expect(instance1).to.not.equal(instance2);
-                expect(instance2).to.not.equal(instance3);
-                expect(instance1).to.not.equal(instance3);
             });
         });
     });
