@@ -90,6 +90,44 @@ suite("Base class tests", function() {
             });
         });
 
+        suite("Cross-class independence", function() {
+            test("SuiteMetrics reset", function() {
+                const concurrentInstance1: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                SuiteMetrics.resetInstance();
+                const concurrentInstance2: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+
+                expect(concurrentInstance1).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                expect(concurrentInstance2).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                expect(concurrentInstance1).to.equal(concurrentInstance2);
+            });
+
+            test("ConcurrentSuiteMetrics reset", function() {
+                const suiteInstance1: SuiteMetrics = SuiteMetrics.getInstance();
+                ConcurrentSuiteMetrics.resetInstance();
+                const suiteInstance2: SuiteMetrics = SuiteMetrics.getInstance();
+
+                expect(suiteInstance1).to.be.an.instanceOf(SuiteMetrics);
+                expect(suiteInstance2).to.be.an.instanceOf(SuiteMetrics);
+                expect(suiteInstance1).to.equal(suiteInstance2);
+            });
+
+            test("Both classes maintain separate singleton instances", function() {
+                const suiteInstance: SuiteMetrics = SuiteMetrics.getInstance();
+                const concurrentInstance: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                expect(suiteInstance).to.not.equal(concurrentInstance);
+
+                SuiteMetrics.resetInstance();
+                ConcurrentSuiteMetrics.resetInstance();
+
+                const suiteInstance2: SuiteMetrics = SuiteMetrics.getInstance();
+                const concurrentInstance2: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                expect(suiteInstance2).to.not.equal(concurrentInstance2);
+
+                expect(suiteInstance).to.not.equal(suiteInstance2);
+                expect(concurrentInstance).to.not.equal(concurrentInstance2);
+            });
+        });
+
         suite("Instances are empty after reset", function() {
             test("SuiteMetrics", function() {
                 // Simulate test completion
