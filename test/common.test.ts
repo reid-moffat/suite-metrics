@@ -18,7 +18,7 @@ suite("Base class tests", function() {
                 const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
                 expect(instance1).to.equal(instance2);
-                expect(instance1).to.be.an.instanceOf(SuiteMetrics)
+                expect(instance1).to.be.an.instanceOf(SuiteMetrics);
             });
 
             test("ConcurrentSuiteMetrics", function() {
@@ -27,6 +27,22 @@ suite("Base class tests", function() {
 
                 expect(instance1).to.equal(instance2);
                 expect(instance1).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+            });
+
+            test("Compare multiple calls", function() {
+                const normalInstances: SuiteMetrics[] = Array.from({ length: 10 }, _ => SuiteMetrics.getInstance());
+                const concurrentInstances: ConcurrentSuiteMetrics[] = Array.from({ length: 10 }, _ => ConcurrentSuiteMetrics.getInstance());
+
+                for (let i = 0; i < normalInstances.length; ++i) {
+                    expect(normalInstances[i]).to.be.an.instanceOf(SuiteMetrics);
+                    expect(normalInstances[i]).to.equal(normalInstances[(i + 1) % normalInstances.length]);
+                    expect(normalInstances[i]).to.not.equal(concurrentInstances[(i + 1) % concurrentInstances.length]);
+                }
+                for (let i = 0; i < concurrentInstances.length; ++i) {
+                    expect(concurrentInstances[i]).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                    expect(concurrentInstances[i]).to.equal(concurrentInstances[(i + 1) % concurrentInstances.length]);
+                    expect(concurrentInstances[i]).to.not.equal(normalInstances[(i + 1) % normalInstances.length]);
+                }
             });
         });
 
