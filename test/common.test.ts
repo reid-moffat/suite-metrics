@@ -68,6 +68,28 @@ suite("Base class tests", function() {
             });
         });
 
+        suite("resetInstance doesn't affect future idempotency", function() {
+            test("SuiteMetrics", function() {
+                SuiteMetrics.resetInstance();
+                const instance1: SuiteMetrics = SuiteMetrics.getInstance();
+                const instance2: SuiteMetrics = SuiteMetrics.getInstance();
+
+                expect(instance1).to.equal(instance2);
+                expect(instance1).to.be.an.instanceOf(SuiteMetrics);
+                expect(instance2).to.be.an.instanceOf(SuiteMetrics);
+            });
+
+            test("ConcurrentSuiteMetrics", function() {
+                ConcurrentSuiteMetrics.resetInstance();
+                const instance1: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+                const instance2: ConcurrentSuiteMetrics = ConcurrentSuiteMetrics.getInstance();
+
+                expect(instance1).to.equal(instance2);
+                expect(instance1).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+                expect(instance2).to.be.an.instanceOf(ConcurrentSuiteMetrics);
+            });
+        });
+
         suite("Instances are empty after reset", function() {
             test("SuiteMetrics", function() {
                 // Simulate test completion
