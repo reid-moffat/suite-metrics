@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { SuiteData, RecursiveSuiteData } from "../src";
+import { SuiteData, RecursiveSuiteData } from "../src/index.ts";
 
 // Required data to validate (total & average time differ each run)
 type SuiteDataValidate = {
