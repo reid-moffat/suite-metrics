@@ -17,9 +17,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const path = ["Basic Functionality", "Single test timing"];
             console.log(`Running test: ${path.join(" > ")}`);
 
-            await metrics.startTest(path);
+            metrics.startTest(path);
             await delay(10); // Simulate some work
-            await metrics.stopTest(path);
+            metrics.stopTest(path);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -29,14 +29,14 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const path2 = ["Basic Functionality", "Test 2"];
 
             console.log(`Running test: ${path1.join(" > ")}`);
-            await metrics.startTest(path1);
+            metrics.startTest(path1);
             await delay(5);
-            await metrics.stopTest(path1);
+            metrics.stopTest(path1);
 
             console.log(`Running test: ${path2.join(" > ")}`);
-            await metrics.startTest(path2);
+            metrics.startTest(path2);
             await delay(15);
-            await metrics.stopTest(path2);
+            metrics.stopTest(path2);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -45,9 +45,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const path = ["Level1", "Level2", "Level3", "Level4", "Deep test"];
             console.log(`Running test: ${path.join(" > ")}`);
 
-            await metrics.startTest(path);
+            metrics.startTest(path);
             await delay(8);
-            await metrics.stopTest(path);
+            metrics.stopTest(path);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -62,16 +62,16 @@ suite("ConcurrentSuiteMetrics Tests", function() {
 
             // Start both tests concurrently
             const promise1 = (async () => {
-                await metrics.startTest(path1);
+                metrics.startTest(path1);
                 await delay(20);
-                await metrics.stopTest(path1);
+                metrics.stopTest(path1);
             })();
 
             const promise2 = (async () => {
-                await delay(5); // Slight offset to test true concurrency
-                await metrics.startTest(path2);
+                await delay(2); // Slight offset to test true concurrency
+                metrics.startTest(path2);
                 await delay(15);
-                await metrics.stopTest(path2);
+                metrics.stopTest(path2);
             })();
 
             await Promise.all([promise1, promise2]);
@@ -90,21 +90,21 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             // Start all tests concurrently
             const promises = [
                 (async () => {
-                    await metrics.startTest(path1);
+                    metrics.startTest(path1);
                     await delay(10);
-                    await metrics.stopTest(path1);
+                    metrics.stopTest(path1);
                 })(),
                 (async () => {
                     await delay(2);
-                    await metrics.startTest(path2);
+                    metrics.startTest(path2);
                     await delay(25);
-                    await metrics.stopTest(path2);
+                    metrics.stopTest(path2);
                 })(),
                 (async () => {
                     await delay(5);
-                    await metrics.startTest(path3);
+                    metrics.startTest(path3);
                     await delay(8);
-                    await metrics.stopTest(path3);
+                    metrics.stopTest(path3);
                 })()
             ];
 
@@ -120,19 +120,19 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             console.log("Testing interleaved execution");
 
             // Start first test
-            await metrics.startTest(path1);
+            metrics.startTest(path1);
             await delay(5);
 
             // Start second test while first is still running
-            await metrics.startTest(path2);
+            metrics.startTest(path2);
             await delay(10);
 
             // Stop first test
-            await metrics.stopTest(path1);
+            metrics.stopTest(path1);
             await delay(5);
 
             // Stop second test
-            await metrics.stopTest(path2);
+            metrics.stopTest(path2);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -141,7 +141,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
     suite("Error Handling", function() {
         test("Invalid test names - empty array", async function() {
             try {
-                await metrics.startTest([]);
+                metrics.startTest([]);
                 expect.fail("Should have thrown error for empty test name");
             } catch (error: any) {
                 expect(error.message).to.contain("empty");
@@ -150,7 +150,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
 
         test("Invalid test names - single element", async function() {
             try {
-                await metrics.startTest(["OnlyTestName"]);
+                metrics.startTest(["OnlyTestName"]);
                 expect.fail("Should have thrown error for test without suite");
             } catch (error: any) {
                 expect(error.message).to.contain("inside at least one suite");
@@ -160,7 +160,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
         test("Invalid test names - non-string elements", async function() {
             try {
                 // @ts-ignore - intentionally passing invalid types for testing
-                await metrics.startTest(["ValidSuite", 123, "TestName"]);
+                metrics.startTest(["ValidSuite", 123, "TestName"]);
                 expect.fail("Should have thrown error for non-string elements");
             } catch (error: any) {
                 expect(error.message).to.contain("non-empty");
@@ -170,7 +170,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
         test("Invalid test names - non-array input", async function() {
             try {
                 // @ts-ignore - intentionally passing invalid type for testing
-                await metrics.startTest("NotAnArray");
+                metrics.startTest("NotAnArray");
                 expect.fail("Should have thrown error for non-array input");
             } catch (error: any) {
                 expect(error.message).to.contain("strings");
@@ -179,7 +179,7 @@ suite("ConcurrentSuiteMetrics Tests", function() {
 
         test("Stopping test that wasn't started", async function() {
             try {
-                await metrics.stopTest(["Error Handling", "Non-existent test"]);
+                metrics.stopTest(["Error Handling", "Non-existent test"]);
                 expect.fail("Should have thrown error for stopping non-existent test");
             } catch (error: any) {}
         });
@@ -187,12 +187,12 @@ suite("ConcurrentSuiteMetrics Tests", function() {
         test("Starting same test twice", async function() {
             const path = ["Error Handling", "Duplicate test"];
 
-            await metrics.startTest(path);
+            metrics.startTest(path);
 
             try {
-                await metrics.startTest(path); // Should this be allowed or throw an error?
+                metrics.startTest(path); // Should this be allowed or throw an error?
                 // Behavior depends on implementation - might overwrite or throw
-                await metrics.stopTest(path);
+                metrics.stopTest(path);
             } catch (error: any) {
                 // If it throws, that's also valid behavior
                 console.log("Duplicate test start threw error:", error.message);
@@ -206,9 +206,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const expectedDuration = 50; // milliseconds
 
             const startTime = Date.now();
-            await metrics.startTest(path);
+            metrics.startTest(path);
             await delay(expectedDuration);
-            await metrics.stopTest(path);
+            metrics.stopTest(path);
             const actualElapsed = Date.now() - startTime;
 
             // Allow some tolerance for timing variations
@@ -223,9 +223,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             // Run several tests in the same suite
             for (let i = 1; i <= 3; i++) {
                 const testPath = [...suitePath, `Test ${i}`];
-                await metrics.startTest(testPath);
+                metrics.startTest(testPath);
                 await delay(i * 10); // Different durations
-                await metrics.stopTest(testPath);
+                metrics.stopTest(testPath);
             }
 
             console.log(metrics.printAllSuiteMetrics());
@@ -248,8 +248,8 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             expect(metrics.suiteExists(suitePath)).to.be.false;
 
             // After running a test, suite should exist
-            await metrics.startTest(testPath);
-            await metrics.stopTest(testPath);
+            metrics.startTest(testPath);
+            metrics.stopTest(testPath);
 
             expect(metrics.suiteExists(suitePath)).to.be.true;
         });
@@ -261,8 +261,8 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             expect(metrics.testExists(testPath)).to.be.false;
 
             // After running the test, it should exist
-            await metrics.startTest(testPath);
-            await metrics.stopTest(testPath);
+            metrics.startTest(testPath);
+            metrics.stopTest(testPath);
 
             expect(metrics.testExists(testPath)).to.be.true;
         });
@@ -275,8 +275,8 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             expect(metrics.suiteExists(["Level1", "Level2"])).to.be.false;
             expect(metrics.suiteExists(nestedPath)).to.be.false;
 
-            await metrics.startTest(testPath);
-            await metrics.stopTest(testPath);
+            metrics.startTest(testPath);
+            metrics.stopTest(testPath);
 
             expect(metrics.suiteExists(["Level1"])).to.be.true;
             expect(metrics.suiteExists(["Level1", "Level2"])).to.be.true;
@@ -291,9 +291,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             // Run some tests
             for (let i = 1; i <= 2; i++) {
                 const testPath = [...suitePath, `Test ${i}`];
-                await metrics.startTest(testPath);
+                metrics.startTest(testPath);
                 await delay(i * 5);
-                await metrics.stopTest(testPath);
+                metrics.stopTest(testPath);
             }
 
             const suiteMetrics: SuiteData = metrics.getSuiteMetrics(suitePath);
@@ -306,13 +306,13 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const basePath = ["Metrics Retrieval", "Recursive Suite"];
 
             // Create nested structure with tests at different levels
-            await metrics.startTest([...basePath, "Direct Test"]);
+            metrics.startTest([...basePath, "Direct Test"]);
             await delay(10);
-            await metrics.stopTest([...basePath, "Direct Test"]);
+            metrics.stopTest([...basePath, "Direct Test"]);
 
-            await metrics.startTest([...basePath, "Sub Suite", "Nested Test"]);
+            metrics.startTest([...basePath, "Sub Suite", "Nested Test"]);
             await delay(15);
-            await metrics.stopTest([...basePath, "Sub Suite", "Nested Test"]);
+            metrics.stopTest([...basePath, "Sub Suite", "Nested Test"]);
 
             const recursiveMetrics = metrics.getSuiteMetricsRecursive(basePath);
             expect(recursiveMetrics).to.exist;
@@ -325,13 +325,13 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const path1 = ["Edge Cases", "Suite A", "Same Name"];
             const path2 = ["Edge Cases", "Suite B", "Same Name"];
 
-            await metrics.startTest(path1);
+            metrics.startTest(path1);
             await delay(10);
-            await metrics.stopTest(path1);
+            metrics.stopTest(path1);
 
-            await metrics.startTest(path2);
+            metrics.startTest(path2);
             await delay(20);
-            await metrics.stopTest(path2);
+            metrics.stopTest(path2);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -340,18 +340,18 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const longName = "This is a very long test name that might cause issues with string handling or display formatting";
             const path = ["Edge Cases", "Long Names", longName];
 
-            await metrics.startTest(path);
+            metrics.startTest(path);
             await delay(5);
-            await metrics.stopTest(path);
+            metrics.stopTest(path);
 
             console.log(metrics.printAllSuiteMetrics());
         });
 
         test("Empty suite name components", async function() {
             try {
-                await metrics.startTest(["Edge Cases", "", "Test"]);
+                metrics.startTest(["Edge Cases", "", "Test"]);
                 // Some implementations might allow empty strings, others might not
-                await metrics.stopTest(["Edge Cases", "", "Test"]);
+                metrics.stopTest(["Edge Cases", "", "Test"]);
             } catch (error: any) {
                 console.log("Empty suite name threw error:", error.message);
                 expect(error).to.exist;
@@ -362,9 +362,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             const deepPath = Array(10).fill(0).map((_, i) => `Level${i}`);
             deepPath.push("Deep Test");
 
-            await metrics.startTest(deepPath);
+            metrics.startTest(deepPath);
             await delay(5);
-            await metrics.stopTest(deepPath);
+            metrics.stopTest(deepPath);
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -381,9 +381,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
                 const testPath = ["Performance Tests", "Many concurrent", `Test ${i}`];
                 promises.push(
                     (async () => {
-                        await metrics.startTest(testPath);
+                        metrics.startTest(testPath);
                         await delay(Math.random() * 20); // Random duration
-                        await metrics.stopTest(testPath);
+                        metrics.stopTest(testPath);
                     })()
                 );
             }
@@ -400,9 +400,9 @@ suite("ConcurrentSuiteMetrics Tests", function() {
 
             for (let i = 0; i < numTests; i++) {
                 const testPath = ["Performance Tests", "Sequential", `Test ${i}`];
-                await metrics.startTest(testPath);
+                metrics.startTest(testPath);
                 await delay(2); // Short duration
-                await metrics.stopTest(testPath);
+                metrics.stopTest(testPath);
             }
 
             console.log(metrics.printAllSuiteMetrics());
