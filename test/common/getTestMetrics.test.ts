@@ -216,6 +216,9 @@ suite("getTestMetrics - Comprehensive Test Coverage", function() {
 
         test("should handle very short duration tests", function() {
             metrics.startTest(["QuickSuite", "QuickTest"]);
+            for (let i = 0; i < 100; ++i) {
+                // Placeholder work ...
+            }
             metrics.stopTest(); // Immediate stop
 
             const testMetrics = metrics.getTestMetrics(["QuickSuite", "QuickTest"]);

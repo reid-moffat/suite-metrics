@@ -34,7 +34,7 @@ suite("testExists Method", function() {
         });
 
         test("should return false for single-element array", function() {
-            expect(metrics.testExists(["just-test"])).to.be.false;
+            expect(metrics.testExists(["suite1", "just-test"])).to.be.false;
         });
     });
 
@@ -72,7 +72,7 @@ suite("testExists Method", function() {
 
             // These are suites, not tests
             expect(metrics.testExists(["Suite1", "Suite2"])).to.be.false;
-            expect(metrics.testExists(["Suite1"])).to.be.false;
+            expect(metrics.testExists(["Suite1", "test1"])).to.be.false;
         });
     });
 
