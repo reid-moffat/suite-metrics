@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
-import { SuiteData } from "../../src/types.ts";
 
 suite("getSuiteMetrics - Comprehensive Test Coverage", function() {
 
