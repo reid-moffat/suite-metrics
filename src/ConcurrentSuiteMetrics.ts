@@ -1,5 +1,5 @@
 import microtime from 'microtime';
-import BaseSuiteMetrics from './BaseSuiteMetrics.js';
+import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 
 /**
  * Concurrent suite metrics implementation - multiple tests can run simultaneously
