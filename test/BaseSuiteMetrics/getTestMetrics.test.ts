@@ -230,11 +230,13 @@ suite("getTestMetrics - Comprehensive Test Coverage", function() {
         test("should handle tests with different durations", function() {
             // Fast test
             metrics.startTest(["DurationSuite", "FastTest"]);
+            let start = Date.now();
+            while (Date.now() - start < 10) { /* busy wait for a short time */ }
             metrics.stopTest();
 
             // Slow test
             metrics.startTest(["DurationSuite", "SlowTest"]);
-            const start = Date.now();
+            start = Date.now();
             while (Date.now() - start < 100) { /* busy wait longer */ }
             metrics.stopTest();
 
