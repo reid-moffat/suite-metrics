@@ -236,7 +236,7 @@ suite("getTestMetrics - Comprehensive Test Coverage", function() {
             // Slow test
             metrics.startTest(["DurationSuite", "SlowTest"]);
             const start = Date.now();
-            while (Date.now() - start < 10) { /* busy wait longer */ }
+            while (Date.now() - start < 100) { /* busy wait longer */ }
             metrics.stopTest();
 
             const fastTest = metrics.getTestMetrics(["DurationSuite", "FastTest"]);
