@@ -80,7 +80,7 @@ suite("getTestMetrics - Comprehensive Test Coverage", function() {
             metrics.startTest(["SimpleSuite", "SimpleTest"]);
             const startTime = Date.now();
             // Add small delay to ensure measurable duration
-            while (Date.now() - startTime < 2) { /* busy wait */ }
+            while (Date.now() - startTime < 100) { /* busy wait */ }
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SimpleSuite", "SimpleTest"]);
@@ -197,7 +197,7 @@ suite("getTestMetrics - Comprehensive Test Coverage", function() {
 
             // Add measurable delay
             const delayStart = Date.now();
-            while (Date.now() - delayStart < 5) { /* busy wait */ }
+            while (Date.now() - delayStart < 100) { /* busy wait */ }
 
             metrics.stopTest();
 
