@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
-import ConcurrentSuiteMetrics from "../../src/ConcurrentSuiteMetrics.ts";
 import {
     createSimpleTestData,
     createNestedTestData,
