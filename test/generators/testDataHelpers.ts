@@ -9,17 +9,6 @@ function randomDuration(min: number, max: number): number {
 }
 
 /**
- * Adds a realistic timing delay (busy wait)
- */
-function addDelay(microseconds: number): void {
-    const milliseconds = microseconds / 1000;
-    const start = Date.now();
-    while (Date.now() - start < milliseconds) {
-        // Busy wait
-    }
-}
-
-/**
  * Creates a simple flat structure with multiple suites and tests
  */
 function createSimpleTestData(
@@ -52,14 +41,14 @@ function createSimpleTestData(
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest();
             }
@@ -106,14 +95,14 @@ function createNestedTestData(
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest();
             }
@@ -184,14 +173,14 @@ function createCustomTestData(
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
                     const duration = randomDuration(opts.minDuration, opts.maxDuration);
-                    addDelay(duration);
+                    // add delay...
                 }
                 metrics.stopTest();
             }
