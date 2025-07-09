@@ -1,60 +1,5 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
-
-/**
- * Configuration options for generating test data
- */
-export interface TestDataOptions {
-    /** Number of top-level suites to create */
-    numSuites?: number;
-    /** Number of tests per suite */
-    testsPerSuite?: number;
-    /** Maximum nesting depth for suites */
-    maxDepth?: number;
-    /** Number of sub-suites per parent suite */
-    subSuitesPerSuite?: number;
-    /** Base name for suites (will be numbered) */
-    suiteNamePrefix?: string;
-    /** Base name for tests (will be numbered) */
-    testNamePrefix?: string;
-    /** Minimum duration for tests in microseconds */
-    minDuration?: number;
-    /** Maximum duration for tests in microseconds */
-    maxDuration?: number;
-    /** Whether to add realistic timing delays */
-    addTimingDelays?: boolean;
-    /** Custom suite structure (overrides other suite options) */
-    customStructure?: SuiteStructure[];
-}
-
-/**
- * Represents a custom suite structure
- */
-export interface SuiteStructure {
-    /** Suite path (e.g., ['Parent', 'Child']) */
-    suitePath: string[];
-    /** Tests to create in this suite */
-    tests: string[];
-    /** Sub-suites to create */
-    subSuites?: SuiteStructure[];
-}
-
-/**
- * Information about generated test data
- */
-export interface GeneratedTestData {
-    /** Total number of tests created */
-    totalTests: number;
-    /** Total number of suites created */
-    totalSuites: number;
-    /** Maximum depth achieved */
-    maxDepthAchieved: number;
-    /** List of all test paths created */
-    testPaths: string[][];
-    /** List of all suite paths created */
-    suitePaths: string[][];
-    /** Mapping of suite paths to their direct test counts */
-    suiteTestCounts: Map<string, number>;
-}
+import { TestDataOptions, SuiteStructure, GeneratedTestData } from "./options.ts";
 
 /**
  * Default options for test data generation
@@ -93,11 +38,11 @@ function addDelay(microseconds: number): void {
 /**
  * Creates a simple flat structure with multiple suites and tests
  */
-export function createSimpleTestData(
+function createSimpleTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = {...DEFAULT_OPTIONS, ...options};
     const info: GeneratedTestData = {
         totalTests: 0,
         totalSuites: 0,
@@ -146,11 +91,11 @@ export function createSimpleTestData(
 /**
  * Creates a nested structure with multiple levels of suites
  */
-export function createNestedTestData(
+function createNestedTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = {...DEFAULT_OPTIONS, ...options};
     const info: GeneratedTestData = {
         totalTests: 0,
         totalSuites: 0,
@@ -224,12 +169,12 @@ export function createNestedTestData(
 /**
  * Creates test data from a custom structure definition
  */
-export function createCustomTestData(
+function createCustomTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     structure: SuiteStructure[],
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = {...DEFAULT_OPTIONS, ...options};
     const info: GeneratedTestData = {
         totalTests: 0,
         totalSuites: 0,
@@ -240,7 +185,7 @@ export function createCustomTestData(
     };
 
     function processStructure(suiteStructure: SuiteStructure): void {
-        const { suitePath, tests, subSuites = [] } = suiteStructure;
+        const {suitePath, tests, subSuites = []} = suiteStructure;
 
         info.maxDepthAchieved = Math.max(info.maxDepthAchieved, suitePath.length);
         info.suitePaths.push([...suitePath]);
@@ -287,7 +232,7 @@ export function createCustomTestData(
 /**
  * Creates a large dataset for performance testing
  */
-export function createLargeTestData(
+function createLargeTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
@@ -307,7 +252,7 @@ export function createLargeTestData(
 /**
  * Creates test data with realistic timing variations
  */
-export function createRealisticTestData(
+function createRealisticTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
@@ -325,11 +270,11 @@ export function createRealisticTestData(
 /**
  * Creates a complex mixed structure with various patterns
  */
-export function createComplexTestData(
+function createComplexTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = {...DEFAULT_OPTIONS, ...options};
 
     const complexStructure: SuiteStructure[] = [
         {
@@ -388,11 +333,11 @@ export function createComplexTestData(
 /**
  * Creates test data with specific characteristics for edge case testing
  */
-export function createEdgeCaseTestData(
+function createEdgeCaseTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = {...DEFAULT_OPTIONS, ...options};
 
     const edgeCaseStructure: SuiteStructure[] = [
         // Suite with special characters
@@ -429,3 +374,16 @@ export function createEdgeCaseTestData(
 
     return createCustomTestData(metrics, edgeCaseStructure, opts);
 }
+
+export {
+    TestDataOptions,
+    SuiteStructure,
+    GeneratedTestData,
+    createSimpleTestData,
+    createNestedTestData,
+    createCustomTestData,
+    createLargeTestData,
+    createRealisticTestData,
+    createComplexTestData,
+    createEdgeCaseTestData
+};
