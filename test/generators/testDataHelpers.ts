@@ -386,13 +386,6 @@ export function createComplexTestData(
 }
 
 /**
- * Utility function to get a fresh concurrent metrics instance
- */
-export function getFreshConcurrentMetrics(): ConcurrentSuiteMetrics {
-    return new ConcurrentSuiteMetrics();
-}
-
-/**
  * Creates test data with specific characteristics for edge case testing
  */
 export function createEdgeCaseTestData(

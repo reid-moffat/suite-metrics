@@ -1,13 +1,12 @@
 import { expect } from 'chai';
-import SuiteMetrics from "../../src/index.ts";
+import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import {
     createSimpleTestData,
     createNestedTestData,
     createComplexTestData,
     createLargeTestData,
     createRealisticTestData,
-    createEdgeCaseTestData,
-    getFreshConcurrentMetrics
+    createEdgeCaseTestData
 } from "./testDataHelpers.ts";
 
 suite("Test Data Helpers", function() {
@@ -39,7 +38,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should work with ConcurrentSuiteMetrics", function() {
-            const metrics = getFreshConcurrentMetrics();
+            const metrics = new ConcurrentSuiteMetrics();
 
             const testData = createSimpleTestData(metrics, {
                 numSuites: 2,
@@ -213,8 +212,8 @@ suite("Test Data Helpers", function() {
         });
 
         test("getFreshConcurrentMetrics should provide new instance", function() {
-            const metrics1 = getFreshConcurrentMetrics();
-            const metrics2 = getFreshConcurrentMetrics();
+            const metrics1 = new ConcurrentSuiteMetrics();
+            const metrics2 = new ConcurrentSuiteMetrics();
 
             // Should be different instances
             expect(metrics1).to.not.equal(metrics2);

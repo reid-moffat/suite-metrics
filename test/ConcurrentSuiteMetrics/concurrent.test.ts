@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
-import { createSimpleTestData, createComplexTestData, getFreshConcurrentMetrics } from "../generators/testDataHelpers.ts";
+import { createSimpleTestData, createComplexTestData } from "../generators/testDataHelpers.ts";
 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -412,7 +412,7 @@ suite("ConcurrentSuiteMetrics", function() {
 
     suite("Using Test Data Helpers", function() {
         test("should work with simple test data helper for concurrent metrics", function() {
-            const freshMetrics = getFreshConcurrentMetrics();
+            const freshMetrics = new ConcurrentSuiteMetrics();
 
             const testData = createSimpleTestData(freshMetrics, {
                 numSuites: 4,
@@ -438,7 +438,7 @@ suite("ConcurrentSuiteMetrics", function() {
         });
 
         test("should work with complex test data helper for concurrent metrics", function() {
-            const freshMetrics = getFreshConcurrentMetrics();
+            const freshMetrics = new ConcurrentSuiteMetrics();
 
             const testData = createComplexTestData(freshMetrics);
 
@@ -467,7 +467,7 @@ suite("ConcurrentSuiteMetrics", function() {
         });
 
         test("should handle large datasets efficiently with concurrent metrics", function() {
-            const freshMetrics = getFreshConcurrentMetrics();
+            const freshMetrics = new ConcurrentSuiteMetrics();
 
             const startTime = Date.now();
             const testData = createSimpleTestData(freshMetrics, {
@@ -495,7 +495,7 @@ suite("ConcurrentSuiteMetrics", function() {
         });
 
         test("should provide useful generation information for concurrent metrics", function() {
-            const freshMetrics = getFreshConcurrentMetrics();
+            const freshMetrics = new ConcurrentSuiteMetrics();
 
             const testData = createComplexTestData(freshMetrics);
 
