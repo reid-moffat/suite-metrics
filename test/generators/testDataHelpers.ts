@@ -1,6 +1,6 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
-import { randomInt } from "../helpers";
+import { randomInt } from "../helpers.ts";
 
 /**
  * Creates a simple flat structure with multiple suites and tests
