@@ -7,7 +7,6 @@ import {
     createLargeTestData,
     createRealisticTestData,
     createEdgeCaseTestData,
-    getFreshMetrics,
     getFreshConcurrentMetrics
 } from "./testDataHelpers.ts";
 
@@ -15,7 +14,7 @@ suite("Test Data Helpers", function() {
 
     suite("Simple Test Data Generation", function() {
         test("should create basic flat structure", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createSimpleTestData(metrics, {
                 numSuites: 2,
@@ -55,7 +54,7 @@ suite("Test Data Helpers", function() {
 
     suite("Nested Test Data Generation", function() {
         test("should create nested structure", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createNestedTestData(metrics, {
                 numSuites: 2,
@@ -74,7 +73,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should handle different depth configurations", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createNestedTestData(metrics, {
                 numSuites: 1,
@@ -93,7 +92,7 @@ suite("Test Data Helpers", function() {
 
     suite("Complex Test Data Generation", function() {
         test("should create realistic application structure", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createComplexTestData(metrics);
 
@@ -110,7 +109,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should provide comprehensive test coverage scenarios", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createComplexTestData(metrics);
 
@@ -127,7 +126,7 @@ suite("Test Data Helpers", function() {
 
     suite("Large Test Data Generation", function() {
         test("should create large dataset efficiently", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const startTime = Date.now();
             const testData = createLargeTestData(metrics, {
@@ -148,7 +147,7 @@ suite("Test Data Helpers", function() {
 
     suite("Realistic Test Data with Timing", function() {
         test("should create tests with realistic timing variations", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createRealisticTestData(metrics, {
                 numSuites: 2,
@@ -174,7 +173,7 @@ suite("Test Data Helpers", function() {
 
     suite("Edge Case Test Data", function() {
         test("should handle special characters and edge cases", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createEdgeCaseTestData(metrics);
 
@@ -209,7 +208,7 @@ suite("Test Data Helpers", function() {
             expect(metrics1.suiteExists(["TempSuite"])).to.be.true;
 
             // Get fresh instance
-            const metrics2 = getFreshMetrics();
+            const metrics2 = new SuiteMetrics();
             expect(metrics2.suiteExists(["TempSuite"])).to.be.false;
         });
 
@@ -228,7 +227,7 @@ suite("Test Data Helpers", function() {
 
     suite("Custom Options and Flexibility", function() {
         test("should respect custom naming options", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createSimpleTestData(metrics, {
                 numSuites: 2,
@@ -244,7 +243,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should provide detailed generation information", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const testData = createNestedTestData(metrics, {
                 numSuites: 2,
@@ -271,7 +270,7 @@ suite("Test Data Helpers", function() {
 
     suite("Performance and Stress Testing", function() {
         test("should handle large datasets without timing delays efficiently", function() {
-            const metrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const startTime = Date.now();
             const testData = createLargeTestData(metrics, {

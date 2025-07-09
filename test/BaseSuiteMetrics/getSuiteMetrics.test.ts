@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
-import { createSimpleTestData, createNestedTestData, getFreshMetrics } from "../generators/testDataHelpers.ts";
+import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
@@ -671,7 +671,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     suite("Using Test Data Helpers", function() {
         test("should work correctly with simple test data helper", function() {
-            const freshMetrics = getFreshMetrics();
+            const freshMetrics = new SuiteMetrics();
 
             const testData = createSimpleTestData(freshMetrics, {
                 numSuites: 3,
@@ -694,7 +694,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         });
 
         test("should work correctly with nested test data helper", function() {
-            const freshMetrics = getFreshMetrics();
+            const freshMetrics = new SuiteMetrics();
 
             const testData = createNestedTestData(freshMetrics, {
                 numSuites: 2,
@@ -724,10 +724,10 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         });
 
         test("should handle large datasets efficiently with helper", function() {
-            const freshMetrics = getFreshMetrics();
+            const metrics = new SuiteMetrics();
 
             const startTime = Date.now();
-            const testData = createSimpleTestData(freshMetrics, {
+            const testData = createSimpleTestData(metrics, {
                 numSuites: 20,
                 testsPerSuite: 25,
                 addTimingDelays: false // Fast generation
@@ -738,11 +738,11 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             expect(endTime - startTime).to.be.below(200); // Should be very fast
 
             // Verify random sampling of the data
-            expect(freshMetrics.suiteExists(["Suite1"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Suite10"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Suite20"])).to.be.true;
+            expect(metrics.suiteExists(["Suite1"])).to.be.true;
+            expect(metrics.suiteExists(["Suite10"])).to.be.true;
+            expect(metrics.suiteExists(["Suite20"])).to.be.true;
 
-            const suite10Data = freshMetrics.getSuiteMetrics(["Suite10"]);
+            const suite10Data = metrics.getSuiteMetrics(["Suite10"]);
             expect(suite10Data.testMetrics.numTests).to.equal(25);
         });
     });

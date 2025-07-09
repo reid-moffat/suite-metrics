@@ -386,14 +386,6 @@ export function createComplexTestData(
 }
 
 /**
- * Utility function to get a fresh metrics instance
- */
-export function getFreshMetrics(): SuiteMetrics {
-    SuiteMetrics.resetInstance();
-    return SuiteMetrics.getInstance();
-}
-
-/**
  * Utility function to get a fresh concurrent metrics instance
  */
 export function getFreshConcurrentMetrics(): ConcurrentSuiteMetrics {
