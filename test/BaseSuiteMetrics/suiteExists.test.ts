@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 
-suite("BaseSuiteMetrics - suiteExists and testExists Comprehensive Tests", function() {
+suite("[BaseSuiteMetrics] suiteExists", function() {
 
     let metrics: SuiteMetrics;
 
@@ -195,8 +195,6 @@ suite("BaseSuiteMetrics - suiteExists and testExists Comprehensive Tests", funct
             });
         });
     });
-
-
 
     suite("Cross-Method Consistency", function() {
         test("should maintain consistency between suiteExists and testExists", function() {

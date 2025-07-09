@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 
-suite("testExists Method", function() {
+suite("[BaseSuiteMetrics] testExists", function() {
 
     let metrics: SuiteMetrics;
 

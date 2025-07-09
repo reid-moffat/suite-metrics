@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData } from "../../src/index.ts";
 
-suite("Singleton Pattern tests", function() {
+suite("Singleton Pattern", function() {
 
     let metrics: SuiteMetrics;
     let concurrentMetrics: ConcurrentSuiteMetrics;

@@ -11,7 +11,7 @@ import {
     getFreshConcurrentMetrics
 } from "./testDataHelpers.ts";
 
-suite("Test Data Helpers - Demonstration", function() {
+suite("Test Data Helpers", function() {
 
     suite("Simple Test Data Generation", function() {
         test("should create basic flat structure", function() {

@@ -5,7 +5,7 @@ import { createSimpleTestData, createComplexTestData, getFreshConcurrentMetrics 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-suite("ConcurrentSuiteMetrics Tests", function() {
+suite("ConcurrentSuiteMetrics", function() {
 
     let metrics: ConcurrentSuiteMetrics;
 

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 import { createSimpleTestData, createNestedTestData, getFreshMetrics } from "../generators/testDataHelpers.ts";
 
-suite("getSuiteMetrics - Comprehensive Test Coverage", function() {
+suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     let metrics: SuiteMetrics;
 
