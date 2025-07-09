@@ -1,12 +1,6 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
-
-/**
- * Generates a random duration between min and max
- */
-function randomDuration(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import { randomInt } from "../helpers";
 
 /**
  * Creates a simple flat structure with multiple suites and tests
@@ -40,14 +34,14 @@ function createSimpleTestData(
             if (metrics instanceof ConcurrentSuiteMetrics) {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest();
@@ -94,14 +88,14 @@ function createNestedTestData(
             if (metrics instanceof ConcurrentSuiteMetrics) {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest();
@@ -172,14 +166,14 @@ function createCustomTestData(
             if (metrics instanceof ConcurrentSuiteMetrics) {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest(testPath);
             } else {
                 metrics.startTest(testPath);
                 if (opts.addTimingDelays) {
-                    const duration = randomDuration(opts.minDuration, opts.maxDuration);
+                    const duration = randomInt(opts.minDuration, opts.maxDuration);
                     // add delay...
                 }
                 metrics.stopTest();
