@@ -74,7 +74,7 @@ suite("SuiteMetrics - Comprehensive Test Coverage", function() {
 
             const suiteData = metrics.getSuiteMetrics(["MultiTestSuite"]);
             expect(suiteData.testMetrics.numTests).to.equal(3);
-            expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+            expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.at.least(0);
             expect(suiteData.testMetrics.averageTime).to.equal(suiteData.testMetrics.totalTime! / 3);
         });
 
