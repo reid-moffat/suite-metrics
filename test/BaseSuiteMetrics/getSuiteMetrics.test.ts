@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
+import { createSimpleTestData, createNestedTestData, getFreshMetrics } from "../generators/testDataHelpers.ts";
 
 suite("getSuiteMetrics - Comprehensive Test Coverage", function() {
 
@@ -665,6 +666,84 @@ suite("getSuiteMetrics - Comprehensive Test Coverage", function() {
             expect(metrics.suiteExists(["ValidSuite"])).to.be.true;
             const stillValidData = metrics.getSuiteMetrics(["ValidSuite"]);
             expect(stillValidData).to.deep.equal(validData);
+        });
+    });
+
+    suite("Using Test Data Helpers", function() {
+        test("should work correctly with simple test data helper", function() {
+            const freshMetrics = getFreshMetrics();
+
+            const testData = createSimpleTestData(freshMetrics, {
+                numSuites: 3,
+                testsPerSuite: 4,
+                suiteNamePrefix: "HelperSuite",
+                testNamePrefix: "HelperTest"
+            });
+
+            expect(testData.totalTests).to.equal(12); // 3 * 4
+            expect(testData.totalSuites).to.equal(3);
+
+            // Verify suite metrics work correctly
+            const suite1Data = freshMetrics.getSuiteMetrics(["HelperSuite1"]);
+            expect(suite1Data.testMetrics.numTests).to.equal(4);
+            expect(suite1Data.childSuites).to.be.null;
+            expect(suite1Data.parentSuites).to.deep.equal([]);
+
+            const topLevelData = freshMetrics.getSuiteMetrics([]);
+            expect(topLevelData.childSuites).to.have.members(["HelperSuite1", "HelperSuite2", "HelperSuite3"]);
+        });
+
+        test("should work correctly with nested test data helper", function() {
+            const freshMetrics = getFreshMetrics();
+
+            const testData = createNestedTestData(freshMetrics, {
+                numSuites: 2,
+                testsPerSuite: 6,
+                maxDepth: 3,
+                subSuitesPerSuite: 2,
+                suiteNamePrefix: "Nested",
+                testNamePrefix: "Test"
+            });
+
+            expect(testData.totalTests).to.be.above(0);
+            expect(testData.maxDepthAchieved).to.equal(3);
+
+            // Verify nested structure
+            expect(freshMetrics.suiteExists(["Nested1"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Nested1", "Nested2_1"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Nested1", "Nested2_1", "Nested3_1"])).to.be.true;
+
+            // Verify metrics at different levels
+            const level1Data = freshMetrics.getSuiteMetrics(["Nested1"]);
+            const level2Data = freshMetrics.getSuiteMetrics(["Nested1", "Nested2_1"]);
+            const level3Data = freshMetrics.getSuiteMetrics(["Nested1", "Nested2_1", "Nested3_1"]);
+
+            expect(level1Data.childSuites).to.have.lengthOf(2); // 2 sub-suites per suite
+            expect(level2Data.parentSuites).to.deep.equal(["Nested1"]);
+            expect(level3Data.testMetrics.numTests).to.equal(6); // Tests at max depth
+        });
+
+        test("should handle large datasets efficiently with helper", function() {
+            const freshMetrics = getFreshMetrics();
+
+            const startTime = Date.now();
+            const testData = createSimpleTestData(freshMetrics, {
+                numSuites: 20,
+                testsPerSuite: 25,
+                addTimingDelays: false // Fast generation
+            });
+            const endTime = Date.now();
+
+            expect(testData.totalTests).to.equal(500); // 20 * 25
+            expect(endTime - startTime).to.be.below(200); // Should be very fast
+
+            // Verify random sampling of the data
+            expect(freshMetrics.suiteExists(["Suite1"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Suite10"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Suite20"])).to.be.true;
+
+            const suite10Data = freshMetrics.getSuiteMetrics(["Suite10"]);
+            expect(suite10Data.testMetrics.numTests).to.equal(25);
         });
     });
 });

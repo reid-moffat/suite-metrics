@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
+import { createSimpleTestData, createComplexTestData, getFreshConcurrentMetrics } from "../generators/testDataHelpers.ts";
 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -406,6 +407,117 @@ suite("ConcurrentSuiteMetrics Tests", function() {
             }
 
             console.log(metrics.printAllSuiteMetrics());
+        });
+    });
+
+    suite("Using Test Data Helpers", function() {
+        test("should work with simple test data helper for concurrent metrics", function() {
+            const freshMetrics = getFreshConcurrentMetrics();
+
+            const testData = createSimpleTestData(freshMetrics, {
+                numSuites: 4,
+                testsPerSuite: 3,
+                suiteNamePrefix: "ConcurrentSuite",
+                testNamePrefix: "ConcurrentTest"
+            });
+
+            expect(testData.totalTests).to.equal(12); // 4 * 3
+            expect(testData.totalSuites).to.equal(4);
+
+            // Verify the structure was created correctly
+            expect(freshMetrics.suiteExists(["ConcurrentSuite1"])).to.be.true;
+            expect(freshMetrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"])).to.be.true;
+            expect(freshMetrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"])).to.be.true;
+
+            // Verify metrics work correctly
+            const suite1Data = freshMetrics.getSuiteMetrics(["ConcurrentSuite1"]);
+            expect(suite1Data.testMetrics.numTests).to.equal(3);
+            expect(suite1Data.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+
+            console.log(freshMetrics.printAllSuiteMetrics());
+        });
+
+        test("should work with complex test data helper for concurrent metrics", function() {
+            const freshMetrics = getFreshConcurrentMetrics();
+
+            const testData = createComplexTestData(freshMetrics);
+
+            expect(testData.totalTests).to.be.above(10);
+
+            // Verify the complex structure was created
+            expect(freshMetrics.suiteExists(["Authentication"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Authentication", "OAuth"])).to.be.true;
+            expect(freshMetrics.suiteExists(["API", "Users", "Validation"])).to.be.true;
+
+            // Verify specific tests exist
+            expect(freshMetrics.testExists(["Authentication", "login"])).to.be.true;
+            expect(freshMetrics.testExists(["Authentication", "OAuth", "google_login"])).to.be.true;
+            expect(freshMetrics.testExists(["API", "Users", "Validation", "email_validation"])).to.be.true;
+
+            // Test metrics at different levels
+            const authData = freshMetrics.getSuiteMetrics(["Authentication"]);
+            expect(authData.testMetrics.numTests).to.equal(3); // Direct tests only
+            expect(authData.childSuites).to.include.members(["OAuth", "TwoFactor"]);
+
+            const apiUsersData = freshMetrics.getSuiteMetrics(["API", "Users"]);
+            expect(apiUsersData.testMetrics.numTests).to.equal(4);
+            expect(apiUsersData.childSuites).to.deep.equal(["Validation"]);
+
+            console.log(freshMetrics.printAllSuiteMetrics());
+        });
+
+        test("should handle large datasets efficiently with concurrent metrics", function() {
+            const freshMetrics = getFreshConcurrentMetrics();
+
+            const startTime = Date.now();
+            const testData = createSimpleTestData(freshMetrics, {
+                numSuites: 15,
+                testsPerSuite: 20,
+                addTimingDelays: false // Fast generation for performance test
+            });
+            const endTime = Date.now();
+
+            expect(testData.totalTests).to.equal(300); // 15 * 20
+            expect(endTime - startTime).to.be.below(300); // Should be very fast
+
+            // Verify random sampling of the data
+            expect(freshMetrics.suiteExists(["Suite1"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Suite8"])).to.be.true;
+            expect(freshMetrics.suiteExists(["Suite15"])).to.be.true;
+
+            const suite8Data = freshMetrics.getSuiteMetrics(["Suite8"]);
+            expect(suite8Data.testMetrics.numTests).to.equal(20);
+            expect(suite8Data.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+
+            // Verify top-level structure
+            const topLevelData = freshMetrics.getSuiteMetrics([]);
+            expect(topLevelData.childSuites).to.have.lengthOf(15);
+        });
+
+        test("should provide useful generation information for concurrent metrics", function() {
+            const freshMetrics = getFreshConcurrentMetrics();
+
+            const testData = createComplexTestData(freshMetrics);
+
+            // Verify GeneratedTestData provides useful information
+            expect(testData.testPaths).to.be.an('array');
+            expect(testData.suitePaths).to.be.an('array');
+            expect(testData.suiteTestCounts).to.be.instanceOf(Map);
+
+            expect(testData.testPaths.length).to.equal(testData.totalTests);
+            expect(testData.suitePaths.length).to.equal(testData.totalSuites);
+
+            // Verify suite test counts are accurate
+            for (const [suitePath, expectedCount] of testData.suiteTestCounts) {
+                const actualSuiteData = freshMetrics.getSuiteMetrics(suitePath.split('/'));
+                expect(actualSuiteData.testMetrics.numTests).to.equal(expectedCount);
+            }
+
+            // Verify some specific paths from the complex structure
+            expect(testData.testPaths).to.deep.include(["Authentication", "login"]);
+            expect(testData.testPaths).to.deep.include(["API", "Users", "Validation", "email_validation"]);
+            expect(testData.suitePaths).to.deep.include(["Authentication", "OAuth"]);
+            expect(testData.suitePaths).to.deep.include(["Frontend", "Components"]);
         });
     });
 });
