@@ -8,9 +8,7 @@ import {
     createRealisticTestData,
     createEdgeCaseTestData,
     getFreshMetrics,
-    getFreshConcurrentMetrics,
-    TestDataOptions,
-    GeneratedTestData
+    getFreshConcurrentMetrics
 } from "./testDataHelpers.ts";
 
 suite("Test Data Helpers - Demonstration", function() {
