@@ -54,4 +54,20 @@ interface GeneratedTestData {
     suiteTestCounts: Map<string, number>;
 }
 
-export { TestDataOptions, SuiteStructure, GeneratedTestData };
+/**
+ * Default options for test data generation
+ */
+const DEFAULT_OPTIONS: Required<TestDataOptions> = {
+    numSuites: 3,
+    testsPerSuite: 2,
+    maxDepth: 2,
+    subSuitesPerSuite: 1,
+    suiteNamePrefix: "Suite",
+    testNamePrefix: "Test",
+    minDuration: 1000, // 1ms in microseconds
+    maxDuration: 10000, // 10ms in microseconds
+    addTimingDelays: false,
+    customStructure: []
+};
+
+export { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS };

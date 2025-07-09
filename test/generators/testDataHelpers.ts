@@ -1,21 +1,5 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
-import { TestDataOptions, SuiteStructure, GeneratedTestData } from "./options.ts";
-
-/**
- * Default options for test data generation
- */
-const DEFAULT_OPTIONS: Required<TestDataOptions> = {
-    numSuites: 3,
-    testsPerSuite: 2,
-    maxDepth: 2,
-    subSuitesPerSuite: 1,
-    suiteNamePrefix: "Suite",
-    testNamePrefix: "Test",
-    minDuration: 1000, // 1ms in microseconds
-    maxDuration: 10000, // 10ms in microseconds
-    addTimingDelays: false,
-    customStructure: []
-};
+import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
 
 /**
  * Generates a random duration between min and max
