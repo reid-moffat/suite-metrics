@@ -1,6 +1,5 @@
 import SuiteMetrics from "../../src/SuiteMetrics.ts";
 import ConcurrentSuiteMetrics from "../../src/ConcurrentSuiteMetrics.ts";
-import BaseSuiteMetrics from "../../src/BaseSuiteMetrics.ts";
 
 /**
  * Configuration options for generating test data
