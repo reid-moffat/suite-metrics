@@ -4,4 +4,5 @@ import BaseSuiteMetrics from "./BaseSuiteMetrics.ts";
 import { Suite, Test, SuiteData, RecursiveSuiteData } from "./types.ts";
 
 export default SuiteMetrics;
-export { ConcurrentSuiteMetrics, BaseSuiteMetrics, Suite, Test, SuiteData, RecursiveSuiteData };
+export { ConcurrentSuiteMetrics, BaseSuiteMetrics };
+export type { Suite, Test, SuiteData, RecursiveSuiteData };
