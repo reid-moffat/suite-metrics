@@ -5,7 +5,9 @@ import { Suite, Test, SuiteData, RecursiveSuiteData } from "./types.ts";
  */
 abstract class BaseSuiteMetrics {
 
-    protected readonly suites: Map<string, Suite> = new Map<string, Suite>();
+    protected readonly suites: Map<string, Suite> = new Map<string, Suite>(); // All suite data
+
+    // Top-level suite makes top-level metrics and functions easier to handle
     protected readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
         tests: null,

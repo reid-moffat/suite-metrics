@@ -7,7 +7,7 @@ import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
  */
 class SuiteMetrics extends BaseSuiteMetrics {
 
-    private static instance: SuiteMetrics;
+    private static instance: SuiteMetrics; // Singleton
 
     private currentTestContext: {
         testPath: string[];

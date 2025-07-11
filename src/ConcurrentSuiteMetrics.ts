@@ -6,8 +6,9 @@ import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
  */
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
-    private static instance: ConcurrentSuiteMetrics;
+    private static instance: ConcurrentSuiteMetrics; // Singleton
 
+    // Stores key (joined path) and start time for each active test
     private readonly activeTests = new Map<string, {
         testPath: string[];
         startTime: number;
