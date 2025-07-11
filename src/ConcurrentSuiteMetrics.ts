@@ -9,10 +9,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private static instance: ConcurrentSuiteMetrics; // Singleton
 
     // Stores key (joined path) and start time for each active test
-    private readonly activeTests = new Map<string, {
-        testPath: string[];
-        startTime: number;
-    }>();
+    private readonly activeTests = new Map<string, number>();
 
     /**
      * Creates a unique key for a test path to track concurrent tests
@@ -53,10 +50,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
         this.createTestInSuite(path);
 
-        this.activeTests.set(testKey, {
-            testPath: path,
-            startTime: microtime.now()
-        });
+        this.activeTests.set(testKey, microtime.now());
     }
 
     /**
@@ -69,8 +63,8 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         this.validatePath(path, { isTest: true });
         const testKey = this.createTestKey(path);
 
-        const activeTest = this.activeTests.get(testKey);
-        if (!activeTest) {
+        const testStartTime = this.activeTests.get(testKey);
+        if (!testStartTime) {
             throw new Error(`Test [${path.join(', ')}] is not currently running - call startTest() first`);
         }
 
@@ -78,9 +72,9 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         const testName = path[path.length - 1];
         const test = suite.tests!.get(testName)!;
 
-        test.startTimestamp = activeTest.startTime;
+        test.startTimestamp = testStartTime;
         test.endTimestamp = endTime;
-        test.duration = endTime - activeTest.startTime;
+        test.duration = endTime - testStartTime;
         test.completed = true;
 
         this.activeTests.delete(testKey);
