@@ -1,6 +1,12 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 
+// Path segments joined with '::'
+type TestKey = string;
+
+// Microsecond timestamp the test began at
+type StartTime = number;
+
 /**
  * Concurrent suite metrics implementation - multiple tests can run simultaneously
  */
@@ -9,7 +15,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private static instance: ConcurrentSuiteMetrics; // Singleton
 
     // Stores key (joined path) and start time for each active test
-    private readonly activeTests = new Map<string, number>();
+    private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
 
     /**
      * Creates a unique key for a test path to track concurrent tests
