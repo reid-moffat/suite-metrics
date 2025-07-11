@@ -94,7 +94,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         test("should return complete suite data for single-level suite", function() {
             metrics.startTest(["SimpleSuite", "Test1"]);
             const startTime = Date.now();
-            while (Date.now() - startTime < 2) { /* busy wait */ }
+            while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["SimpleSuite"]);
@@ -109,6 +109,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
         test("should return complete suite data for nested suite", function() {
             metrics.startTest(["Level1", "Level2", "Level3", "Test1"]);
+            const startTime = Date.now();
+            while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["Level1", "Level2", "Level3"]);
@@ -144,7 +146,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         test("should calculate correct metrics for suite with single test", function() {
             metrics.startTest(["SingleTestSuite", "OnlyTest"]);
             const startTime = Date.now();
-            while (Date.now() - startTime < 5) { /* busy wait */ }
+            while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SingleTestSuite", "OnlyTest"]);
@@ -572,6 +574,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             // Create many tests in same suite
             for (let i = 0; i < numTests; i++) {
                 metrics.startTest(["LargeSuite", `Test${i}`]);
+                const startTime = Date.now();
+                while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
                 metrics.stopTest();
             }
 
