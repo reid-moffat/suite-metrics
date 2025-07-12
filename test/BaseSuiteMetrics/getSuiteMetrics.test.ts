@@ -101,7 +101,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             expect(suiteData.name).to.equal("SimpleSuite");
             expect(suiteData.parentSuites).to.deep.equal([]);
-            expect(suiteData.childSuites).to.be.null;
+            expect(suiteData.childSuites).to.deep.equal([]);
             expect(suiteData.testMetrics.numTests).to.equal(1);
             expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.above(0);
             expect(suiteData.testMetrics.averageTime).to.equal(suiteData.testMetrics.totalTime);
@@ -117,7 +117,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             expect(suiteData.name).to.equal("Level3");
             expect(suiteData.parentSuites).to.deep.equal(["Level1", "Level2"]);
-            expect(suiteData.childSuites).to.be.null;
+            expect(suiteData.childSuites).to.deep.equal([]);
             expect(suiteData.testMetrics.numTests).to.equal(1);
             expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.above(0);
             expect(suiteData.testMetrics.averageTime).to.equal(suiteData.testMetrics.totalTime);
@@ -223,7 +223,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             // Sub suite should count its direct tests
             expect(subSuiteData.testMetrics.numTests).to.equal(2);
-            expect(subSuiteData.childSuites).to.be.null;
+            expect(subSuiteData.childSuites).to.deep.equal([]);
         });
     });
 
@@ -260,9 +260,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const subBranchData = metrics.getSuiteMetrics(["Root", "Branch3", "SubBranch"]);
 
             expect(rootData.childSuites).to.have.members(["Branch1", "Branch2", "Branch3"]);
-            expect(branch1Data.childSuites).to.be.null;
+            expect(branch1Data.childSuites).to.deep.equal([]);
             expect(branch3Data.childSuites).to.deep.equal(["SubBranch"]);
-            expect(subBranchData.childSuites).to.be.null;
+            expect(subBranchData.childSuites).to.deep.equal([]);
         });
 
         test("should handle suites with both direct tests and child suites", function() {
@@ -284,7 +284,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             const leafData = metrics.getSuiteMetrics(["LeafSuite"]);
-            expect(leafData.childSuites).to.be.null;
+            expect(leafData.childSuites).to.deep.equal([]);
         });
 
         test("should return empty array for parentSuites when suite is at top level", function() {
@@ -316,8 +316,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             expect(subSuiteData.testMetrics.numTests).to.equal(1);
 
             expect(suite1Data.childSuites).to.deep.equal(["SubSuite"]);
-            expect(suite2Data.childSuites).to.be.null;
-            expect(subSuiteData.childSuites).to.be.null;
+            expect(suite2Data.childSuites).to.deep.equal([]);
+            expect(subSuiteData.childSuites).to.deep.equal([]);
         });
 
         test("should handle deeply nested suite hierarchies", function() {
@@ -344,7 +344,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             expect(level5Data.testMetrics.numTests).to.equal(0);
 
             expect(level10Data.parentSuites).to.deep.equal(deepPath.slice(0, 9));
-            expect(level10Data.childSuites).to.be.null;
+            expect(level10Data.childSuites).to.deep.equal([]);
             expect(level10Data.testMetrics.numTests).to.equal(1);
         });
 
@@ -584,7 +584,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             expect(suiteData.testMetrics.numTests).to.equal(numTests);
             expect(suiteData.testMetrics.totalTime).to.be.a('number').and.be.above(0);
             expect(suiteData.testMetrics.averageTime).to.equal(suiteData.testMetrics.totalTime! / numTests);
-            expect(suiteData.childSuites).to.be.null;
+            expect(suiteData.childSuites).to.deep.equal([]);
         });
 
         test("should handle large number of child suites efficiently", function() {
@@ -632,7 +632,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
                 }
 
                 if (i === depth) {
-                    expect(levelData.childSuites).to.be.null;
+                    expect(levelData.childSuites).to.deep.equal([]);
                     expect(levelData.testMetrics.numTests).to.equal(1);
                 } else {
                     expect(levelData.childSuites).to.deep.equal([`Level${i + 1}`]);
@@ -690,7 +690,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             // Verify suite metrics work correctly
             const suite1Data = freshMetrics.getSuiteMetrics(["HelperSuite1"]);
             expect(suite1Data.testMetrics.numTests).to.equal(4);
-            expect(suite1Data.childSuites).to.be.null;
+            expect(suite1Data.childSuites).to.deep.equal([]);
             expect(suite1Data.parentSuites).to.deep.equal([]);
 
             const topLevelData = freshMetrics.getSuiteMetrics([]);

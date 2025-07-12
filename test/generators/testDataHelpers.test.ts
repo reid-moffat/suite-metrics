@@ -85,7 +85,7 @@ suite("Test Data Helpers", function() {
 
             const suiteData = metrics.getSuiteMetrics(["Suite1"]);
             expect(suiteData.testMetrics.numTests).to.equal(3);
-            expect(suiteData.childSuites).to.be.null;
+            expect(suiteData.childSuites).to.deep.equal([]);
         });
     });
 

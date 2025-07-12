@@ -155,7 +155,7 @@ suite("SuiteMetrics", function() {
 
             expect(deepSuiteData.testMetrics.numTests).to.equal(1);
             expect(deepSuiteData.parentSuites).to.deep.equal(["TopSuite", "SubSuite1"]);
-            expect(deepSuiteData.childSuites).to.be.null;
+            expect(deepSuiteData.childSuites).to.deep.equal([]);
         });
     });
 
