@@ -47,4 +47,4 @@ type RecursiveSuiteData = {
     }
 };
 
-export { Test, Suite, SuiteData, RecursiveSuiteData };
+export type { Test, Suite, SuiteData, RecursiveSuiteData };
