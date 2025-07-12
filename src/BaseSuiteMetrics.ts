@@ -9,21 +9,22 @@ abstract class BaseSuiteMetrics {
     protected readonly suites: Map<string, Suite> = new Map<string, Suite>();
 
     // Top-level suite makes top-level metrics and functions easier to handle
-    protected readonly topLevelSuite: Suite = {
+    private readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
         tests: null,
         numSubTests: 0,
         subSuites: this.suites
     };
 
-    // total number of tests in this instance
+    // Total number of tests in this instance
     protected testCounter: number = 0;
 
 
     /**
-     * Returns true if a given suite exists in this instance, false if not
+     * Checks if a given suite exists
      *
      * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
+     * @returns true if the suite exists, false if not
      */
     public suiteExists(suitePath: string[]): boolean {
         this.validatePath(suitePath, { allowTopLevel: true });
@@ -31,9 +32,10 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Returns true if a given test exists in this instance, false if not
+     * Checks if a given test exists
      *
      * @param testPath Path to check for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns true if the suite exists, false if not
      */
     public testExists(testPath: string[]): boolean {
         this.validatePath(testPath, { isTest: true });
@@ -44,14 +46,15 @@ abstract class BaseSuiteMetrics {
      * Gets metrics for a specific test
      *
      * @param path Path to get metrics for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns An object with test's name, timestamps, durations, and number
      */
     public getTestMetrics(path: string[]): Test {
         this.validatePath(path, { isTest: true });
-        const suite = this.navigateToSuite(path, { isTestPath: true });
-        const testName = path[path.length - 1];
+        const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
+        const testName: string = path[path.length - 1];
 
-        const test = suite.tests?.get(testName);
-        if (!test) {
+        const test: Test | undefined = suite.tests?.get(testName);
+        if (test === undefined) {
             throw new Error(`Test [${path.join(', ')}] does not exist`);
         }
 
@@ -59,13 +62,14 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets metrics (metadata plus number and time stats for tests) for a given suite
+     * Gets metrics for a specific suite
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An object with suite's name, parent/child, and test statistics
      */
     public getSuiteMetrics(path: string[]): SuiteData {
         this.validatePath(path, { allowTopLevel: true });
-        const suite = this.navigateToSuite(path);
+        const suite: Suite = this.navigateToSuite(path);
         const testMetrics = this.calculateDirectTestMetrics(suite);
 
         return {
@@ -77,18 +81,19 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets metrics (metadata plus number and time stats for tests) for a given suite and its sub-suites
+     * Gets metrics for a given suite and its sub-suites
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An object with suite metadata, and metrics for direct & sub tests
      */
     public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
         this.validatePath(path, { allowTopLevel: true });
-        const suite = this.navigateToSuite(path);
+        const suite: Suite = this.navigateToSuite(path);
 
         const directMetrics = this.calculateDirectTestMetrics(suite);
         const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
-        const subTests = totalTests - directMetrics.numTests;
-        const subTime = totalTime - (directMetrics.totalTime ?? 0);
+        const subTests: number = totalTests - directMetrics.numTests;
+        const subTime: number = totalTime - (directMetrics.totalTime ?? 0);
 
         return {
             name: suite.name,
@@ -111,7 +116,8 @@ abstract class BaseSuiteMetrics {
     /**
      * Returns a formatted string with all suite's data regarding tests
      *
-     * @param topLevelSuite Include a top-level suite with all suite data summed up at the top
+     * @param topLevelSuite Include a top-level suite with all suite data summed up at the top (default: true)
+     * @returns Formatted string (warning: may be very long for large contexts)
      */
     public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
         const lines: string[] = [];
@@ -130,11 +136,13 @@ abstract class BaseSuiteMetrics {
 
     /**
      * Validates a test or suite path
+     *
+     * @param path Path to the specified suite or test
+     * @param options Optional flags for specific cases
+     * @param options.isTest Set to true if this is validating a test (default: false)
+     * @param options.alowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
      */
-    protected validatePath(path: string[], options: {
-        isTest?: boolean;
-        allowTopLevel?: boolean;
-    } = {}): void {
+    protected validatePath(path: string[], options: { isTest?: boolean; allowTopLevel?: boolean; } = {}): void {
 
         const { isTest = false, allowTopLevel = false } = options;
 
@@ -142,7 +150,7 @@ abstract class BaseSuiteMetrics {
         if (!Array.isArray(path)) {
             throw new Error('Path must be an array of strings');
         }
-        if (!path.every((segment) => typeof segment === 'string' && segment.length > 0)) {
+        if (!path.every((segment: string): boolean => segment.length > 0)) {
             throw new Error('Path must be an array of non-empty strings');
         }
 
@@ -160,13 +168,15 @@ abstract class BaseSuiteMetrics {
 
     /**
      * Navigates to a suite in the hierarchy, optionally creating missing suites
+     *
+     * @param path Path of the suite to navigate to (can be a test path with isTestPath, see below)
+     * @param options Optional flags for specific cases
+     * @param options.createIfMissing Set to true to create the suite and all parent suites above it if required (default: false)
+     * @param options.isTestPath Set to true if the path is a test (default: false). Will use the test's suite
      */
-    protected navigateToSuite(path: string[], options: {
-        createIfMissing?: boolean;
-        isTestPath?: boolean;
-    } = {}): Suite {
+    protected navigateToSuite(path: string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
-        const suitePath = isTestPath ? path.slice(0, -1) : path;
+        const suitePath: string[] = isTestPath ? path.slice(0, -1) : path;
 
         let currentSuite: Suite = this.topLevelSuite;
 
@@ -178,7 +188,7 @@ abstract class BaseSuiteMetrics {
                 currentSuite.subSuites = new Map<string, Suite>();
             }
 
-            let targetSuite = currentSuite.subSuites.get(suiteName);
+            let targetSuite: Suite | undefined = currentSuite.subSuites.get(suiteName);
             if (targetSuite === undefined) {
                 if (!createIfMissing) {
                     throw new Error(`Suite path [${suitePath.join(', ')}] does not exist`);

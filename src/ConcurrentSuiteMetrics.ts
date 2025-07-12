@@ -74,7 +74,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
         // Verify test exists
         const testStartTime: number | undefined = this.activeTests.get(testKey);
-        if (!testStartTime) {
+        if (testStartTime === undefined) {
             throw new Error(`Test [${path.join(', ')}] is not currently running. Call startTest() first to begin testing`);
         }
 
