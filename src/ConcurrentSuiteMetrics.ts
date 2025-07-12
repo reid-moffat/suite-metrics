@@ -79,6 +79,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             throw new Error(`Test [${path.join(', ')}] is not currently running. Call startTest() first to begin testing`);
         }
 
+        // Store test data and delete from active tests
         this.addTest(path, testStartTime, endTime);
         this.activeTests.delete(testKey);
     }
