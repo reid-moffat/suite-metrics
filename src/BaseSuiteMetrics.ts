@@ -214,20 +214,20 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Creates a new test in the specified suite
+     * Adds a completed test's data
      */
-    protected createTestInSuite(testPath: string[]): { suite: Suite; testName: string; test: Test } {
-        const suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
-        const testName = testPath[testPath.length - 1];
+    protected addTest(testPath: string[], startTime: number, endTime: number): void {
+        const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
+        const testName: string = testPath[testPath.length - 1];
 
         // Update sub-test counters for all parent suites
         this.updateSubTestCounters(testPath.slice(0, -1));
 
         const test: Test = {
             name: testName,
-            startTimestamp: -1,
-            endTimestamp: -1,
-            duration: -1,
+            startTimestamp: startTime,
+            endTimestamp: endTime,
+            duration: endTime - startTime,
             testNumber: ++this.testCounter,
             suiteTestNumber: (suite.tests?.size ?? 0) + 1
         };
@@ -236,8 +236,6 @@ abstract class BaseSuiteMetrics {
             suite.tests = new Map<string, Test>();
         }
         suite.tests.set(testName, test);
-
-        return { suite, testName, test };
     }
 
     /**

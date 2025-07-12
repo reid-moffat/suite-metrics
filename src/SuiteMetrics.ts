@@ -50,7 +50,6 @@ class SuiteMetrics extends BaseSuiteMetrics {
         }
 
         this.validatePath(path, { isTest: true });
-        this.createTestInSuite(path);
 
         this.activeTest = {
             testPath: path,
@@ -68,14 +67,8 @@ class SuiteMetrics extends BaseSuiteMetrics {
             throw new Error('No test is currently running. Call startTest() first to begin a test');
         }
 
-        const { testPath, startTime } = this.activeTest;
-        const suite: Suite = this.navigateToSuite(testPath, { isTestPath: true });
-        const testName: string = testPath[testPath.length - 1];
-        const test: Test = suite.tests!.get(testName)!;
-
-        test.startTimestamp = startTime;
-        test.endTimestamp = endTime;
-        test.duration = endTime - startTime;
+        const { testPath, startTime }: TestMetadata = this.activeTest;
+        this.addTest(testPath, startTime, endTime);
 
         this.activeTest = null;
     }

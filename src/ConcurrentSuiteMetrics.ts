@@ -60,8 +60,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             throw new Error(`Test [${path.join(', ')}] is already running`);
         }
 
-        this.createTestInSuite(path);
-
         this.activeTests.set(testKey, microtime.now());
     }
 
@@ -81,14 +79,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             throw new Error(`Test [${path.join(', ')}] is not currently running. Call startTest() first to begin testing`);
         }
 
-        const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
-        const testName: string = path[path.length - 1];
-        const test = suite.tests!.get(testName)!;
-
-        test.startTimestamp = testStartTime;
-        test.endTimestamp = endTime;
-        test.duration = endTime - testStartTime;
-
+        this.addTest(path, testStartTime, endTime);
         this.activeTests.delete(testKey);
     }
 }
