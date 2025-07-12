@@ -76,7 +76,6 @@ class SuiteMetrics extends BaseSuiteMetrics {
         test.startTimestamp = startTime;
         test.endTimestamp = endTime;
         test.duration = endTime - startTime;
-        test.completed = true;
 
         this.activeTest = null;
     }

@@ -228,7 +228,6 @@ abstract class BaseSuiteMetrics {
             startTimestamp: -1,
             endTimestamp: -1,
             duration: -1,
-            completed: false,
             testNumber: ++this.testCounter,
             suiteTestNumber: (suite.tests?.size ?? 0) + 1
         };

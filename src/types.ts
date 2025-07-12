@@ -3,7 +3,6 @@ type Test = {
     startTimestamp: number;
     endTimestamp: number;
     duration: number;
-    completed: boolean;
     readonly testNumber: number;
     readonly suiteTestNumber: number;
 };

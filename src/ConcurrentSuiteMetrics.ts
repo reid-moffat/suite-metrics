@@ -88,7 +88,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         test.startTimestamp = testStartTime;
         test.endTimestamp = endTime;
         test.duration = endTime - testStartTime;
-        test.completed = true;
 
         this.activeTests.delete(testKey);
     }
