@@ -8,11 +8,12 @@ type TestKey = string;
 type StartTime = number;
 
 /**
- * Concurrent suite metrics implementation - multiple tests can run simultaneously
+ * Provides metrics for tests and test suites, with the ability to track multiple test simultaneously
  */
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
-    private static instance: ConcurrentSuiteMetrics; // Singleton
+    // Lazy singleton instance
+    private static _instance: ConcurrentSuiteMetrics | null = null;
 
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
@@ -26,19 +27,21 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Gets the singleton instance of ConcurrentSuiteMetrics
+     *
+     * @returns
      */
     public static getInstance(): ConcurrentSuiteMetrics {
-        if (!ConcurrentSuiteMetrics.instance) {
-            ConcurrentSuiteMetrics.instance = new ConcurrentSuiteMetrics();
+        if (ConcurrentSuiteMetrics._instance === null) {
+            ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
         }
-        return ConcurrentSuiteMetrics.instance;
+        return ConcurrentSuiteMetrics._instance;
     }
 
     /**
      * Resets the singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
-        ConcurrentSuiteMetrics.instance = new ConcurrentSuiteMetrics();
+        ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
     }
 
     /**
