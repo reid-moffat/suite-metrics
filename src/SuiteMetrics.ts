@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
+import { Suite, Test } from "./types.ts";
 
 // Metadata for the currently running test
 type TestMetadata = { testPath: string[]; startTime: number; };
@@ -61,16 +62,16 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Stops timing the currently active test, storing the test information
      */
     public stopTest(): void {
-        const endTime = microtime.now();
+        const endTime: number = microtime.now();
 
         if (this.currentTestMetadata === null) {
             throw new Error('No test is currently running. Call startTest() first to begin a test');
         }
 
         const { testPath, startTime } = this.currentTestMetadata;
-        const suite = this.navigateToSuite(testPath, { isTestPath: true });
-        const testName = testPath[testPath.length - 1];
-        const test = suite.tests!.get(testName)!;
+        const suite: Suite = this.navigateToSuite(testPath, { isTestPath: true });
+        const testName: string = testPath[testPath.length - 1];
+        const test: Test = suite.tests!.get(testName)!;
 
         test.startTimestamp = startTime;
         test.endTimestamp = endTime;
