@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
+import { Suite } from "./types.ts";
 
 // Path segments joined with '::'
 type TestKey = string;
@@ -20,15 +21,17 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Creates a unique key for a test path to track concurrent tests
+     *
+     * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
      */
     private createTestKey(testPath: string[]): string {
         return testPath.join('::');
     }
 
     /**
-     * Gets the singleton instance of ConcurrentSuiteMetrics
+     * Gets the lazy singleton instance of ConcurrentSuiteMetrics
      *
-     * @returns
+     * @returns The globally available ConcurrentSuiteMetrics instance
      */
     public static getInstance(): ConcurrentSuiteMetrics {
         if (ConcurrentSuiteMetrics._instance === null) {
@@ -38,20 +41,20 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     }
 
     /**
-     * Resets the singleton instance (from getInstance()), clearing all data
+     * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
-        ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
+        ConcurrentSuiteMetrics._instance = null;
     }
 
     /**
-     * Starts timing a new test (may be called when other tests are running)
+     * Starts timing a new test. May be called when other tests are actively running
      *
-     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public startTest(path: string[]): void {
         this.validatePath(path, { isTest: true });
-        const testKey = this.createTestKey(path);
+        const testKey: string = this.createTestKey(path);
 
         if (this.activeTests.has(testKey)) {
             throw new Error(`Test [${path.join(', ')}] is already running`);
@@ -65,20 +68,21 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     /**
      * Stops timing a specific test
      *
-     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public stopTest(path: string[]): void {
-        const endTime = microtime.now();
+        const endTime: number = microtime.now();
         this.validatePath(path, { isTest: true });
-        const testKey = this.createTestKey(path);
+        const testKey: string = this.createTestKey(path);
 
-        const testStartTime = this.activeTests.get(testKey);
+        // Verify test exists
+        const testStartTime: number | undefined = this.activeTests.get(testKey);
         if (!testStartTime) {
-            throw new Error(`Test [${path.join(', ')}] is not currently running - call startTest() first`);
+            throw new Error(`Test [${path.join(', ')}] is not currently running. Call startTest() first to begin testing`);
         }
 
-        const suite = this.navigateToSuite(path, { isTestPath: true });
-        const testName = path[path.length - 1];
+        const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
+        const testName: string = path[path.length - 1];
         const test = suite.tests!.get(testName)!;
 
         test.startTimestamp = testStartTime;
