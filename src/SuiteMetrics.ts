@@ -16,7 +16,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
     private static _instance: SuiteMetrics | null = null;
 
     // Currently running test's data (path and start time, or null if no ongoing test)
-    private currentTestMetadata: TestMetadata | null = null;
+    private activeTest: TestMetadata | null = null;
 
     /**
      * Gets the lazy singleton instance of SuiteMetrics
@@ -44,7 +44,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public startTest(path: string[]): void {
-        if (this.currentTestMetadata !== null) {
+        if (this.activeTest !== null) {
             throw new Error('Only one test may run at a time with SuiteMetrics. Call stopTest() first before ' +
                 'starting a new test, or use ConcurrentSuiteMetrics to run multiple tests simultaneously');
         }
@@ -52,7 +52,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
         this.validatePath(path, { isTest: true });
         this.createTestInSuite(path);
 
-        this.currentTestMetadata = {
+        this.activeTest = {
             testPath: path,
             startTime: microtime.now()
         };
@@ -64,11 +64,11 @@ class SuiteMetrics extends BaseSuiteMetrics {
     public stopTest(): void {
         const endTime: number = microtime.now();
 
-        if (this.currentTestMetadata === null) {
+        if (this.activeTest === null) {
             throw new Error('No test is currently running. Call startTest() first to begin a test');
         }
 
-        const { testPath, startTime } = this.currentTestMetadata;
+        const { testPath, startTime } = this.activeTest;
         const suite: Suite = this.navigateToSuite(testPath, { isTestPath: true });
         const testName: string = testPath[testPath.length - 1];
         const test: Test = suite.tests!.get(testName)!;
@@ -78,7 +78,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
         test.duration = endTime - startTime;
         test.completed = true;
 
-        this.currentTestMetadata = null;
+        this.activeTest = null;
     }
 }
 
