@@ -150,7 +150,7 @@ abstract class BaseSuiteMetrics {
         if (!Array.isArray(path)) {
             throw new Error('Path must be an array of strings');
         }
-        if (!path.every((segment: string): boolean => segment.length > 0)) {
+        if (!path.every((segment: string): boolean => typeof segment === "string" && segment.length > 0)) {
             throw new Error('Path must be an array of non-empty strings');
         }
 
