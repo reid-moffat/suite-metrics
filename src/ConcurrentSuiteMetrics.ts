@@ -1,6 +1,5 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import { Suite } from "./types.ts";
 
 // Path segments joined with '::'
 type TestKey = string;

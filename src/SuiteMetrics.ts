@@ -1,6 +1,5 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import { Suite, Test } from "./types.ts";
 
 // Metadata for the currently running test
 type TestMetadata = { testPath: string[]; startTime: number; };
