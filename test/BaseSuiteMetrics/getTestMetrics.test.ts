@@ -91,7 +91,6 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             expect(testMetrics.endTimestamp).to.be.a('number').and.be.above(testMetrics.startTimestamp);
             expect(testMetrics.duration).to.be.a('number').and.be.above(0);
             expect(testMetrics.duration).to.equal(testMetrics.endTimestamp - testMetrics.startTimestamp);
-            expect(testMetrics.completed).to.be.true;
             expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
             expect(testMetrics.suiteTestNumber).to.be.a('number').and.be.above(0);
         });
@@ -103,7 +102,6 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const testMetrics = metrics.getTestMetrics(["Level1", "Level2", "Level3", "DeepTest"]);
 
             expect(testMetrics.name).to.equal("DeepTest");
-            expect(testMetrics.completed).to.be.true;
             expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
             expect(testMetrics.suiteTestNumber).to.equal(1); // First test in this suite
         });
@@ -288,8 +286,7 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
             // Verify all properties from Test type are present
             expect(testMetrics).to.have.all.keys([
-                'name', 'startTimestamp', 'endTimestamp', 'duration',
-                'completed', 'testNumber', 'suiteTestNumber'
+                'name', 'startTimestamp', 'endTimestamp', 'duration', 'testNumber', 'suiteTestNumber'
             ]);
 
             // Verify property types
@@ -297,7 +294,6 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             expect(testMetrics.startTimestamp).to.be.a('number');
             expect(testMetrics.endTimestamp).to.be.a('number');
             expect(testMetrics.duration).to.be.a('number');
-            expect(testMetrics.completed).to.be.a('boolean');
             expect(testMetrics.testNumber).to.be.a('number');
             expect(testMetrics.suiteTestNumber).to.be.a('number');
         });

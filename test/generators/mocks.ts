@@ -28,7 +28,6 @@ class _MockSuiteMetrics extends SuiteMetrics {
         test.startTimestamp = this.currentMockTime;
         test.endTimestamp = this.currentMockTime + duration;
         test.duration = duration;
-        test.completed = options.completed ?? true;
 
         this.currentMockTime += duration;
 
@@ -73,7 +72,6 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
         test.startTimestamp = this.currentMockTime;
         test.endTimestamp = this.currentMockTime + duration;
         test.duration = duration;
-        test.completed = options.completed ?? true;
 
         // Update max duration if required
         if (duration > this.maxDurationInBatch) {

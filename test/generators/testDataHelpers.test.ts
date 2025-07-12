@@ -159,7 +159,6 @@ suite("Test Data Helpers", function() {
             // Verify that tests have realistic durations
             const testMetrics = metrics.getTestMetrics(["Suite1", "Test1"]);
             expect(testMetrics.duration).to.be.above(0);
-            expect(testMetrics.completed).to.be.true;
 
             // Check if Test2 exists before trying to get its metrics
             if (metrics.testExists(["Suite1", "Test2"])) {

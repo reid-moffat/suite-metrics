@@ -197,7 +197,6 @@ suite("SuiteMetrics", function() {
             expect(testMetrics.endTimestamp).to.be.a('number').and.be.above(testMetrics.startTimestamp);
             expect(testMetrics.duration).to.be.a('number').and.be.above(0);
             expect(testMetrics.duration).to.equal(testMetrics.endTimestamp - testMetrics.startTimestamp);
-            expect(testMetrics.completed).to.be.true;
             expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
             expect(testMetrics.suiteTestNumber).to.be.a('number').and.be.above(0);
         });
@@ -360,7 +359,6 @@ suite("SuiteMetrics", function() {
             expect(testMetrics1.startTimestamp).to.be.a('number');
             expect(testMetrics1.endTimestamp).to.be.a('number');
             expect(testMetrics1.duration).to.be.a('number');
-            expect(testMetrics1.completed).to.be.a('boolean');
             expect(testMetrics1.testNumber).to.be.a('number');
             expect(testMetrics1.suiteTestNumber).to.be.a('number');
         });
