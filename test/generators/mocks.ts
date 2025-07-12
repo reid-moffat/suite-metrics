@@ -19,15 +19,11 @@ class _MockSuiteMetrics extends SuiteMetrics {
      * @param options.duration Test duration in microseconds. Defaults to a random number in (5ms - 2s)
      * @param options.completed The completion status of the test. Defaults to true
      */
-    public addTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
+    public addMockTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
         this.validatePath(path, { isTest: true });
-        const { test } = this.createTestInSuite(path);
 
         const duration = options.duration ?? Math.floor(Math.random() * (2_000_000 - 5_000 + 1)) + 5_000;
-
-        test.startTimestamp = this.currentMockTime;
-        test.endTimestamp = this.currentMockTime + duration;
-        test.duration = duration;
+        this.addTest(path, this.currentMockTime, this.currentMockTime + duration);
 
         this.currentMockTime += duration;
 
@@ -57,9 +53,8 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
      * @param options.duration Duration in microseconds. Defaults to a random value (5ms - 2s).
      * @param options.completed The completion status of the test. Defaults to true.
      */
-    public addTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
+    public addMockTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
         this.validatePath(path, { isTest: true });
-        const { test } = this.createTestInSuite(path);
 
         // Starting a new batch of concurrent tests: create the concurrent size and set start time
         if (this.currentConcurrentCount === 0) {
@@ -69,9 +64,7 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
         const duration = options.duration ?? Math.floor(Math.random() * (2_000_000 - 5_000 + 1)) + 5_000;
 
         // All tests in a concurrent batch start at the same time
-        test.startTimestamp = this.currentMockTime;
-        test.endTimestamp = this.currentMockTime + duration;
-        test.duration = duration;
+        this.addTest(path, this.currentMockTime, this.currentMockTime + duration);
 
         // Update max duration if required
         if (duration > this.maxDurationInBatch) {
