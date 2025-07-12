@@ -1,67 +1,73 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 
+// Metadata for the currently running test
+type TestMetadata = { testPath: string[]; startTime: number; };
+
 /**
- * Sequential suite metrics implementation.
- * Note: Only one test can run at a time, for concurrent tests use ConcurrentSuiteMetrics
+ * Provides metrics for tests and test suites
+ *
+ * Note: Only one test can run at a time. For concurrent tests, use ConcurrentSuiteMetrics
  */
 class SuiteMetrics extends BaseSuiteMetrics {
 
-    private static instance: SuiteMetrics; // Singleton
+    // Lazy singleton instance
+    private static _instance: SuiteMetrics | null = null;
 
-    private currentTestContext: {
-        testPath: string[];
-        startTime: number;
-    } | null = null;
+    // Currently running test's data (path and start time, or null if no ongoing test)
+    private currentTestMetadata: TestMetadata | null = null;
 
     /**
-     * Gets the singleton instance of SuiteMetrics
+     * Gets the lazy singleton instance of SuiteMetrics
+     *
+     * @returns The globally available SuiteMetrics instance
      */
     public static getInstance(): SuiteMetrics {
-        if (!SuiteMetrics.instance) {
-            SuiteMetrics.instance = new SuiteMetrics();
+        if (SuiteMetrics._instance === null) {
+            SuiteMetrics._instance = new SuiteMetrics();
         }
-        return SuiteMetrics.instance;
+        return SuiteMetrics._instance;
     }
 
     /**
-     * Resets the singleton instance (from getInstance()), clearing all data
+     * Resets SuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
-        SuiteMetrics.instance = new SuiteMetrics();
+        SuiteMetrics._instance = null;
     }
 
     /**
      * Starts timing a new test
-     * Note: Only one test can be active at a time. For multiple concurrent tests, use ConcurrentSuiteMetrics
      *
-     * @param path Path of suites to this test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * Note: Only one test may be active at a time. For multiple concurrent tests, use ConcurrentSuiteMetrics
+     * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public startTest(path: string[]): void {
-        if (this.currentTestContext !== null) {
-            throw new Error('Another test is already running - call stopTest() first');
+        if (this.currentTestMetadata !== null) {
+            throw new Error('Only one test may run at a time with SuiteMetrics. Call stopTest() first before ' +
+                'starting a new test, or use ConcurrentSuiteMetrics to run multiple tests simultaneously');
         }
 
         this.validatePath(path, { isTest: true });
         this.createTestInSuite(path);
 
-        this.currentTestContext = {
+        this.currentTestMetadata = {
             testPath: path,
             startTime: microtime.now()
         };
     }
 
     /**
-     * Stops timing the currently active test
+     * Stops timing the currently active test, storing the test information
      */
     public stopTest(): void {
         const endTime = microtime.now();
 
-        if (this.currentTestContext === null) {
-            throw new Error('No test is currently running - call startTest() first');
+        if (this.currentTestMetadata === null) {
+            throw new Error('No test is currently running. Call startTest() first to begin a test');
         }
 
-        const { testPath, startTime } = this.currentTestContext;
+        const { testPath, startTime } = this.currentTestMetadata;
         const suite = this.navigateToSuite(testPath, { isTestPath: true });
         const testName = testPath[testPath.length - 1];
         const test = suite.tests!.get(testName)!;
@@ -71,7 +77,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
         test.duration = endTime - startTime;
         test.completed = true;
 
-        this.currentTestContext = null;
+        this.currentTestMetadata = null;
     }
 }
 
