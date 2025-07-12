@@ -213,8 +213,8 @@ abstract class BaseSuiteMetrics {
     private pathExists(path: string[], isTest: boolean): boolean {
         try {
             if (isTest) {
-                const suite = this.navigateToSuite(path, { isTestPath: true });
-                const testName = path[path.length - 1];
+                const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
+                const testName: string = path[path.length - 1];
                 return suite.tests?.has(testName) ?? false;
             } else {
                 this.navigateToSuite(path);
@@ -271,14 +271,14 @@ abstract class BaseSuiteMetrics {
         totalTime: number | null;
         averageTime: number | null;
     } {
-        const numTests = suite.tests?.size ?? 0;
+        const numTests: number = suite.tests?.size ?? 0;
 
         if (numTests === 0) {
             return { numTests: 0, totalTime: null, averageTime: null };
         }
 
-        const totalTime = Array.from(suite.tests!.values())
-            .reduce((sum, test) => sum + test.duration, 0);
+        const totalTime: number = Array.from(suite.tests!.values())
+            .reduce((sum: number, test: Test): number => sum + test.duration, 0);
 
         return {
             numTests,
@@ -291,11 +291,11 @@ abstract class BaseSuiteMetrics {
      * Recursively calculates test metrics for a suite and all its sub-suites
      */
     private calculateRecursiveTestMetrics(suite: Suite): [number, number] {
-        let totalTests = suite.tests?.size ?? 0;
-        let totalTime = 0;
+        let totalTests: number = suite.tests?.size ?? 0;
+        let totalTime: number = 0;
 
         // Add direct test times
-        suite.tests?.forEach(test => totalTime += test.duration);
+        suite.tests?.forEach((test: Test): void => { totalTime += test.duration; });
 
         // Recursively add sub-suite metrics
         if (suite.subSuites) {
@@ -313,10 +313,10 @@ abstract class BaseSuiteMetrics {
      * Formats suite information for printing
      */
     private formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
-        const indent = ' '.repeat(indentLevel);
-        const directTestCount = suite.tests?.size ?? 0;
-        const directTestDuration = Array.from(suite.tests?.values() ?? [])
-            .reduce((sum, test) => sum + test.duration, 0);
+        const indent: string = ' '.repeat(indentLevel);
+        const directTestCount: number = suite.tests?.size ?? 0;
+        const directTestDuration: number = Array.from(suite.tests?.values() ?? [])
+            .reduce((sum: number, test: Test) => sum + test.duration, 0);
 
         lines.push(`${indent}Suite: ${suite.name}`);
         lines.push(`${indent}  Summary:`);
@@ -327,7 +327,7 @@ abstract class BaseSuiteMetrics {
 
         if (suite.tests && suite.tests.size > 0) {
             lines.push(`\n${indent}  Tests:`);
-            let testNumber = 1;
+            let testNumber: number = 1;
             for (const test of suite.tests.values()) {
                 lines.push(`${indent}    ${testNumber++}) '${test.name}': ${(test.duration / 1000).toFixed(2)} ms`);
             }
