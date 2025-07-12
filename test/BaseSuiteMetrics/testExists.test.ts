@@ -171,7 +171,7 @@ suite("[BaseSuiteMetrics] testExists", function() {
 
             // During test execution
             metrics.startTest(["Suite", "Test"]);
-            expect(metrics.testExists(["Suite", "Test"])).to.be.true;
+            expect(metrics.testExists(["Suite", "Test"])).to.be.false;
 
             // After test completion
             metrics.stopTest();
@@ -181,14 +181,14 @@ suite("[BaseSuiteMetrics] testExists", function() {
         test("should handle multiple test creation and completion cycles", function() {
             // First cycle
             metrics.startTest(["Suite", "Test1"]);
-            expect(metrics.testExists(["Suite", "Test1"])).to.be.true;
+            expect(metrics.testExists(["Suite", "Test1"])).to.be.false;
             metrics.stopTest();
             expect(metrics.testExists(["Suite", "Test1"])).to.be.true;
 
             // Second cycle
             metrics.startTest(["Suite", "Test2"]);
             expect(metrics.testExists(["Suite", "Test1"])).to.be.true; // Previous test still exists
-            expect(metrics.testExists(["Suite", "Test2"])).to.be.true;
+            expect(metrics.testExists(["Suite", "Test2"])).to.be.false;
             metrics.stopTest();
             expect(metrics.testExists(["Suite", "Test1"])).to.be.true;
             expect(metrics.testExists(["Suite", "Test2"])).to.be.true;

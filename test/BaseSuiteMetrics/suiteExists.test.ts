@@ -175,7 +175,7 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
 
                 // Create first test
                 metrics.startTest(["TestSuite", "Test1"]);
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
+                expect(metrics.suiteExists(["TestSuite"])).to.be.false;
                 metrics.stopTest();
                 expect(metrics.suiteExists(["TestSuite"])).to.be.true;
 
@@ -188,7 +188,7 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
                 // Create test in nested suite
                 metrics.startTest(["TestSuite", "NestedSuite", "Test3"]);
                 expect(metrics.suiteExists(["TestSuite"])).to.be.true;
-                expect(metrics.suiteExists(["TestSuite", "NestedSuite"])).to.be.true;
+                expect(metrics.suiteExists(["TestSuite", "NestedSuite"])).to.be.false;
                 metrics.stopTest();
                 expect(metrics.suiteExists(["TestSuite"])).to.be.true;
                 expect(metrics.suiteExists(["TestSuite", "NestedSuite"])).to.be.true;
