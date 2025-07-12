@@ -1,8 +1,8 @@
 type Test = {
     readonly name: string;
-    startTimestamp: number;
-    endTimestamp: number;
-    duration: number;
+    readonly startTimestamp: number;
+    readonly endTimestamp: number;
+    readonly duration: number;
     readonly testNumber: number;
     readonly suiteTestNumber: number;
 };
@@ -10,39 +10,39 @@ type Test = {
 type Suite = {
     readonly name: string;
     tests: Map<string, Test> | null;
-    numSubTests: number;
     subSuites: Map<string, Suite> | null;
+    numSubTests: number;
 };
 
 type SuiteData = {
-    name: string;
-    parentSuites: string[] | null;
-    childSuites: string[] | null;
-    testMetrics: {
-        numTests: number;
-        totalTime: number | null;
-        averageTime: number | null;
+    readonly name: string;
+    readonly parentSuites: string[] | null;
+    readonly childSuites: string[] | null;
+    readonly testMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number | null;
+        readonly averageTime: number | null;
     }
 };
 
 type RecursiveSuiteData = {
-    name: string;
-    parentSuites: string[] | null;
-    childSuites: string[] | null;
-    directTestMetrics: {
-        numTests: number;
-        totalTime: number | null;
-        averageTime: number | null;
+    readonly name: string;
+    readonly parentSuites: string[] | null;
+    readonly childSuites: string[] | null;
+    readonly directTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number | null;
+        readonly averageTime: number | null;
     }
-    subTestMetrics: {
-        numTests: number;
-        totalTime: number | null;
-        averageTime: number | null;
+    readonly subTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number | null;
+        readonly averageTime: number | null;
     }
-    totalTestMetrics: {
-        numTests: number;
-        totalTime: number | null;
-        averageTime: number | null;
+    readonly totalTestMetrics: {
+        readonly numTests: number;
+        readonly totalTime: number | null;
+        readonly averageTime: number | null;
     }
 };
 
