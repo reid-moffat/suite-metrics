@@ -11,7 +11,7 @@ abstract class BaseSuiteMetrics {
     // Top-level suite makes top-level metrics and functions easier to handle
     private readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
-        tests: null,
+        tests: new Map<string, Test>(),
         numSubTests: 0,
         subSuites: this.suites
     };
@@ -181,13 +181,6 @@ abstract class BaseSuiteMetrics {
         let currentSuite: Suite = this.topLevelSuite;
 
         for (const suiteName of suitePath) {
-            if (currentSuite.subSuites === null) {
-                if (!createIfMissing) {
-                    throw new Error(`Suite path [${suitePath.join(', ')}] does not exist`);
-                }
-                currentSuite.subSuites = new Map<string, Suite>();
-            }
-
             let targetSuite: Suite | undefined = currentSuite.subSuites.get(suiteName);
             if (targetSuite === undefined) {
                 if (!createIfMissing) {
@@ -195,9 +188,9 @@ abstract class BaseSuiteMetrics {
                 }
                 targetSuite = {
                     name: suiteName,
-                    tests: null,
+                    tests: new Map<string, Test>(),
                     numSubTests: 0,
-                    subSuites: null
+                    subSuites: new Map<string, Suite>()
                 };
                 currentSuite.subSuites.set(suiteName, targetSuite);
             }
@@ -244,9 +237,6 @@ abstract class BaseSuiteMetrics {
             suiteTestNumber: (suite.tests?.size ?? 0) + 1
         };
 
-        if (suite.tests === null) {
-            suite.tests = new Map<string, Test>();
-        }
         suite.tests.set(testName, test);
     }
 
