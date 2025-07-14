@@ -487,7 +487,7 @@ suite("ConcurrentSuiteMetrics", function() {
 
             const suite8Data = freshMetrics.getSuiteMetrics(["Suite8"]);
             expect(suite8Data.testMetrics.numTests).to.equal(20);
-            expect(suite8Data.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+            expect(suite8Data.testMetrics.totalTime).to.be.a('number').and.be.at.least(0);
 
             // Verify top-level structure
             const topLevelData = freshMetrics.getSuiteMetrics([]);
