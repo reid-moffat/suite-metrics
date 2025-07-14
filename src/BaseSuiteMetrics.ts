@@ -232,9 +232,6 @@ abstract class BaseSuiteMetrics {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
         const testName: string = testPath[testPath.length - 1];
 
-        // Update sub-test counters for all parent suites
-        this.updateSubTestCounters(testPath.slice(0, -1));
-
         const test: Test = {
             name: testName,
             startTimestamp: startTime,
@@ -245,10 +242,13 @@ abstract class BaseSuiteMetrics {
         };
 
         suite.tests.set(testName, test);
+
+        // Update sub-test counters for all parent suites
+        this.updateSubTestCounters(testPath.slice(0, -1));
     }
 
     /**
-     * Updates the subtest counter for all suites in the path recursively
+     * Updates the subtest counter for all suites above this suite
      *
      * @param suitePath Path of the suite to update
      */
@@ -257,7 +257,11 @@ abstract class BaseSuiteMetrics {
         currentSuite.numSubTests++;
 
         for (const suiteName of suitePath) {
-            currentSuite = currentSuite.subSuites!.get(suiteName)!;
+            currentSuite = currentSuite.subSuites.get(suiteName)!;
+            if (currentSuite === undefined) {
+                throw new Error(`Error - suite '${suiteName}' not found`);
+            }
+
             currentSuite.numSubTests++;
         }
     }
