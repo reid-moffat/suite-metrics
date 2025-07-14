@@ -18,14 +18,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
 
-    /**
-     * Creates a unique key for a test path to track concurrent tests
-     *
-     * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
-     */
-    private createTestKey(testPath: string[]): string {
-        return testPath.join('::');
-    }
 
     /**
      * Gets the lazy singleton instance of ConcurrentSuiteMetrics
@@ -81,6 +73,16 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         // Store test data and delete from active tests
         this.addTest(path, testStartTime, endTime);
         this.activeTests.delete(testKey);
+    }
+
+
+    /**
+     * Creates a unique key for a test path to track concurrent tests
+     *
+     * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
+     */
+    private createTestKey(testPath: string[]): string {
+        return testPath.join('::');
     }
 }
 

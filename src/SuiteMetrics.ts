@@ -17,6 +17,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
     // Currently running test's data (path and start time, or null if no ongoing test)
     private activeTest: TestMetadata | null = null;
 
+
     /**
      * Gets the lazy singleton instance of SuiteMetrics
      *

@@ -84,7 +84,7 @@ abstract class BaseSuiteMetrics {
      * Gets metrics for a given suite and its sub-suites
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
-     * @returns An object with suite metadata, and metrics for direct & sub tests
+     * @returns An object with suite metadata, and metrics for direct & subtests
      */
     public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
         this.validatePath(path, { allowTopLevel: true });
@@ -202,6 +202,9 @@ abstract class BaseSuiteMetrics {
 
     /**
      * Checks if a suite or test exists at the given path
+     *
+     * @param path Path to check if exists
+     * @param isTest Specifies if this is checking for a test (false to check for a suite)
      */
     private pathExists(path: string[], isTest: boolean): boolean {
         try {
@@ -219,7 +222,11 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Adds a completed test's data
+     * Stores a completed test's data in this metrics instance
+     *
+     * @param testPath Path to this test
+     * @param startTime Time the test was started at
+     * @param endTime Time the test was completed at
      */
     protected addTest(testPath: string[], startTime: number, endTime: number): void {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
@@ -241,7 +248,9 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Updates the sub-test counter for all suites in the path
+     * Updates the subtest counter for all suites in the path recursively
+     *
+     * @param suitePath Path of the suite to update
      */
     private updateSubTestCounters(suitePath: string[]): void {
         let currentSuite: Suite = this.topLevelSuite;
@@ -254,7 +263,9 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Calculates test metrics for a suite (direct tests only)
+     * Calculates metrics for all tests directly in a suite
+     *
+     * @param suite Suite object to calculate metrics for
      */
     private calculateDirectTestMetrics(suite: Suite): {
         numTests: number;
@@ -279,6 +290,8 @@ abstract class BaseSuiteMetrics {
 
     /**
      * Recursively calculates test metrics for a suite and all its sub-suites
+     *
+     * @param suite Suite object to calculate test metrics for recursively
      */
     private calculateRecursiveTestMetrics(suite: Suite): [number, number] {
         let totalTests: number = suite.tests?.size ?? 0;
@@ -301,6 +314,10 @@ abstract class BaseSuiteMetrics {
 
     /**
      * Formats suite information for printing
+     *
+     * @param suite Suite object to get information for
+     * @param lines Current array of lines (pass [] on initial call)
+     * @param indentLevel Number of indents for each level of information separation
      */
     private formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
         const indent: string = ' '.repeat(indentLevel);
