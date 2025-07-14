@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
+import { addDelay } from "../helpers.ts";
 
 suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
@@ -78,9 +79,7 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
     suite("Basic Functionality", function() {
         test("should return complete test metrics for simple test", function() {
             metrics.startTest(["SimpleSuite", "SimpleTest"]);
-            const startTime = Date.now();
-            // Add small delay to ensure measurable duration
-            while (Date.now() - startTime < 100) { /* busy wait */ }
+            addDelay(100);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SimpleSuite", "SimpleTest"]);
@@ -228,22 +227,20 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
         test("should handle tests with different durations", function() {
             // Fast test
             metrics.startTest(["DurationSuite", "FastTest"]);
-            let start = Date.now();
-            while (Date.now() - start < 10) { /* busy wait for a short time */ }
+            addDelay(10);
             metrics.stopTest();
 
             // Slow test
             metrics.startTest(["DurationSuite", "SlowTest"]);
-            start = Date.now();
-            while (Date.now() - start < 100) { /* busy wait longer */ }
+            addDelay(100);
             metrics.stopTest();
 
             const fastTest = metrics.getTestMetrics(["DurationSuite", "FastTest"]);
             const slowTest = metrics.getTestMetrics(["DurationSuite", "SlowTest"]);
 
             expect(slowTest.duration).to.be.above(fastTest.duration);
-            expect(fastTest.duration).to.be.above(0);
-            expect(slowTest.duration).to.be.above(0);
+            expect(fastTest.duration).to.be.above(10_000);
+            expect(slowTest.duration).to.be.above(100_000);
         });
     });
 
