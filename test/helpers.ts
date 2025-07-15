@@ -4,6 +4,9 @@ import microtime from "microtime";
  * Generates a random integer between min and max (both inclusive)
  */
 function randomInt(min: number, max: number): number {
+    if (min > max) {
+        throw new Error(`[randomInt] Error: min (${min}) is greater than the value of max (${max})`);
+    }
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
