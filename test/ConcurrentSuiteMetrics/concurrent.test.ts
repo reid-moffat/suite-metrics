@@ -10,7 +10,7 @@ import {
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-suite("ConcurrentSuiteMetrics", function() {
+suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
     let metrics: ConcurrentSuiteMetrics;
 
