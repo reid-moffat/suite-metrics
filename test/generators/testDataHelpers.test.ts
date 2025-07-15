@@ -7,23 +7,18 @@ import {
     GeneratedTestData,
     PRESET_TYPE
 } from "./testDataHelpers.ts";
+import concurrentSuiteMetrics from "../../src/ConcurrentSuiteMetrics.js";
 
 suite("Test Data Helpers", function() {
 
     suite("Simple Test Data Generation", function() {
         test("should create basic flat structure", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData = createSimpleTestData(metrics, {
+            const metrics: SuiteMetrics = createSimpleTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 3,
                 suiteNamePrefix: "Demo",
                 testNamePrefix: "Test"
-            });
-
-            expect(testData.totalTests).to.equal(6); // 2 suites * 3 tests
-            expect(testData.totalSuites).to.equal(2);
-            expect(testData.maxDepthAchieved).to.equal(1);
+            }) as SuiteMetrics;
 
             // Verify the structure was created correctly
             expect(metrics.suiteExists(["Demo1"])).to.be.true;
@@ -37,14 +32,11 @@ suite("Test Data Helpers", function() {
         });
 
         test("should work with ConcurrentSuiteMetrics", function() {
-            const metrics = new ConcurrentSuiteMetrics();
-
-            const testData = createSimpleTestData(metrics, {
+            const metrics: ConcurrentSuiteMetrics = createSimpleTestData(true, {
                 numSuites: 2,
                 testsPerSuite: 2
-            });
+            }) as ConcurrentSuiteMetrics;
 
-            expect(testData.totalTests).to.equal(4);
             expect(metrics.suiteExists(["Suite1"])).to.be.true;
             expect(metrics.testExists(["Suite1", "Test1"])).to.be.true;
         });
@@ -216,14 +208,12 @@ suite("Test Data Helpers", function() {
 
     suite("Custom Options and Flexibility", function() {
         test("should respect custom naming options", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData = createSimpleTestData(metrics, {
+            const metrics: SuiteMetrics = createSimpleTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 2,
                 suiteNamePrefix: "CustomSuite",
                 testNamePrefix: "CustomTest"
-            });
+            }) as SuiteMetrics;
 
             expect(metrics.suiteExists(["CustomSuite1"])).to.be.true;
             expect(metrics.suiteExists(["CustomSuite2"])).to.be.true;

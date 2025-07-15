@@ -2,58 +2,33 @@ import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
 import { randomInt } from "../helpers.ts";
 import { realisticStructure, edgeCaseStructure } from "./presets.ts";
+import { _MockConcurrentSuiteMetrics, _MockSuiteMetrics } from "./mocks.js";
 
 /**
  * Creates a simple flat structure with multiple suites and tests
  */
 function createSimpleTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
+    isConcurrent: boolean = false,
     options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
-    const opts = {...DEFAULT_OPTIONS, ...options};
-    const info: GeneratedTestData = {
-        totalTests: 0,
-        totalSuites: 0,
-        maxDepthAchieved: 1,
-        testPaths: [],
-        suitePaths: [],
-        suiteTestCounts: new Map()
-    };
+): SuiteMetrics | ConcurrentSuiteMetrics {
+    const opts = { ...DEFAULT_OPTIONS, ...options };
 
-    for (let suiteIndex = 1; suiteIndex <= opts.numSuites; suiteIndex++) {
+    const metrics = isConcurrent ? new _MockConcurrentSuiteMetrics() : new _MockSuiteMetrics();
+
+    for (let suiteIndex: number = 1; suiteIndex <= opts.numSuites; suiteIndex++) {
         const suiteName = `${opts.suiteNamePrefix}${suiteIndex}`;
-        const suitePath = [suiteName];
-
-        info.suitePaths.push([...suitePath]);
-        info.totalSuites++;
-        info.suiteTestCounts.set(suitePath.join('/'), opts.testsPerSuite);
+        const suitePath: string[] = [suiteName];
 
         for (let testIndex = 1; testIndex <= opts.testsPerSuite; testIndex++) {
             const testName = `${opts.testNamePrefix}${testIndex}`;
-            const testPath = [...suitePath, testName];
+            const testPath: string[] = [...suitePath, testName];
 
-            if (metrics instanceof ConcurrentSuiteMetrics) {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest(testPath);
-            } else {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest();
-            }
-
-            info.testPaths.push(testPath);
-            info.totalTests++;
+            const duration: number = randomInt(opts.minDuration, opts.maxDuration);
+            metrics.addMockTest(testPath, { duration });
         }
     }
 
-    return info;
+    return metrics;
 }
 
 /**
@@ -63,7 +38,7 @@ function createNestedTestData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = {...DEFAULT_OPTIONS, ...options};
+    const opts = { ...DEFAULT_OPTIONS, ...options };
     const info: GeneratedTestData = {
         totalTests: 0,
         totalSuites: 0,
@@ -142,7 +117,7 @@ function createCustomTestData(
     structure: SuiteStructure[],
     options: Partial<TestDataOptions> = {}
 ): GeneratedTestData {
-    const opts = {...DEFAULT_OPTIONS, ...options};
+    const opts = { ...DEFAULT_OPTIONS, ...options };
     const info: GeneratedTestData = {
         totalTests: 0,
         totalSuites: 0,

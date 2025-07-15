@@ -417,29 +417,22 @@ suite("ConcurrentSuiteMetrics", function() {
 
     suite("Using Test Data Helpers", function() {
         test("should work with simple test data helper for concurrent metrics", function() {
-            const freshMetrics = new ConcurrentSuiteMetrics();
-
-            const testData = createSimpleTestData(freshMetrics, {
+            const metrics = createSimpleTestData(true, {
                 numSuites: 4,
                 testsPerSuite: 3,
                 suiteNamePrefix: "ConcurrentSuite",
                 testNamePrefix: "ConcurrentTest"
             });
 
-            expect(testData.totalTests).to.equal(12); // 4 * 3
-            expect(testData.totalSuites).to.equal(4);
-
             // Verify the structure was created correctly
-            expect(freshMetrics.suiteExists(["ConcurrentSuite1"])).to.be.true;
-            expect(freshMetrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"])).to.be.true;
-            expect(freshMetrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"])).to.be.true;
+            expect(metrics.suiteExists(["ConcurrentSuite1"])).to.be.true;
+            expect(metrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"])).to.be.true;
+            expect(metrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"])).to.be.true;
 
             // Verify metrics work correctly
-            const suite1Data = freshMetrics.getSuiteMetrics(["ConcurrentSuite1"]);
+            const suite1Data = metrics.getSuiteMetrics(["ConcurrentSuite1"]);
             expect(suite1Data.testMetrics.numTests).to.equal(3);
             expect(suite1Data.testMetrics.totalTime).to.be.a('number').and.be.above(0);
-
-            console.log(freshMetrics.printAllSuiteMetrics());
         });
 
         test("should work with complex test data helper for concurrent metrics", function() {
@@ -448,6 +441,8 @@ suite("ConcurrentSuiteMetrics", function() {
             const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.REALISTIC_PREMADE);
 
             expect(testData.totalTests).to.be.above(10);
+
+            console.log(freshMetrics.printAllSuiteMetrics());
 
             // Verify the complex structure was created
             assert.isTrue(freshMetrics.suiteExists(["Authentication"]), "Expected 'Authentication' suite to exist");
@@ -467,35 +462,30 @@ suite("ConcurrentSuiteMetrics", function() {
             const apiUsersData = freshMetrics.getSuiteMetrics(["API", "Users"]);
             expect(apiUsersData.testMetrics.numTests).to.equal(4);
             expect(apiUsersData.childSuites).to.deep.equal(["Validation"]);
-
-            console.log(freshMetrics.printAllSuiteMetrics());
         });
 
         test("should handle large datasets efficiently with concurrent metrics", function() {
-            const freshMetrics = new ConcurrentSuiteMetrics();
-
             const startTime = Date.now();
-            const testData = createSimpleTestData(freshMetrics, {
+            const metrics = createSimpleTestData(true, {
                 numSuites: 15,
                 testsPerSuite: 20,
                 addTimingDelays: false // Fast generation for performance test
             });
             const endTime = Date.now();
 
-            expect(testData.totalTests).to.equal(300); // 15 * 20
             expect(endTime - startTime).to.be.below(300); // Should be very fast
 
             // Verify random sampling of the data
-            expect(freshMetrics.suiteExists(["Suite1"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Suite8"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Suite15"])).to.be.true;
+            expect(metrics.suiteExists(["Suite1"])).to.be.true;
+            expect(metrics.suiteExists(["Suite8"])).to.be.true;
+            expect(metrics.suiteExists(["Suite15"])).to.be.true;
 
-            const suite8Data = freshMetrics.getSuiteMetrics(["Suite8"]);
+            const suite8Data = metrics.getSuiteMetrics(["Suite8"]);
             expect(suite8Data.testMetrics.numTests).to.equal(20);
             expect(suite8Data.testMetrics.totalTime).to.be.a('number').and.be.at.least(0);
 
             // Verify top-level structure
-            const topLevelData = freshMetrics.getSuiteMetrics([]);
+            const topLevelData = metrics.getSuiteMetrics([]);
             expect(topLevelData.childSuites).to.have.lengthOf(15);
         });
 

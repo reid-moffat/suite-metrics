@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
+import suiteMetrics from "../../src/SuiteMetrics.js";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
@@ -675,25 +676,20 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     suite("Using Test Data Helpers", function() {
         test("should work correctly with simple test data helper", function() {
-            const freshMetrics = new SuiteMetrics();
-
-            const testData = createSimpleTestData(freshMetrics, {
+            const metrics: SuiteMetrics = createSimpleTestData(false, {
                 numSuites: 3,
                 testsPerSuite: 4,
                 suiteNamePrefix: "HelperSuite",
                 testNamePrefix: "HelperTest"
-            });
-
-            expect(testData.totalTests).to.equal(12); // 3 * 4
-            expect(testData.totalSuites).to.equal(3);
+            }) as SuiteMetrics;
 
             // Verify suite metrics work correctly
-            const suite1Data = freshMetrics.getSuiteMetrics(["HelperSuite1"]);
+            const suite1Data = metrics.getSuiteMetrics(["HelperSuite1"]);
             expect(suite1Data.testMetrics.numTests).to.equal(4);
             expect(suite1Data.childSuites).to.deep.equal([]);
             expect(suite1Data.parentSuites).to.deep.equal([]);
 
-            const topLevelData = freshMetrics.getSuiteMetrics([]);
+            const topLevelData = metrics.getSuiteMetrics([]);
             expect(topLevelData.childSuites).to.have.members(["HelperSuite1", "HelperSuite2", "HelperSuite3"]);
         });
 
@@ -728,17 +724,14 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         });
 
         test("should handle large datasets efficiently with helper", function() {
-            const metrics = new SuiteMetrics();
-
             const startTime = Date.now();
-            const testData = createSimpleTestData(metrics, {
+            const metrics = createSimpleTestData(false, {
                 numSuites: 20,
                 testsPerSuite: 25,
                 addTimingDelays: false // Fast generation
             });
             const endTime = Date.now();
 
-            expect(testData.totalTests).to.equal(500); // 20 * 25
             expect(endTime - startTime).to.be.below(200); // Should be very fast
 
             // Verify random sampling of the data
