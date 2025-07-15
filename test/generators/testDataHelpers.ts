@@ -13,7 +13,10 @@ function createSimpleTestData(
 ): _MockSuiteMetrics | _MockConcurrentSuiteMetrics {
     const opts = { ...DEFAULT_OPTIONS, ...options };
 
-    const metrics: _MockSuiteMetrics | _MockConcurrentSuiteMetrics = isConcurrent ? new _MockConcurrentSuiteMetrics() : new _MockSuiteMetrics();
+    const metrics: _MockSuiteMetrics | _MockConcurrentSuiteMetrics =
+        isConcurrent
+            ? new _MockConcurrentSuiteMetrics()
+            : new _MockSuiteMetrics();
 
     for (let suiteIndex: number = 1; suiteIndex <= opts.numSuites; suiteIndex++) {
         const suiteName = `${opts.suiteNamePrefix}${suiteIndex}`;
@@ -35,50 +38,28 @@ function createSimpleTestData(
  * Creates a nested structure with multiple levels of suites
  */
 function createNestedTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
+    isConcurrent: boolean = false,
     options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
+): _MockSuiteMetrics | _MockConcurrentSuiteMetrics {
     const opts = { ...DEFAULT_OPTIONS, ...options };
-    const info: GeneratedTestData = {
-        totalTests: 0,
-        totalSuites: 0,
-        maxDepthAchieved: 0,
-        testPaths: [],
-        suitePaths: [],
-        suiteTestCounts: new Map()
-    };
+
+    const metrics: _MockSuiteMetrics | _MockConcurrentSuiteMetrics =
+        isConcurrent
+            ? new _MockConcurrentSuiteMetrics()
+            : new _MockSuiteMetrics();
 
     function createNestedLevel(currentPath: string[], depth: number): void {
         if (depth > opts.maxDepth) return;
 
-        info.maxDepthAchieved = Math.max(info.maxDepthAchieved, depth);
-
         // Create tests at this level
         const testsAtThisLevel = depth === opts.maxDepth ? opts.testsPerSuite : Math.max(1, Math.floor(opts.testsPerSuite / 2));
-        info.suiteTestCounts.set(currentPath.join('/'), testsAtThisLevel);
 
         for (let testIndex = 1; testIndex <= testsAtThisLevel; testIndex++) {
             const testName = `${opts.testNamePrefix}${testIndex}`;
             const testPath = [...currentPath, testName];
 
-            if (metrics instanceof ConcurrentSuiteMetrics) {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest(testPath);
-            } else {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest();
-            }
-
-            info.testPaths.push(testPath);
-            info.totalTests++;
+            const duration: number = randomInt(opts.minDuration, opts.maxDuration);
+            metrics.addMockTest(testPath, { duration });
         }
 
         // Create sub-suites if we haven't reached max depth
@@ -86,9 +67,6 @@ function createNestedTestData(
             for (let subSuiteIndex = 1; subSuiteIndex <= opts.subSuitesPerSuite; subSuiteIndex++) {
                 const subSuiteName = `${opts.suiteNamePrefix}${depth + 1}_${subSuiteIndex}`;
                 const subSuitePath = [...currentPath, subSuiteName];
-
-                info.suitePaths.push([...subSuitePath]);
-                info.totalSuites++;
 
                 createNestedLevel(subSuitePath, depth + 1);
             }
@@ -100,13 +78,10 @@ function createNestedTestData(
         const suiteName = `${opts.suiteNamePrefix}${suiteIndex}`;
         const suitePath = [suiteName];
 
-        info.suitePaths.push([...suitePath]);
-        info.totalSuites++;
-
         createNestedLevel(suitePath, 1);
     }
 
-    return info;
+    return metrics;
 }
 
 /**
@@ -190,9 +165,9 @@ enum PRESET_TYPE {
  * Creates test data based on various presets
  */
 function createPresetData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
+    isConcurrent: boolean = false,
     preset: PRESET_TYPE
-): GeneratedTestData {
+): _MockSuiteMetrics | _MockConcurrentSuiteMetrics {
 
     switch (preset) {
         case PRESET_TYPE.NORMAL:
@@ -203,7 +178,7 @@ function createPresetData(
                 maxDuration: 50_000,
             };
 
-            return createNestedTestData(metrics, normalOpts);
+            return createNestedTestData(isConcurrent, normalOpts);
         case PRESET_TYPE.LARGE_SUITE:
             const largeOpts = {
                 ...DEFAULT_OPTIONS,
@@ -214,11 +189,11 @@ function createPresetData(
                 addTimingDelays: false
             };
 
-            return createNestedTestData(metrics, largeOpts);
+            return createNestedTestData(isConcurrent, largeOpts);
         case PRESET_TYPE.REALISTIC_PREMADE:
-            return createCustomTestData(metrics, realisticStructure);
+            return createCustomTestData(isConcurrent, realisticStructure);
         case PRESET_TYPE.EDGE_CASES:
-            return createCustomTestData(metrics, edgeCaseStructure);
+            return createCustomTestData(isConcurrent, edgeCaseStructure);
         default:
             throw new Error(`createPresetData: Case for enum '${preset}' has not be defined`);
     }
