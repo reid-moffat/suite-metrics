@@ -74,10 +74,7 @@ function createNestedTestData(
 
     // Create top-level suites
     for (let suiteIndex = 1; suiteIndex <= opts.numSuites; suiteIndex++) {
-        const suiteName = `${opts.suiteNamePrefix}${suiteIndex}`;
-        const suitePath = [suiteName];
-
-        createNestedLevel(suitePath, 1);
+        createNestedLevel([`${opts.suiteNamePrefix}${suiteIndex}`], 1);
     }
 
     return metrics;
