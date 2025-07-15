@@ -88,50 +88,26 @@ function createNestedTestData(
  * Creates test data from a custom structure definition
  */
 function createCustomTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
+    isConcurrent: boolean = false,
     structure: SuiteStructure[],
     options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
+): _MockSuiteMetrics | _MockConcurrentSuiteMetrics {
     const opts = { ...DEFAULT_OPTIONS, ...options };
-    const info: GeneratedTestData = {
-        totalTests: 0,
-        totalSuites: 0,
-        maxDepthAchieved: 0,
-        testPaths: [],
-        suitePaths: [],
-        suiteTestCounts: new Map()
-    };
+
+    const metrics: _MockSuiteMetrics | _MockConcurrentSuiteMetrics =
+        isConcurrent
+            ? new _MockConcurrentSuiteMetrics()
+            : new _MockSuiteMetrics();
 
     function processStructure(suiteStructure: SuiteStructure): void {
-        const {suitePath, tests, subSuites = []} = suiteStructure;
-
-        info.maxDepthAchieved = Math.max(info.maxDepthAchieved, suitePath.length);
-        info.suitePaths.push([...suitePath]);
-        info.totalSuites++;
-        info.suiteTestCounts.set(suitePath.join('/'), tests.length);
+        const { suitePath, tests, subSuites = [] } = suiteStructure;
 
         // Create tests in this suite
         for (const testName of tests) {
-            const testPath = [...suitePath, testName];
+            const testPath: string[] = [...suitePath, testName];
 
-            if (metrics instanceof ConcurrentSuiteMetrics) {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest(testPath);
-            } else {
-                metrics.startTest(testPath);
-                if (opts.addTimingDelays) {
-                    const duration = randomInt(opts.minDuration, opts.maxDuration);
-                    // add delay...
-                }
-                metrics.stopTest();
-            }
-
-            info.testPaths.push(testPath);
-            info.totalTests++;
+            const duration: number = randomInt(opts.minDuration, opts.maxDuration);
+            metrics.addMockTest(testPath, duration);
         }
 
         // Process sub-suites
@@ -144,7 +120,7 @@ function createCustomTestData(
         processStructure(suiteStructure);
     }
 
-    return info;
+    return metrics;
 }
 
 enum PRESET_TYPE {
