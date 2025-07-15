@@ -27,7 +27,7 @@ function createSimpleTestData(
             const testPath: string[] = [...suitePath, testName];
 
             const duration: number = randomInt(opts.minDuration, opts.maxDuration);
-            metrics.addMockTest(testPath, { duration });
+            metrics.addMockTest(testPath, duration);
         }
     }
 
@@ -59,7 +59,7 @@ function createNestedTestData(
             const testPath = [...currentPath, testName];
 
             const duration: number = randomInt(opts.minDuration, opts.maxDuration);
-            metrics.addMockTest(testPath, { duration });
+            metrics.addMockTest(testPath, duration);
         }
 
         // Create sub-suites if we haven't reached max depth

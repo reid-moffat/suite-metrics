@@ -1,5 +1,6 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import microtime from "microtime";
+import { randomInt } from "../helpers.ts";
 
 // Set the initial time 1 hour ago for a semi-realistic start time
 const hourInMicrosec = 60 * 60 * 1000 * 1000;
@@ -15,14 +16,11 @@ class _MockSuiteMetrics extends SuiteMetrics {
      * Adds a mock test
      *
      * @param path Path of suites to this test
-     * @param options Optional parameters for the test.
-     * @param options.duration Test duration in microseconds. Defaults to a random number in (5ms - 2s)
-     * @param options.completed The completion status of the test. Defaults to true
+     * @param duration Test duration in microseconds. Defaults to a random number in (5ms - 2s)
      */
-    public addMockTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
+    public addMockTest(path: string[], duration: number = randomInt(5_000, 2_000_000)): void {
         this.validatePath(path, { isTest: true });
 
-        const duration = options.duration ?? Math.floor(Math.random() * (2_000_000 - 5_000 + 1)) + 5_000;
         this.addTest(path, this.currentMockTime, this.currentMockTime + duration);
 
         this.currentMockTime += duration;
@@ -49,19 +47,15 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
      * Adds a mock test, simulating concurrent execution by grouping tests into batches
      *
      * @param path Path of suites to this test
-     * @param options Optional parameters for the test.
-     * @param options.duration Duration in microseconds. Defaults to a random value (5ms - 2s).
-     * @param options.completed The completion status of the test. Defaults to true.
+     * @param duration Duration in microseconds. Defaults to a random value (5ms - 2s).
      */
-    public addMockTest(path: string[], options: { duration?: number; completed?: boolean } = {}): void {
+    public addMockTest(path: string[], duration: number = randomInt(5_000, 2_000_000)): void {
         this.validatePath(path, { isTest: true });
 
         // Starting a new batch of concurrent tests: create the concurrent size and set start time
         if (this.currentConcurrentCount === 0) {
             this.maxConcurrentTestsInBatch = Math.floor(Math.pow(Math.random(), 20) * 100) + 1;
         }
-
-        const duration = options.duration ?? Math.floor(Math.random() * (2_000_000 - 5_000 + 1)) + 5_000;
 
         // All tests in a concurrent batch start at the same time
         this.addTest(path, this.currentMockTime, this.currentMockTime + duration);
