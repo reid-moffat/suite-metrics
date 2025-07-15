@@ -8,6 +8,7 @@ import {
     PRESET_TYPE
 } from "./testDataHelpers.ts";
 import concurrentSuiteMetrics from "../../src/ConcurrentSuiteMetrics.js";
+import { _MockSuiteMetrics } from "./mocks.js";
 
 suite("Test Data Helpers", function() {
 
@@ -208,12 +209,12 @@ suite("Test Data Helpers", function() {
 
     suite("Custom Options and Flexibility", function() {
         test("should respect custom naming options", function() {
-            const metrics: SuiteMetrics = createSimpleTestData(false, {
+            const metrics: _MockSuiteMetrics = createSimpleTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 2,
                 suiteNamePrefix: "CustomSuite",
                 testNamePrefix: "CustomTest"
-            }) as SuiteMetrics;
+            }) as _MockSuiteMetrics;
 
             expect(metrics.suiteExists(["CustomSuite1"])).to.be.true;
             expect(metrics.suiteExists(["CustomSuite2"])).to.be.true;

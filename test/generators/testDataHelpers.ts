@@ -10,16 +10,16 @@ import { _MockConcurrentSuiteMetrics, _MockSuiteMetrics } from "./mocks.js";
 function createSimpleTestData(
     isConcurrent: boolean = false,
     options: Partial<TestDataOptions> = {}
-): SuiteMetrics | ConcurrentSuiteMetrics {
+): _MockSuiteMetrics | _MockConcurrentSuiteMetrics {
     const opts = { ...DEFAULT_OPTIONS, ...options };
 
-    const metrics = isConcurrent ? new _MockConcurrentSuiteMetrics() : new _MockSuiteMetrics();
+    const metrics: _MockSuiteMetrics | _MockConcurrentSuiteMetrics = isConcurrent ? new _MockConcurrentSuiteMetrics() : new _MockSuiteMetrics();
 
     for (let suiteIndex: number = 1; suiteIndex <= opts.numSuites; suiteIndex++) {
         const suiteName = `${opts.suiteNamePrefix}${suiteIndex}`;
         const suitePath: string[] = [suiteName];
 
-        for (let testIndex = 1; testIndex <= opts.testsPerSuite; testIndex++) {
+        for (let testIndex: number = 1; testIndex <= opts.testsPerSuite; testIndex++) {
             const testName = `${opts.testNamePrefix}${testIndex}`;
             const testPath: string[] = [...suitePath, testName];
 
