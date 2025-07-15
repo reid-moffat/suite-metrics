@@ -37,24 +37,6 @@ interface SuiteStructure {
 }
 
 /**
- * Information about generated test data
- */
-interface GeneratedTestData {
-    /** Total number of tests created */
-    totalTests: number;
-    /** Total number of suites created */
-    totalSuites: number;
-    /** Maximum depth achieved */
-    maxDepthAchieved: number;
-    /** List of all test paths created */
-    testPaths: string[][];
-    /** List of all suite paths created */
-    suitePaths: string[][];
-    /** Mapping of suite paths to their direct test counts */
-    suiteTestCounts: Map<string, number>;
-}
-
-/**
  * Default options for test data generation
  */
 const DEFAULT_OPTIONS: Required<TestDataOptions> = {
@@ -70,4 +52,4 @@ const DEFAULT_OPTIONS: Required<TestDataOptions> = {
     customStructure: []
 };
 
-export { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS };
+export { TestDataOptions, SuiteStructure, DEFAULT_OPTIONS };

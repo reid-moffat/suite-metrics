@@ -3,7 +3,6 @@ import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
 import {
     createPresetData,
     createSimpleTestData,
-    GeneratedTestData,
     PRESET_TYPE
 } from "../generators/testDataHelpers.ts";
 

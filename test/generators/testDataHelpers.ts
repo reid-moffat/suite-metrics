@@ -1,4 +1,4 @@
-import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
+import { TestDataOptions, SuiteStructure, DEFAULT_OPTIONS } from "./options.ts";
 import { randomInt } from "../helpers.ts";
 import { realisticStructure, edgeCaseStructure } from "./presets.ts";
 import { _MockConcurrentSuiteMetrics, _MockSuiteMetrics } from "./mocks.js";
@@ -172,9 +172,6 @@ function createPresetData(
 }
 
 export {
-    TestDataOptions,
-    SuiteStructure,
-    GeneratedTestData,
     createSimpleTestData,
     createNestedTestData,
     createCustomTestData,
