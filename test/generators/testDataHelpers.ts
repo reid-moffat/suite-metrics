@@ -1,6 +1,7 @@
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
 import { randomInt } from "../helpers.ts";
+import { realisticStructure, edgeCaseStructure } from "./presets.ts";
 
 /**
  * Creates a simple flat structure with multiple suites and tests
@@ -196,150 +197,56 @@ function createCustomTestData(
     return info;
 }
 
-/**
- * Creates a large dataset for performance testing
- */
-function createLargeTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
-    options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
-    const opts = {
-        ...DEFAULT_OPTIONS,
-        numSuites: 10,
-        testsPerSuite: 20,
-        maxDepth: 3,
-        subSuitesPerSuite: 3,
-        addTimingDelays: false, // Disable delays for performance
-        ...options
-    };
+enum PRESET_TYPE {
+    /** Default settings, creates a few suites and tests */
+    NORMAL,
 
-    return createNestedTestData(metrics, opts);
+    /** Large amount of data (600 tests) randomly generated */
+    LARGE_SUITE,
+
+    /** Hardcoded realistic small data (auth, API, frontend) */
+    REALISTIC_PREMADE,
+
+    /** A bunch of weird cases: numeric paths, unicode (e.g. 测), long names, etc */
+    EDGE_CASES
 }
 
 /**
- * Creates test data with realistic timing variations
+ * Creates test data based on various presets
  */
-function createRealisticTestData(
+function createPresetData(
     metrics: SuiteMetrics | ConcurrentSuiteMetrics,
-    options: Partial<TestDataOptions> = {}
+    preset: PRESET_TYPE
 ): GeneratedTestData {
-    const opts = {
-        ...DEFAULT_OPTIONS,
-        addTimingDelays: true,
-        minDuration: 500,   // 0.5ms
-        maxDuration: 50000, // 50ms
-        ...options
-    };
 
-    return createNestedTestData(metrics, opts);
-}
+    switch (preset) {
+        case PRESET_TYPE.NORMAL:
+            const normalOpts = {
+                ...DEFAULT_OPTIONS,
+                addTimingDelays: true,
+                minDuration: 500,
+                maxDuration: 50_000,
+            };
 
-/**
- * Creates a complex mixed structure with various patterns
- */
-function createComplexTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
-    options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
-    const opts = {...DEFAULT_OPTIONS, ...options};
+            return createNestedTestData(metrics, normalOpts);
+        case PRESET_TYPE.LARGE_SUITE:
+            const largeOpts = {
+                ...DEFAULT_OPTIONS,
+                numSuites: 20,
+                testsPerSuite: 30,
+                maxDepth: 3,
+                subSuitesPerSuite: 3,
+                addTimingDelays: false
+            };
 
-    const complexStructure: SuiteStructure[] = [
-        {
-            suitePath: ["Authentication"],
-            tests: ["login", "logout", "password_reset"],
-            subSuites: [
-                {
-                    suitePath: ["Authentication", "OAuth"],
-                    tests: ["google_login", "github_login"],
-                },
-                {
-                    suitePath: ["Authentication", "TwoFactor"],
-                    tests: ["sms_verification", "app_verification"],
-                }
-            ]
-        },
-        {
-            suitePath: ["API"],
-            tests: ["health_check"],
-            subSuites: [
-                {
-                    suitePath: ["API", "Users"],
-                    tests: ["create_user", "get_user", "update_user", "delete_user"],
-                    subSuites: [
-                        {
-                            suitePath: ["API", "Users", "Validation"],
-                            tests: ["email_validation", "password_strength"],
-                        }
-                    ]
-                },
-                {
-                    suitePath: ["API", "Posts"],
-                    tests: ["create_post", "get_posts", "update_post"],
-                }
-            ]
-        },
-        {
-            suitePath: ["Frontend"],
-            tests: ["page_load"],
-            subSuites: [
-                {
-                    suitePath: ["Frontend", "Components"],
-                    tests: ["button_click", "form_submission", "modal_display"],
-                },
-                {
-                    suitePath: ["Frontend", "Navigation"],
-                    tests: ["menu_navigation", "breadcrumb_display"],
-                }
-            ]
-        }
-    ];
-
-    return createCustomTestData(metrics, complexStructure, opts);
-}
-
-/**
- * Creates test data with specific characteristics for edge case testing
- */
-function createEdgeCaseTestData(
-    metrics: SuiteMetrics | ConcurrentSuiteMetrics,
-    options: Partial<TestDataOptions> = {}
-): GeneratedTestData {
-    const opts = {...DEFAULT_OPTIONS, ...options};
-
-    const edgeCaseStructure: SuiteStructure[] = [
-        // Suite with special characters
-        {
-            suitePath: ["Suite with spaces & symbols!@#$%^&*()"],
-            tests: ["Test with spaces", "Test!@#$%^&*()"],
-        },
-        // Suite with unicode characters
-        {
-            suitePath: ["测试套件 🧪 тест"],
-            tests: ["测试 🧪", "тест"],
-        },
-        // Very long names
-        {
-            suitePath: ["A".repeat(100)],
-            tests: ["B".repeat(100)],
-        },
-        // Numeric-looking names
-        {
-            suitePath: ["0", "1"],
-            tests: ["2", "3"],
-        },
-        // Whitespace names (but not empty)
-        {
-            suitePath: ["   ", "\t\n "],
-            tests: [" test ", "\ttest\n"],
-        },
-        // Case sensitivity tests
-        {
-            suitePath: ["CaseSuite"],
-            tests: ["TestName", "testname", "TESTNAME"],
-        }
-    ];
-
-    return createCustomTestData(metrics, edgeCaseStructure, opts);
+            return createNestedTestData(metrics, largeOpts);
+        case PRESET_TYPE.REALISTIC_PREMADE:
+            return createCustomTestData(metrics, realisticStructure);
+        case PRESET_TYPE.EDGE_CASES:
+            return createCustomTestData(metrics, edgeCaseStructure);
+        default:
+            throw new Error(`createPresetData: Case for enum '${preset}' has not be defined`);
+    }
 }
 
 export {
@@ -349,8 +256,6 @@ export {
     createSimpleTestData,
     createNestedTestData,
     createCustomTestData,
-    createLargeTestData,
-    createRealisticTestData,
-    createComplexTestData,
-    createEdgeCaseTestData
+    createPresetData,
+    PRESET_TYPE
 };

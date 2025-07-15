@@ -1,6 +1,11 @@
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
-import { createSimpleTestData, createComplexTestData } from "../generators/testDataHelpers.ts";
+import {
+    createPresetData,
+    createSimpleTestData,
+    GeneratedTestData,
+    PRESET_TYPE
+} from "../generators/testDataHelpers.ts";
 
 // Helper function to simulate async work
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -440,14 +445,14 @@ suite("ConcurrentSuiteMetrics", function() {
         test("should work with complex test data helper for concurrent metrics", function() {
             const freshMetrics = new ConcurrentSuiteMetrics();
 
-            const testData = createComplexTestData(freshMetrics);
+            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.REALISTIC_PREMADE);
 
             expect(testData.totalTests).to.be.above(10);
 
             // Verify the complex structure was created
-            expect(freshMetrics.suiteExists(["Authentication"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Authentication", "OAuth"])).to.be.true;
-            expect(freshMetrics.suiteExists(["API", "Users", "Validation"])).to.be.true;
+            assert.isTrue(freshMetrics.suiteExists(["Authentication"]), "Expected 'Authentication' suite to exist");
+            assert.isTrue(freshMetrics.suiteExists(["Authentication", "OAuth"]), "Expected 'Authentication > OAuth' suite to exist");
+            assert.isTrue(freshMetrics.suiteExists(["API", "Users", "Validation"]), "Expected 'API > Users > Validation' suite to exist");
 
             // Verify specific tests exist
             expect(freshMetrics.testExists(["Authentication", "login"])).to.be.true;
@@ -497,7 +502,7 @@ suite("ConcurrentSuiteMetrics", function() {
         test("should provide useful generation information for concurrent metrics", function() {
             const freshMetrics = new ConcurrentSuiteMetrics();
 
-            const testData = createComplexTestData(freshMetrics);
+            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Verify GeneratedTestData provides useful information
             expect(testData.testPaths).to.be.an('array');
