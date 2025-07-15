@@ -1,4 +1,3 @@
-import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import { TestDataOptions, SuiteStructure, GeneratedTestData, DEFAULT_OPTIONS } from "./options.ts";
 import { randomInt } from "../helpers.ts";
 import { realisticStructure, edgeCaseStructure } from "./presets.ts";
