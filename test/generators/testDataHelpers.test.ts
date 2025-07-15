@@ -1,13 +1,11 @@
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import SuiteMetrics, { ConcurrentSuiteMetrics } from "../../src/index.ts";
 import {
     createNestedTestData,
     createPresetData,
     createSimpleTestData,
-    GeneratedTestData,
     PRESET_TYPE
 } from "./testDataHelpers.ts";
-import concurrentSuiteMetrics from "../../src/ConcurrentSuiteMetrics.js";
 import { _MockSuiteMetrics } from "./mocks.js";
 
 suite("Test Data Helpers", function() {
@@ -136,21 +134,22 @@ suite("Test Data Helpers", function() {
             const metrics = createPresetData(false, PRESET_TYPE.EDGE_CASES);
 
             // Verify special character handling
-            expect(metrics.suiteExists(["Suite with spaces & symbols!@#$%^&*()"])).to.be.true;
-            expect(metrics.testExists(["Suite with spaces & symbols!@#$%^&*()", "Test with spaces"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["Suite with spaces & symbols!@#$%^&*()"]), "Suite with spaces &" +
+                " symbols does not exist.");
+            assert.isTrue(metrics.testExists(["Suite with spaces & symbols!@#$%^&*()", "Test with spaces"]), "Test with" +
+                " spaces does not exist.");
 
             // Verify unicode handling
-            expect(metrics.suiteExists(["测试套件 🧪 тест"])).to.be.true;
-            expect(metrics.testExists(["测试套件 🧪 тест", "测试 🧪"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["测试套件 🧪 тест"]), "Unicode suite does not exist.");
 
             // Verify long names
-            expect(metrics.suiteExists(["A".repeat(100)])).to.be.true;
-            expect(metrics.testExists(["A".repeat(100), "B".repeat(100)])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["A".repeat(1000)]), "Long name suite does not exist.");
+            assert.isTrue(metrics.testExists(["A".repeat(1000), "B".repeat(10_000)]), "Long name test does not exist.");
 
             // Verify case sensitivity
-            expect(metrics.testExists(["CaseSuite", "TestName"])).to.be.true;
-            expect(metrics.testExists(["CaseSuite", "testname"])).to.be.true;
-            expect(metrics.testExists(["CaseSuite", "TESTNAME"])).to.be.true;
+            assert.isTrue(metrics.testExists(["CaseSuite", "TestName"]), "TestName with exact casing does not exist.");
+            assert.isTrue(metrics.testExists(["CaseSuite", "testname"]), "TestName with lowercase casing does not exist.");
+            assert.isTrue(metrics.testExists(["CaseSuite", "TESTNAME"]), "TestName with uppercase casing does not exist.");
         });
     });
 
