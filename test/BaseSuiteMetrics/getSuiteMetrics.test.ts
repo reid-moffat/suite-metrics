@@ -694,9 +694,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         });
 
         test("should work correctly with nested test data helper", function() {
-            const freshMetrics = new SuiteMetrics();
-
-            const testData = createNestedTestData(freshMetrics, {
+            const metrics = createNestedTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 6,
                 maxDepth: 3,
@@ -705,18 +703,15 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
                 testNamePrefix: "Test"
             });
 
-            expect(testData.totalTests).to.be.above(0);
-            expect(testData.maxDepthAchieved).to.equal(3);
-
             // Verify nested structure
-            expect(freshMetrics.suiteExists(["Nested1"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Nested1", "Nested2_1"])).to.be.true;
-            expect(freshMetrics.suiteExists(["Nested1", "Nested2_1", "Nested3_1"])).to.be.true;
+            expect(metrics.suiteExists(["Nested1"])).to.be.true;
+            expect(metrics.suiteExists(["Nested1", "Nested2_1"])).to.be.true;
+            expect(metrics.suiteExists(["Nested1", "Nested2_1", "Nested3_1"])).to.be.true;
 
             // Verify metrics at different levels
-            const level1Data = freshMetrics.getSuiteMetrics(["Nested1"]);
-            const level2Data = freshMetrics.getSuiteMetrics(["Nested1", "Nested2_1"]);
-            const level3Data = freshMetrics.getSuiteMetrics(["Nested1", "Nested2_1", "Nested3_1"]);
+            const level1Data = metrics.getSuiteMetrics(["Nested1"]);
+            const level2Data = metrics.getSuiteMetrics(["Nested1", "Nested2_1"]);
+            const level3Data = metrics.getSuiteMetrics(["Nested1", "Nested2_1", "Nested3_1"]);
 
             expect(level1Data.childSuites).to.have.lengthOf(2); // 2 sub-suites per suite
             expect(level2Data.parentSuites).to.deep.equal(["Nested1"]);

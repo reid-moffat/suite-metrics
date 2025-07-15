@@ -45,17 +45,13 @@ suite("Test Data Helpers", function() {
 
     suite("Nested Test Data Generation", function() {
         test("should create nested structure", function() {
-            const metrics = new SuiteMetrics();
 
-            const testData = createNestedTestData(metrics, {
+            const metrics = createNestedTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 4,
                 maxDepth: 3,
                 subSuitesPerSuite: 2
             });
-
-            expect(testData.totalTests).to.be.above(0);
-            expect(testData.maxDepthAchieved).to.equal(3);
 
             // Should have nested structure
             expect(metrics.suiteExists(["Suite1"])).to.be.true;
@@ -64,16 +60,11 @@ suite("Test Data Helpers", function() {
         });
 
         test("should handle different depth configurations", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData = createNestedTestData(metrics, {
+            const metrics = createNestedTestData(false, {
                 numSuites: 1,
                 maxDepth: 1,
                 testsPerSuite: 3
             });
-
-            expect(testData.maxDepthAchieved).to.equal(1);
-            expect(testData.totalSuites).to.equal(1);
 
             const suiteData = metrics.getSuiteMetrics(["Suite1"]);
             expect(suiteData.testMetrics.numTests).to.equal(3);
@@ -83,11 +74,7 @@ suite("Test Data Helpers", function() {
 
     suite("Complex Test Data Generation", function() {
         test("should create realistic application structure", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.REALISTIC_PREMADE);
-
-            expect(testData.totalTests).to.be.above(10);
+            const metrics = createPresetData(false, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Verify specific structure elements
             expect(metrics.suiteExists(["Authentication"])).to.be.true;
@@ -100,9 +87,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should provide comprehensive test coverage scenarios", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.REALISTIC_PREMADE);
+            const metrics = createPresetData(false, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Test various suite metrics
             const authData = metrics.getSuiteMetrics(["Authentication"]);
@@ -117,13 +102,10 @@ suite("Test Data Helpers", function() {
 
     suite("Large Test Data Generation", function() {
         test("should create large dataset efficiently", function() {
-            const metrics = new SuiteMetrics();
-
             const startTime = Date.now();
-            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.LARGE_SUITE);
+            const metrics = createPresetData(false, PRESET_TYPE.LARGE_SUITE);
             const endTime = Date.now();
 
-            expect(testData.totalTests).to.be.above(50);
             expect(endTime - startTime).to.be.below(1_000); // Should complete quickly
 
             // Verify structure integrity
@@ -134,11 +116,7 @@ suite("Test Data Helpers", function() {
 
     suite("Realistic Test Data with Timing", function() {
         test("should create tests with realistic timing variations", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData: GeneratedTestData = createPresetData(metrics, PRESET_TYPE.LARGE_SUITE);
-
-            expect(testData.totalTests).to.be.above(0);
+            const metrics = createPresetData(false, PRESET_TYPE.LARGE_SUITE);
 
             // Verify that tests have realistic durations
             const testMetrics = metrics.getTestMetrics(["Suite1", "Test1"]);
@@ -155,11 +133,7 @@ suite("Test Data Helpers", function() {
 
     suite("Edge Case Test Data", function() {
         test("should handle special characters and edge cases", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData = createPresetData(metrics, PRESET_TYPE.EDGE_CASES);
-
-            expect(testData.totalTests).to.be.above(0);
+            const metrics = createPresetData(false, PRESET_TYPE.EDGE_CASES);
 
             // Verify special character handling
             expect(metrics.suiteExists(["Suite with spaces & symbols!@#$%^&*()"])).to.be.true;
@@ -223,9 +197,7 @@ suite("Test Data Helpers", function() {
         });
 
         test("should provide detailed generation information", function() {
-            const metrics = new SuiteMetrics();
-
-            const testData = createNestedTestData(metrics, {
+            const metrics = createNestedTestData(false, {
                 numSuites: 2,
                 testsPerSuite: 3,
                 maxDepth: 2,
@@ -233,35 +205,20 @@ suite("Test Data Helpers", function() {
             });
 
             // Verify GeneratedTestData provides useful information
-            expect(testData.testPaths).to.be.an('array');
-            expect(testData.suitePaths).to.be.an('array');
-            expect(testData.suiteTestCounts).to.be.instanceOf(Map);
-
-            expect(testData.testPaths.length).to.equal(testData.totalTests);
-            expect(testData.suitePaths.length).to.equal(testData.totalSuites);
-
-            // Verify suite test counts are accurate
-            for (const [suitePath, expectedCount] of testData.suiteTestCounts) {
-                const actualSuiteData = metrics.getSuiteMetrics(suitePath.split('/'));
-                expect(actualSuiteData.testMetrics.numTests).to.equal(expectedCount);
-            }
+            // TODO
         });
     });
 
     suite("Performance and Stress Testing", function() {
         test("should handle normal datasets without timing delays efficiently", function() {
-            const metrics = new SuiteMetrics();
-
             const startTime = Date.now();
-            const testData = createPresetData(metrics, PRESET_TYPE.NORMAL);
+            const metrics = createPresetData(false, PRESET_TYPE.NORMAL);
             const endTime = Date.now();
 
-            expect(testData.totalTests).to.be.above(100);
             expect(endTime - startTime).to.be.below(500); // Should be very fast without delays
 
             // Verify data integrity
-            expect(testData.testPaths.length).to.equal(testData.totalTests);
-            expect(testData.suitePaths.length).to.equal(testData.totalSuites);
+            // TODO
         });
     });
 });
