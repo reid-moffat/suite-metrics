@@ -93,7 +93,7 @@ abstract class BaseSuiteMetrics {
         const directMetrics: { numTests: number, totalTime: number, averageTime: number } = this.calculateDirectTestMetrics(suite);
         const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
         const subTests: number = totalTests - directMetrics.numTests;
-        const subTime: number = totalTime - (directMetrics.totalTime ?? 0);
+        const subTime: number = totalTime - directMetrics.totalTime;
 
         return {
             name: suite.name,
