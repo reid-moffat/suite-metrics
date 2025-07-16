@@ -48,8 +48,8 @@ type SuiteData = {
  */
 type RecursiveSuiteData = {
     readonly name: string;
-    readonly parentSuites: string[] | null;
-    readonly childSuites: string[] | null;
+    readonly parentSuites: string[];
+    readonly childSuites: string[];
     readonly directTestMetrics: {
         readonly numTests: number;
         readonly totalTime: number | null;
