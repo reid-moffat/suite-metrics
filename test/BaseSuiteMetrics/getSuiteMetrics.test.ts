@@ -83,14 +83,14 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             assert.isObject(topLevelData, 'Top level data should be an object');
             assert.strictEqual(topLevelData.name, "<Top-Level suite>", 'Top level suite should have correct name');
-            assert.isNull(topLevelData.parentSuites, 'Top level suite should have null parent suites');
+            assert.isEmpty(topLevelData.parentSuites, 'Top level suite should have null parent suites');
             assert.isArray(topLevelData.childSuites, 'Top level suite should have array of child suites');
             assert.isArray(topLevelData.childSuites, 'Top level suite should have child suites array');
             assert.includeMembers(topLevelData.childSuites!, ["Suite1", "Suite2"], 'Top level suite should include created child suites');
             assert.isObject(topLevelData.testMetrics, 'Top level suite should have test metrics object');
             assert.strictEqual(topLevelData.testMetrics.numTests, 0, 'Top level suite should have no direct tests');
-            assert.isNull(topLevelData.testMetrics.totalTime, 'Top level suite should have null total time when no direct tests');
-            assert.isNull(topLevelData.testMetrics.averageTime, 'Top level suite should have null average time when no direct tests');
+            assert.equal(topLevelData.testMetrics.totalTime, 0, 'Top level suite should have null total time when no direct tests');
+            assert.equal(topLevelData.testMetrics.averageTime, 0, 'Top level suite should have null average time when no direct tests');
         });
 
         test("Complete suite data for single-level suite", function() {
@@ -199,8 +199,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const parentData = metrics.getSuiteMetrics(["ParentSuite"]);
 
             assert.strictEqual(parentData.testMetrics.numTests, 0, 'Parent suite with no direct tests should have zero test count');
-            assert.isNull(parentData.testMetrics.totalTime, 'Parent suite with no direct tests should have null total time');
-            assert.isNull(parentData.testMetrics.averageTime, 'Parent suite with no direct tests should have null average time');
+            assert.equal(parentData.testMetrics.totalTime, 0, 'Parent suite with no direct tests should have null total time');
+            assert.equal(parentData.testMetrics.averageTime, 0, 'Parent suite with no direct tests should have null average time');
             assert.deepEqual(parentData.childSuites, ["ChildSuite"], 'Parent suite should have child suite');
         });
 
@@ -567,7 +567,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assert.throws(() => newMetrics.getSuiteMetrics(["ResetSuite"]), 'Should throw error when accessing suite after reset');
+            assert.throws(() => newMetrics.getSuiteMetrics(["ResetSuite"]), 'Suite path [ResetSuite] does not exist');
             assert.isFalse(newMetrics.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
 
             // Should work with new instance

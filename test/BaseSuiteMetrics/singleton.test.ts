@@ -490,17 +490,17 @@ suite("[Both] Singleton Pattern", function() {
 
             const suiteData = instance.getSuiteMetrics(['timing-test']);
             assert.isNumber(suiteData.testMetrics.totalTime, "Total time should be a number");
-            assert.isAbove(suiteData.testMetrics.totalTime as number, 0, "Total time should be greater than 0");
+            assert.isAbove(suiteData.testMetrics.totalTime, 0, "Total time should be greater than 0");
             assert.isNumber(suiteData.testMetrics.averageTime, "Average time should be a number");
-            assert.isAbove(suiteData.testMetrics.averageTime as number, 0, "Average time should be greater than 0");
+            assert.isAbove(suiteData.testMetrics.averageTime, 0, "Average time should be greater than 0");
 
             // Reset and verify timing data is cleared
             SuiteMetrics.resetInstance();
             const newInstance = SuiteMetrics.getInstance();
 
             const topLevelData = newInstance.getSuiteMetricsRecursive([]);
-            assert.isNull(topLevelData.totalTestMetrics.totalTime, "Total time should be null after reset");
-            assert.isNull(topLevelData.totalTestMetrics.averageTime, "Average time should be null after reset");
+            assert.equal(topLevelData.totalTestMetrics.totalTime, 0, "Total time should be null after reset");
+            assert.equal(topLevelData.totalTestMetrics.averageTime, 0, "Average time should be null after reset");
         });
     });
 

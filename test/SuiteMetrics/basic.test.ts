@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import SuiteMetrics from "../../src/index.ts";
+import SuiteMetrics, { RecursiveSuiteData, Suite, SuiteData } from "../../src/index.ts";
 
 suite("[SuiteMetrics] Basic tests", function() {
 
@@ -249,8 +249,8 @@ suite("[SuiteMetrics] Basic tests", function() {
 
             const parentData = metrics.getSuiteMetrics(["ParentSuite"]);
             expect(parentData.testMetrics.numTests).to.equal(0);
-            expect(parentData.testMetrics.totalTime).to.be.null;
-            expect(parentData.testMetrics.averageTime).to.be.null;
+            expect(parentData.testMetrics.totalTime).to.equal(0);
+            expect(parentData.testMetrics.averageTime).to.equal(0);
             expect(parentData.childSuites).to.deep.equal(["SubSuite"]);
         });
 
@@ -263,7 +263,7 @@ suite("[SuiteMetrics] Basic tests", function() {
 
             const topLevelData = metrics.getSuiteMetricsRecursive([]);
             expect(topLevelData.name).to.equal("<Top-Level suite>");
-            expect(topLevelData.parentSuites).to.be.null;
+            expect(topLevelData.parentSuites).to.deep.equal([]);
             expect(topLevelData.directTestMetrics.numTests).to.equal(0);
             expect(topLevelData.subTestMetrics.numTests).to.equal(2);
             expect(topLevelData.totalTestMetrics.numTests).to.equal(2);
@@ -274,13 +274,13 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["EmptySuite", "SubSuite", "Test1"]);
             metrics.stopTest();
 
-            const emptyData = metrics.getSuiteMetrics(["EmptySuite"]);
-            expect(emptyData.testMetrics.totalTime).to.be.null;
-            expect(emptyData.testMetrics.averageTime).to.be.null;
+            const emptyData: SuiteData = metrics.getSuiteMetrics(["EmptySuite"]);
+            expect(emptyData.testMetrics.totalTime).to.equal(0);
+            expect(emptyData.testMetrics.averageTime).to.equal(0);
 
-            const recursiveData = metrics.getSuiteMetricsRecursive(["EmptySuite"]);
-            expect(recursiveData.directTestMetrics.totalTime).to.be.null;
-            expect(recursiveData.directTestMetrics.averageTime).to.be.null;
+            const recursiveData: RecursiveSuiteData = metrics.getSuiteMetricsRecursive(["EmptySuite"]);
+            expect(recursiveData.directTestMetrics.totalTime).to.equal(0);
+            expect(recursiveData.directTestMetrics.averageTime).to.equal(0);
             expect(recursiveData.subTestMetrics.totalTime).to.be.a('number');
         });
     });
