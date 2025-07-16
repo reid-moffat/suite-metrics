@@ -52,18 +52,18 @@ type RecursiveSuiteData = {
     readonly childSuites: string[];
     readonly directTestMetrics: {
         readonly numTests: number;
-        readonly totalTime: number | null;
-        readonly averageTime: number | null;
+        readonly totalTime: number;
+        readonly averageTime: number;
     }
     readonly subTestMetrics: {
         readonly numTests: number;
-        readonly totalTime: number | null;
-        readonly averageTime: number | null;
+        readonly totalTime: number;
+        readonly averageTime: number;
     }
     readonly totalTestMetrics: {
         readonly numTests: number;
-        readonly totalTime: number | null;
-        readonly averageTime: number | null;
+        readonly totalTime: number;
+        readonly averageTime: number;
     }
 };
 
