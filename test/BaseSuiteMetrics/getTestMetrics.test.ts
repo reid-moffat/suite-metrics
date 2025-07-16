@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { assert } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 import { addDelay } from "../helpers.ts";
 
@@ -11,121 +11,127 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
     });
 
     suite("Input Validation", function() {
-        test("should throw error for non-array path", function() {
+        test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            expect(() => metrics.getTestMetrics("not an array")).to.throw('Path must be an array of strings');
+            assert.throws(() => metrics.getTestMetrics("not an array"), 'Path must be an array of strings', 'Should throw error when path is not an array');
         });
 
-        test("should throw error for empty path", function() {
-            expect(() => metrics.getTestMetrics([])).to.throw('Path cannot be empty - must define a path');
+        test("Empty path", function() {
+            assert.throws(() => metrics.getTestMetrics([]), 'Path cannot be empty - must define a path', 'Should throw error when path array is empty');
         });
 
-        test("should throw error for single-element path", function() {
-            expect(() => metrics.getTestMetrics(["just-test"])).to.throw('A test must be inside at least one suite - it must contain at least [suite, test]');
+        test("Single-element path", function() {
+            assert.throws(() => metrics.getTestMetrics(["just-test"]), 'A test must be inside at least one suite - it must contain at least [suite, test]', 'Should throw error when path has only one element');
         });
 
-        test("should throw error for path with empty strings", function() {
-            expect(() => metrics.getTestMetrics(["suite", ""])).to.throw('Path must be an array of non-empty strings');
+        test("Path with empty strings", function() {
+            assert.throws(() => metrics.getTestMetrics(["suite", ""]), 'Path must be an array of non-empty strings', 'Should throw error when path contains empty string');
         });
 
-        test("should throw error for path with non-string elements", function() {
+        test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            expect(() => metrics.getTestMetrics(["suite", 123])).to.throw('Path must be an array of non-empty strings');
+            assert.throws(() => metrics.getTestMetrics(["suite", 123]), 'Path must be an array of non-empty strings', 'Should throw error when path contains number');
         });
 
-        test("should throw error for path with null/undefined elements", function() {
+        test("Path with null/undefined elements", function() {
             // @ts-ignore - Testing runtime validation
-            expect(() => metrics.getTestMetrics(["suite", null])).to.throw('Path must be an array of non-empty strings');
+            assert.throws(() => metrics.getTestMetrics(["suite", null]), 'Path must be an array of non-empty strings', 'Should throw error when path contains null');
             // @ts-ignore - Testing runtime validation
-            expect(() => metrics.getTestMetrics(["suite", undefined])).to.throw('Path must be an array of non-empty strings');
+            assert.throws(() => metrics.getTestMetrics(["suite", undefined]), 'Path must be an array of non-empty strings', 'Should throw error when path contains undefined');
         });
     });
 
     suite("Non-existent Test/Suite Handling", function() {
-        test("should throw error for non-existent suite", function() {
-            expect(() => metrics.getTestMetrics(["NonExistentSuite", "Test"])).to.throw('Suite path [NonExistentSuite] does not exist');
+        test("Non-existent suite", function() {
+            assert.throws(() => metrics.getTestMetrics(["NonExistentSuite", "Test"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when suite does not exist');
         });
 
-        test("should throw error for non-existent test in existing suite", function() {
+        test("Non-existent test in existing suite", function() {
             metrics.startTest(["ExistingSuite", "ExistingTest"]);
             metrics.stopTest();
 
-            expect(() => metrics.getTestMetrics(["ExistingSuite", "NonExistentTest"])).to.throw('Test [ExistingSuite, NonExistentTest] does not exist');
+            assert.throws(() => metrics.getTestMetrics(["ExistingSuite", "NonExistentTest"]), 'Test [ExistingSuite, NonExistentTest] does not exist', 'Should throw error when test does not exist in existing suite');
         });
 
-        test("should throw error for non-existent test in nested suite", function() {
+        test("Non-existent test in nested suite", function() {
             metrics.startTest(["Parent", "Child", "ExistingTest"]);
             metrics.stopTest();
 
-            expect(() => metrics.getTestMetrics(["Parent", "Child", "NonExistentTest"])).to.throw('Test [Parent, Child, NonExistentTest] does not exist');
+            assert.throws(() => metrics.getTestMetrics(["Parent", "Child", "NonExistentTest"]), 'Test [Parent, Child, NonExistentTest] does not exist', 'Should throw error when test does not exist in nested suite');
         });
 
-        test("should throw error for test path that points to suite", function() {
+        test("Test path that points to suite", function() {
             metrics.startTest(["Suite1", "SubSuite", "Test1"]);
             metrics.stopTest();
 
             // Trying to get test metrics for a suite path should fail
-            expect(() => metrics.getTestMetrics(["Suite1", "SubSuite"])).to.throw('Test [Suite1, SubSuite] does not exist');
+            assert.throws(() => metrics.getTestMetrics(["Suite1", "SubSuite"]), 'Test [Suite1, SubSuite] does not exist', 'Should throw error when path points to suite instead of test');
         });
 
-        test("should throw error for partially non-existent nested path", function() {
+        test("Partially non-existent nested path", function() {
             metrics.startTest(["Level1", "Level2", "Test1"]);
             metrics.stopTest();
 
-            expect(() => metrics.getTestMetrics(["Level1", "NonExistentLevel2", "Test1"])).to.throw('Suite path [Level1, NonExistentLevel2] does not exist');
+            assert.throws(() => metrics.getTestMetrics(["Level1", "NonExistentLevel2", "Test1"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
         });
     });
 
     suite("Basic Functionality", function() {
-        test("should return complete test metrics for simple test", function() {
+        test("Complete test metrics for simple test", function() {
             metrics.startTest(["SimpleSuite", "SimpleTest"]);
             addDelay(100);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SimpleSuite", "SimpleTest"]);
 
-            expect(testMetrics).to.be.an('object');
-            expect(testMetrics.name).to.equal("SimpleTest");
-            expect(testMetrics.startTimestamp).to.be.a('number').and.be.above(0);
-            expect(testMetrics.endTimestamp).to.be.a('number').and.be.above(testMetrics.startTimestamp);
-            expect(testMetrics.duration).to.be.a('number').and.be.above(0);
-            expect(testMetrics.duration).to.equal(testMetrics.endTimestamp - testMetrics.startTimestamp);
-            expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
-            expect(testMetrics.suiteTestNumber).to.be.a('number').and.be.above(0);
+            assert.isObject(testMetrics, 'Test metrics should be an object');
+            assert.strictEqual(testMetrics.name, "SimpleTest", 'Test name should match');
+            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
+            assert.isAbove(testMetrics.startTimestamp, 0, 'Start timestamp should be positive');
+            assert.isNumber(testMetrics.endTimestamp, 'End timestamp should be a number');
+            assert.isAbove(testMetrics.endTimestamp, testMetrics.startTimestamp, 'End timestamp should be after start timestamp');
+            assert.isNumber(testMetrics.duration, 'Duration should be a number');
+            assert.isAbove(testMetrics.duration, 0, 'Duration should be positive');
+            assert.strictEqual(testMetrics.duration, testMetrics.endTimestamp - testMetrics.startTimestamp, 'Duration should equal timestamp difference');
+            assert.isNumber(testMetrics.testNumber, 'Test number should be a number');
+            assert.isAbove(testMetrics.testNumber, 0, 'Test number should be positive');
+            assert.isNumber(testMetrics.suiteTestNumber, 'Suite test number should be a number');
+            assert.isAbove(testMetrics.suiteTestNumber, 0, 'Suite test number should be positive');
         });
 
-        test("should return test metrics for nested test", function() {
+        test("Test metrics for nested test", function() {
             metrics.startTest(["Level1", "Level2", "Level3", "DeepTest"]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["Level1", "Level2", "Level3", "DeepTest"]);
 
-            expect(testMetrics.name).to.equal("DeepTest");
-            expect(testMetrics.testNumber).to.be.a('number').and.be.above(0);
-            expect(testMetrics.suiteTestNumber).to.equal(1); // First test in this suite
+            assert.strictEqual(testMetrics.name, "DeepTest", 'Test name should match for nested test');
+            assert.isNumber(testMetrics.testNumber, 'Test number should be a number for nested test');
+            assert.isAbove(testMetrics.testNumber, 0, 'Test number should be positive for nested test');
+            assert.strictEqual(testMetrics.suiteTestNumber, 1, 'Should be first test in this suite');
         });
 
-        test("should handle tests with special characters in names", function() {
+        test("Tests with special characters in names", function() {
             const specialTestName = "Test with spaces & symbols!@#$%^&*()";
             metrics.startTest(["SpecialSuite", specialTestName]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SpecialSuite", specialTestName]);
-            expect(testMetrics.name).to.equal(specialTestName);
+            assert.strictEqual(testMetrics.name, specialTestName, 'Test name with special characters should be preserved');
         });
 
-        test("should handle tests with unicode characters", function() {
+        test("Tests with unicode characters", function() {
             const unicodeTestName = "测试 🧪 тест";
             metrics.startTest(["UnicodeSuite", unicodeTestName]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["UnicodeSuite", unicodeTestName]);
-            expect(testMetrics.name).to.equal(unicodeTestName);
+            assert.strictEqual(testMetrics.name, unicodeTestName, 'Test name with unicode characters should be preserved');
         });
     });
 
     suite("Test Numbering and Ordering", function() {
-        test("should assign correct global test numbers", function() {
+        test("Correct global test numbers", function() {
             metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
@@ -139,12 +145,12 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const test2 = metrics.getTestMetrics(["Suite2", "Test2"]);
             const test3 = metrics.getTestMetrics(["Suite1", "Test3"]);
 
-            expect(test1.testNumber).to.equal(1);
-            expect(test2.testNumber).to.equal(2);
-            expect(test3.testNumber).to.equal(3);
+            assert.strictEqual(test1.testNumber, 1, 'First test should have test number 1');
+            assert.strictEqual(test2.testNumber, 2, 'Second test should have test number 2');
+            assert.strictEqual(test3.testNumber, 3, 'Third test should have test number 3');
         });
 
-        test("should assign correct suite-specific test numbers", function() {
+        test("Correct suite-specific test numbers", function() {
             metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
@@ -162,13 +168,13 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const suite1Test2 = metrics.getTestMetrics(["Suite1", "Test2"]);
             const suite2Test2 = metrics.getTestMetrics(["Suite2", "Test2"]);
 
-            expect(suite1Test1.suiteTestNumber).to.equal(1);
-            expect(suite2Test1.suiteTestNumber).to.equal(1);
-            expect(suite1Test2.suiteTestNumber).to.equal(2);
-            expect(suite2Test2.suiteTestNumber).to.equal(2);
+            assert.strictEqual(suite1Test1.suiteTestNumber, 1, 'First test in Suite1 should have suite test number 1');
+            assert.strictEqual(suite2Test1.suiteTestNumber, 1, 'First test in Suite2 should have suite test number 1');
+            assert.strictEqual(suite1Test2.suiteTestNumber, 2, 'Second test in Suite1 should have suite test number 2');
+            assert.strictEqual(suite2Test2.suiteTestNumber, 2, 'Second test in Suite2 should have suite test number 2');
         });
 
-        test("should handle suite test numbering in nested suites", function() {
+        test("Suite test numbering in nested suites", function() {
             metrics.startTest(["Parent", "Child1", "Test1"]);
             metrics.stopTest();
 
@@ -182,14 +188,14 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const child2Test1 = metrics.getTestMetrics(["Parent", "Child2", "Test1"]);
             const child1Test2 = metrics.getTestMetrics(["Parent", "Child1", "Test2"]);
 
-            expect(child1Test1.suiteTestNumber).to.equal(1);
-            expect(child2Test1.suiteTestNumber).to.equal(1);
-            expect(child1Test2.suiteTestNumber).to.equal(2);
+            assert.strictEqual(child1Test1.suiteTestNumber, 1, 'First test in Child1 should have suite test number 1');
+            assert.strictEqual(child2Test1.suiteTestNumber, 1, 'First test in Child2 should have suite test number 1');
+            assert.strictEqual(child1Test2.suiteTestNumber, 2, 'Second test in Child1 should have suite test number 2');
         });
     });
 
     suite("Timing and Duration", function() {
-        test("should record accurate timing information", function() {
+        test("Accurate timing information", function() {
             metrics.startTest(["TimingSuite", "TimingTest"]);
 
             // Add measurable delay
@@ -201,16 +207,19 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const testMetrics = metrics.getTestMetrics(["TimingSuite", "TimingTest"]);
 
             // Verify timing properties exist and are reasonable
-            expect(testMetrics.startTimestamp).to.be.a('number').and.be.above(0);
-            expect(testMetrics.endTimestamp).to.be.a('number').and.be.above(testMetrics.startTimestamp);
-            expect(testMetrics.duration).to.be.a('number').and.be.above(0);
-            expect(testMetrics.duration).to.equal(testMetrics.endTimestamp - testMetrics.startTimestamp);
+            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
+            assert.isAbove(testMetrics.startTimestamp, 0, 'Start timestamp should be positive');
+            assert.isNumber(testMetrics.endTimestamp, 'End timestamp should be a number');
+            assert.isAbove(testMetrics.endTimestamp, testMetrics.startTimestamp, 'End timestamp should be after start timestamp');
+            assert.isNumber(testMetrics.duration, 'Duration should be a number');
+            assert.isAbove(testMetrics.duration, 0, 'Duration should be positive');
+            assert.strictEqual(testMetrics.duration, testMetrics.endTimestamp - testMetrics.startTimestamp, 'Duration should equal timestamp difference');
 
             // Verify the duration is reasonable (should be at least a few microseconds due to the delay)
-            expect(testMetrics.duration).to.be.above(1000); // At least 1ms in microseconds
+            assert.isAbove(testMetrics.duration, 1000, 'Duration should be at least 1ms in microseconds due to delay');
         });
 
-        test("should handle very short duration tests", function() {
+        test("Very short duration tests", function() {
             metrics.startTest(["QuickSuite", "QuickTest"]);
             for (let i = 0; i < 100; ++i) {
                 // Placeholder work ...
@@ -219,12 +228,12 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
             const testMetrics = metrics.getTestMetrics(["QuickSuite", "QuickTest"]);
 
-            expect(testMetrics.duration).to.be.a('number');
-            expect(testMetrics.duration).to.be.at.least(0);
-            expect(testMetrics.startTimestamp).to.be.below(testMetrics.endTimestamp);
+            assert.isNumber(testMetrics.duration, 'Duration should be a number for quick test');
+            assert.isAtLeast(testMetrics.duration, 0, 'Duration should be non-negative for quick test');
+            assert.isBelow(testMetrics.startTimestamp, testMetrics.endTimestamp, 'Start timestamp should be before end timestamp for quick test');
         });
 
-        test("should handle tests with different durations", function() {
+        test("Tests with different durations", function() {
             // Fast test
             metrics.startTest(["DurationSuite", "FastTest"]);
             addDelay(10);
@@ -238,66 +247,66 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const fastTest = metrics.getTestMetrics(["DurationSuite", "FastTest"]);
             const slowTest = metrics.getTestMetrics(["DurationSuite", "SlowTest"]);
 
-            expect(slowTest.duration).to.be.above(fastTest.duration);
-            expect(fastTest.duration).to.be.above(10_000);
-            expect(slowTest.duration).to.be.above(100_000);
+            assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
+            assert.isAbove(fastTest.duration, 10_000, 'Fast test should have at least 10ms duration');
+            assert.isAbove(slowTest.duration, 100_000, 'Slow test should have at least 100ms duration');
         });
     });
 
     suite("Data Immutability and Integrity", function() {
-        test("should return a copy of test data (not reference)", function() {
+        test("Return copy of test data (not reference)", function() {
             metrics.startTest(["ImmutableSuite", "ImmutableTest"]);
             metrics.stopTest();
 
             const testMetrics1 = metrics.getTestMetrics(["ImmutableSuite", "ImmutableTest"]);
             const testMetrics2 = metrics.getTestMetrics(["ImmutableSuite", "ImmutableTest"]);
 
-            expect(testMetrics1).to.deep.equal(testMetrics2);
-            expect(testMetrics1).to.not.equal(testMetrics2); // Different object references
+            assert.deepEqual(testMetrics1, testMetrics2, 'Multiple calls should return equal objects');
+            assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');
 
             // Verify modifying returned object doesn't affect internal state
             // @ts-ignore - Testing immutability
             testMetrics1.duration = 999999;
             const testMetrics3 = metrics.getTestMetrics(["ImmutableSuite", "ImmutableTest"]);
-            expect(testMetrics3.duration).to.not.equal(999999);
-            expect(testMetrics3).to.deep.equal(testMetrics2);
+            assert.notEqual(testMetrics3.duration, 999999, 'Modifying returned object should not affect internal state');
+            assert.deepEqual(testMetrics3, testMetrics2, 'Internal state should remain unchanged after modification');
         });
 
-        test("should maintain readonly properties", function() {
+        test("Readonly properties", function() {
             metrics.startTest(["ReadonlySuite", "ReadonlyTest"]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["ReadonlySuite", "ReadonlyTest"]);
 
             // These should be readonly according to the type definition
-            expect(testMetrics.name).to.be.a('string');
-            expect(testMetrics.testNumber).to.be.a('number');
-            expect(testMetrics.suiteTestNumber).to.be.a('number');
+            assert.isString(testMetrics.name, 'Name should be a string');
+            assert.isNumber(testMetrics.testNumber, 'Test number should be a number');
+            assert.isNumber(testMetrics.suiteTestNumber, 'Suite test number should be a number');
         });
 
-        test("should have all required Test properties", function() {
+        test("All required Test properties", function() {
             metrics.startTest(["CompleteSuite", "CompleteTest"]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["CompleteSuite", "CompleteTest"]);
 
             // Verify all properties from Test type are present
-            expect(testMetrics).to.have.all.keys([
+            assert.hasAllKeys(testMetrics, [
                 'name', 'startTimestamp', 'endTimestamp', 'duration', 'testNumber', 'suiteTestNumber'
-            ]);
+            ], 'Test metrics should have all required properties');
 
             // Verify property types
-            expect(testMetrics.name).to.be.a('string');
-            expect(testMetrics.startTimestamp).to.be.a('number');
-            expect(testMetrics.endTimestamp).to.be.a('number');
-            expect(testMetrics.duration).to.be.a('number');
-            expect(testMetrics.testNumber).to.be.a('number');
-            expect(testMetrics.suiteTestNumber).to.be.a('number');
+            assert.isString(testMetrics.name, 'Name property should be string');
+            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp property should be number');
+            assert.isNumber(testMetrics.endTimestamp, 'End timestamp property should be number');
+            assert.isNumber(testMetrics.duration, 'Duration property should be number');
+            assert.isNumber(testMetrics.testNumber, 'Test number property should be number');
+            assert.isNumber(testMetrics.suiteTestNumber, 'Suite test number property should be number');
         });
     });
 
     suite("Complex Scenarios", function() {
-        test("should handle multiple tests in deeply nested suites", function() {
+        test("Multiple tests in deeply nested suites", function() {
             const deepPath1 = ["L1", "L2", "L3", "L4", "L5", "Test1"];
             const deepPath2 = ["L1", "L2", "L3", "L4", "L5", "Test2"];
             const deepPath3 = ["L1", "L2", "L3", "L4", "L6", "Test3"];
@@ -315,20 +324,20 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const test2 = metrics.getTestMetrics(deepPath2);
             const test3 = metrics.getTestMetrics(deepPath3);
 
-            expect(test1.name).to.equal("Test1");
-            expect(test2.name).to.equal("Test2");
-            expect(test3.name).to.equal("Test3");
+            assert.strictEqual(test1.name, "Test1", 'First deep test should have correct name');
+            assert.strictEqual(test2.name, "Test2", 'Second deep test should have correct name');
+            assert.strictEqual(test3.name, "Test3", 'Third deep test should have correct name');
 
-            expect(test1.suiteTestNumber).to.equal(1);
-            expect(test2.suiteTestNumber).to.equal(2);
-            expect(test3.suiteTestNumber).to.equal(1); // Different suite (L6 vs L5)
+            assert.strictEqual(test1.suiteTestNumber, 1, 'First test in L5 suite should have suite test number 1');
+            assert.strictEqual(test2.suiteTestNumber, 2, 'Second test in L5 suite should have suite test number 2');
+            assert.strictEqual(test3.suiteTestNumber, 1, 'First test in L6 suite should have suite test number 1');
 
-            expect(test1.testNumber).to.equal(1);
-            expect(test2.testNumber).to.equal(2);
-            expect(test3.testNumber).to.equal(3);
+            assert.strictEqual(test1.testNumber, 1, 'First test globally should have test number 1');
+            assert.strictEqual(test2.testNumber, 2, 'Second test globally should have test number 2');
+            assert.strictEqual(test3.testNumber, 3, 'Third test globally should have test number 3');
         });
 
-        test("should handle tests with identical names in different suites", function() {
+        test("Tests with identical names in different suites", function() {
             metrics.startTest(["Suite1", "DuplicateName"]);
             metrics.stopTest();
 
@@ -342,20 +351,20 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const test2 = metrics.getTestMetrics(["Suite2", "DuplicateName"]);
             const test3 = metrics.getTestMetrics(["Suite1", "SubSuite", "DuplicateName"]);
 
-            expect(test1.name).to.equal("DuplicateName");
-            expect(test2.name).to.equal("DuplicateName");
-            expect(test3.name).to.equal("DuplicateName");
+            assert.strictEqual(test1.name, "DuplicateName", 'First duplicate test should have correct name');
+            assert.strictEqual(test2.name, "DuplicateName", 'Second duplicate test should have correct name');
+            assert.strictEqual(test3.name, "DuplicateName", 'Third duplicate test should have correct name');
 
-            expect(test1.testNumber).to.equal(1);
-            expect(test2.testNumber).to.equal(2);
-            expect(test3.testNumber).to.equal(3);
+            assert.strictEqual(test1.testNumber, 1, 'First test should have global test number 1');
+            assert.strictEqual(test2.testNumber, 2, 'Second test should have global test number 2');
+            assert.strictEqual(test3.testNumber, 3, 'Third test should have global test number 3');
 
-            expect(test1.suiteTestNumber).to.equal(1);
-            expect(test2.suiteTestNumber).to.equal(1);
-            expect(test3.suiteTestNumber).to.equal(1);
+            assert.strictEqual(test1.suiteTestNumber, 1, 'First test in Suite1 should have suite test number 1');
+            assert.strictEqual(test2.suiteTestNumber, 1, 'First test in Suite2 should have suite test number 1');
+            assert.strictEqual(test3.suiteTestNumber, 1, 'First test in SubSuite should have suite test number 1');
         });
 
-        test("should maintain consistency across multiple operations", function() {
+        test("Consistency across multiple operations", function() {
             // Create a complex test structure
             metrics.startTest(["ConsistencySuite", "Test1"]);
             metrics.stopTest();
@@ -371,21 +380,21 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
             // Original test should remain unchanged
             const laterTest = metrics.getTestMetrics(["ConsistencySuite", "Test1"]);
-            expect(laterTest).to.deep.equal(initialTest);
+            assert.deepEqual(laterTest, initialTest, 'Original test metrics should remain unchanged after adding more tests');
 
             // New tests should have correct numbering
             const test2 = metrics.getTestMetrics(["ConsistencySuite", "Test2"]);
             const test3 = metrics.getTestMetrics(["ConsistencySuite", "SubSuite", "Test3"]);
 
-            expect(test2.suiteTestNumber).to.equal(2);
-            expect(test3.suiteTestNumber).to.equal(1);
-            expect(test2.testNumber).to.equal(2);
-            expect(test3.testNumber).to.equal(3);
+            assert.strictEqual(test2.suiteTestNumber, 2, 'Second test in main suite should have suite test number 2');
+            assert.strictEqual(test3.suiteTestNumber, 1, 'First test in sub suite should have suite test number 1');
+            assert.strictEqual(test2.testNumber, 2, 'Second test globally should have test number 2');
+            assert.strictEqual(test3.testNumber, 3, 'Third test globally should have test number 3');
         });
     });
 
     suite("Edge Cases and Error Conditions", function() {
-        test("should handle very long suite and test names", function() {
+        test("Very long suite and test names", function() {
             const longSuiteName = "A".repeat(1000);
             const longTestName = "B".repeat(1000);
 
@@ -393,19 +402,19 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics([longSuiteName, longTestName]);
-            expect(testMetrics.name).to.equal(longTestName);
-            expect(testMetrics.name.length).to.equal(1000);
+            assert.strictEqual(testMetrics.name, longTestName, 'Very long test name should be preserved');
+            assert.strictEqual(testMetrics.name.length, 1000, 'Test name should maintain full length');
         });
 
-        test("should handle suite names that look like array indices", function() {
+        test("Suite names that look like array indices", function() {
             metrics.startTest(["0", "1", "2"]);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["0", "1", "2"]);
-            expect(testMetrics.name).to.equal("2");
+            assert.strictEqual(testMetrics.name, "2", 'Test name that looks like array index should be preserved');
         });
 
-        test("should handle whitespace-only names (but not empty)", function() {
+        test("Whitespace-only names (but not empty)", function() {
             const whitespaceSuite = "   ";
             const whitespaceTest = "\t\n ";
 
@@ -413,10 +422,10 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics([whitespaceSuite, whitespaceTest]);
-            expect(testMetrics.name).to.equal(whitespaceTest);
+            assert.strictEqual(testMetrics.name, whitespaceTest, 'Whitespace-only test name should be preserved');
         });
 
-        test("should handle case-sensitive test names", function() {
+        test("Case-sensitive test names", function() {
             metrics.startTest(["CaseSuite", "TestName"]);
             metrics.stopTest();
 
@@ -430,18 +439,18 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const test2 = metrics.getTestMetrics(["CaseSuite", "testname"]);
             const test3 = metrics.getTestMetrics(["CaseSuite", "TESTNAME"]);
 
-            expect(test1.name).to.equal("TestName");
-            expect(test2.name).to.equal("testname");
-            expect(test3.name).to.equal("TESTNAME");
+            assert.strictEqual(test1.name, "TestName", 'Original case test name should be preserved');
+            assert.strictEqual(test2.name, "testname", 'Lowercase test name should be preserved');
+            assert.strictEqual(test3.name, "TESTNAME", 'Uppercase test name should be preserved');
 
-            expect(test1.suiteTestNumber).to.equal(1);
-            expect(test2.suiteTestNumber).to.equal(2);
-            expect(test3.suiteTestNumber).to.equal(3);
+            assert.strictEqual(test1.suiteTestNumber, 1, 'Original case test should have suite test number 1');
+            assert.strictEqual(test2.suiteTestNumber, 2, 'Lowercase test should have suite test number 2');
+            assert.strictEqual(test3.suiteTestNumber, 3, 'Uppercase test should have suite test number 3');
         });
     });
 
     suite("State Isolation", function() {
-        test("should not affect other tests when retrieving metrics", function() {
+        test("Not affect other tests when retrieving metrics", function() {
             metrics.startTest(["IsolationSuite", "Test1"]);
             metrics.stopTest();
 
@@ -460,29 +469,29 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
             const test1After = metrics.getTestMetrics(["IsolationSuite", "Test1"]);
             const test2After = metrics.getTestMetrics(["IsolationSuite", "Test2"]);
 
-            expect(test1After).to.deep.equal(test1Before);
-            expect(test2After).to.deep.equal(test2Before);
+            assert.deepEqual(test1After, test1Before, 'Test1 metrics should remain unchanged after multiple retrievals');
+            assert.deepEqual(test2After, test2Before, 'Test2 metrics should remain unchanged after retrieving Test1 metrics');
         });
 
-        test("should work correctly after instance reset", function() {
+        test("Work correctly after instance reset", function() {
             metrics.startTest(["ResetSuite", "Test1"]);
             metrics.stopTest();
 
-            expect(metrics.testExists(["ResetSuite", "Test1"])).to.be.true;
+            assert.isTrue(metrics.testExists(["ResetSuite", "Test1"]), 'Test should exist before reset');
 
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            expect(() => newMetrics.getTestMetrics(["ResetSuite", "Test1"])).to.throw();
-            expect(newMetrics.testExists(["ResetSuite", "Test1"])).to.be.false;
+            assert.throws(() => newMetrics.getTestMetrics(["ResetSuite", "Test1"]), 'Suite path [ResetSuite] does not exist');
+            assert.isFalse(newMetrics.testExists(["ResetSuite", "Test1"]), 'Test should not exist after reset');
 
             // Should work with new instance
             newMetrics.startTest(["NewSuite", "NewTest"]);
             newMetrics.stopTest();
 
             const newTestMetrics = newMetrics.getTestMetrics(["NewSuite", "NewTest"]);
-            expect(newTestMetrics.name).to.equal("NewTest");
-            expect(newTestMetrics.testNumber).to.equal(1); // Reset counter
+            assert.strictEqual(newTestMetrics.name, "NewTest", 'New test should work correctly after reset');
+            assert.strictEqual(newTestMetrics.testNumber, 1, 'Test counter should be reset');
         });
     });
 });
