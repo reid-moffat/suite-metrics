@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { assert } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 
 suite("[BaseSuiteMetrics] suiteExists", function() {
@@ -12,92 +12,92 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
     suite("suiteExists Method", function() {
 
         suite("Input Validation", function() {
-            test("should throw error for non-array path", function() {
+            test("Non-array path", function() {
                 // @ts-ignore - Testing runtime validation
-                expect(() => metrics.suiteExists("not an array")).to.throw('Path must be an array of strings');
+                assert.throws(() => metrics.suiteExists("not an array"), 'Path must be an array of strings', 'Non-array path should throw validation error');
             });
 
-            test("should throw error for array with non-string elements", function() {
+            test("Non-string elements", function() {
                 // @ts-ignore - Testing runtime validation
-                expect(() => metrics.suiteExists([123, "suite"])).to.throw('Path must be an array of non-empty strings');
+                assert.throws(() => metrics.suiteExists([123, "suite"]), 'Path must be an array of non-empty strings', 'Array with number element should throw validation error');
                 // @ts-ignore - Testing runtime validation
-                expect(() => metrics.suiteExists(["suite", null])).to.throw('Path must be an array of non-empty strings');
+                assert.throws(() => metrics.suiteExists(["suite", null]), 'Path must be an array of non-empty strings', 'Array with null element should throw validation error');
                 // @ts-ignore - Testing runtime validation
-                expect(() => metrics.suiteExists(["suite", undefined])).to.throw('Path must be an array of non-empty strings');
+                assert.throws(() => metrics.suiteExists(["suite", undefined]), 'Path must be an array of non-empty strings', 'Array with undefined element should throw validation error');
                 // @ts-ignore - Testing runtime validation
-                expect(() => metrics.suiteExists([{}, "suite"])).to.throw('Path must be an array of non-empty strings');
+                assert.throws(() => metrics.suiteExists([{}, "suite"]), 'Path must be an array of non-empty strings', 'Array with object element should throw validation error');
             });
 
-            test("should throw error for array with empty string elements", function() {
-                expect(() => metrics.suiteExists([""])).to.throw('Path must be an array of non-empty strings');
-                expect(() => metrics.suiteExists(["suite", ""])).to.throw('Path must be an array of non-empty strings');
-                expect(() => metrics.suiteExists(["", "suite"])).to.throw('Path must be an array of non-empty strings');
+            test("Empty string elements", function() {
+                assert.throws(() => metrics.suiteExists([""]), 'Path must be an array of non-empty strings', 'Array with single empty string should throw validation error');
+                assert.throws(() => metrics.suiteExists(["suite", ""]), 'Path must be an array of non-empty strings', 'Array with empty string at end should throw validation error');
+                assert.throws(() => metrics.suiteExists(["", "suite"]), 'Path must be an array of non-empty strings', 'Array with empty string at start should throw validation error');
             });
 
-            test("should allow empty array (top-level suite)", function() {
-                expect(() => metrics.suiteExists([])).to.not.throw();
+            test("Allows empty array (top-level suite)", function() {
+                assert.doesNotThrow(() => metrics.suiteExists([]), 'Empty array path should not throw error for top-level suite');
             });
         });
 
         suite("Basic Functionality", function() {
-            test("should return true for top-level suite (empty path)", function() {
-                expect(metrics.suiteExists([])).to.be.true;
+            test("Top-level suite (empty path)", function() {
+                assert.isTrue(metrics.suiteExists([]), 'Top-level suite with empty path should exist');
             });
 
-            test("should return false for non-existent single-level suite", function() {
-                expect(metrics.suiteExists(["NonExistentSuite"])).to.be.false;
+            test("Non-existent single-level suite", function() {
+                assert.isFalse(metrics.suiteExists(["NonExistentSuite"]), 'Non-existent single-level suite should return false');
             });
 
-            test("should return false for non-existent multi-level suite", function() {
-                expect(metrics.suiteExists(["NonExistent", "Suite"])).to.be.false;
-                expect(metrics.suiteExists(["Non", "Existent", "Suite", "Path"])).to.be.false;
+            test("Non-existent multi-level suite", function() {
+                assert.isFalse(metrics.suiteExists(["NonExistent", "Suite"]), 'Non-existent two-level suite should return false');
+                assert.isFalse(metrics.suiteExists(["Non", "Existent", "Suite", "Path"]), 'Non-existent four-level suite should return false');
             });
 
-            test("should return true for existing single-level suite", function() {
+            test("Existing single-level suite", function() {
                 // Create a suite by creating a test in it
                 metrics.startTest(["ExistingSuite", "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists(["ExistingSuite"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["ExistingSuite"]), 'Existing single-level suite should return true');
             });
 
-            test("should return true for existing multi-level suite", function() {
+            test("Existing multi-level suite", function() {
                 // Create nested suites by creating a test in them
                 metrics.startTest(["Level1", "Level2", "Level3", "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists(["Level1"])).to.be.true;
-                expect(metrics.suiteExists(["Level1", "Level2"])).to.be.true;
-                expect(metrics.suiteExists(["Level1", "Level2", "Level3"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["Level1"]), 'First level of nested suite should exist');
+                assert.isTrue(metrics.suiteExists(["Level1", "Level2"]), 'Second level of nested suite should exist');
+                assert.isTrue(metrics.suiteExists(["Level1", "Level2", "Level3"]), 'Third level of nested suite should exist');
             });
         });
 
         suite("Edge Cases", function() {
-            test("should handle suites with special characters", function() {
+            test("Suites with special characters", function() {
                 metrics.startTest(["Suite-With-Dashes", "Test@#$%", "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists(["Suite-With-Dashes"])).to.be.true;
-                expect(metrics.suiteExists(["Suite-With-Dashes", "Test@#$%"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["Suite-With-Dashes"]), 'Suite with dashes should exist');
+                assert.isTrue(metrics.suiteExists(["Suite-With-Dashes", "Test@#$%"]), 'Suite with special characters should exist');
             });
 
-            test("should handle suites with spaces", function() {
+            test("Suites with spaces", function() {
                 metrics.startTest(["Suite With Spaces", "Sub Suite With Spaces", "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists(["Suite With Spaces"])).to.be.true;
-                expect(metrics.suiteExists(["Suite With Spaces", "Sub Suite With Spaces"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["Suite With Spaces"]), 'Suite with spaces should exist');
+                assert.isTrue(metrics.suiteExists(["Suite With Spaces", "Sub Suite With Spaces"]), 'Nested suite with spaces should exist');
             });
 
-            test("should handle very long suite names", function() {
+            test("Very long suite names", function() {
                 const longSuiteName = "A".repeat(1000);
                 metrics.startTest([longSuiteName, "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists([longSuiteName])).to.be.true;
+                assert.isTrue(metrics.suiteExists([longSuiteName]), 'Suite with very long name should exist');
             });
 
-            test("should handle deeply nested suites", function() {
+            test("Deeply nested suites", function() {
                 const deepPath: string[] = [];
                 for (let i = 1; i <= 10; i++) {
                     deepPath.push(`Level${i}`);
@@ -110,39 +110,39 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
                 // Check all levels exist
                 for (let i = 1; i <= 10; i++) {
                     const pathToCheck = deepPath.slice(0, i);
-                    expect(metrics.suiteExists(pathToCheck)).to.be.true;
+                    assert.isTrue(metrics.suiteExists(pathToCheck), `Level ${i} of deeply nested suite should exist`);
                 }
             });
 
-            test("should be case sensitive", function() {
+            test("Case sensitivity", function() {
                 metrics.startTest(["CaseSensitive", "Test1"]);
                 metrics.stopTest();
 
-                expect(metrics.suiteExists(["CaseSensitive"])).to.be.true;
-                expect(metrics.suiteExists(["casesensitive"])).to.be.false;
-                expect(metrics.suiteExists(["CASESENSITIVE"])).to.be.false;
-                expect(metrics.suiteExists(["CaseSENSITIVE"])).to.be.false;
+                assert.isTrue(metrics.suiteExists(["CaseSensitive"]), 'Exact case suite name should exist');
+                assert.isFalse(metrics.suiteExists(["casesensitive"]), 'All lowercase version should not exist');
+                assert.isFalse(metrics.suiteExists(["CASESENSITIVE"]), 'All uppercase version should not exist');
+                assert.isFalse(metrics.suiteExists(["CaseSENSITIVE"]), 'Mixed case version should not exist');
             });
         });
 
         suite("Partial Path Existence", function() {
-            test("should return false for partial paths when full path doesn't exist", function() {
+            test("Partial paths when full path doesn't exist", function() {
                 // Create Level1 -> Level2 -> Level3
                 metrics.startTest(["Level1", "Level2", "Level3", "Test1"]);
                 metrics.stopTest();
 
                 // These should exist
-                expect(metrics.suiteExists(["Level1"])).to.be.true;
-                expect(metrics.suiteExists(["Level1", "Level2"])).to.be.true;
-                expect(metrics.suiteExists(["Level1", "Level2", "Level3"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["Level1"]), 'First level should exist');
+                assert.isTrue(metrics.suiteExists(["Level1", "Level2"]), 'Second level should exist');
+                assert.isTrue(metrics.suiteExists(["Level1", "Level2", "Level3"]), 'Third level should exist');
 
                 // These should not exist (wrong paths)
-                expect(metrics.suiteExists(["Level1", "WrongLevel2"])).to.be.false;
-                expect(metrics.suiteExists(["Level1", "Level2", "WrongLevel3"])).to.be.false;
-                expect(metrics.suiteExists(["Level1", "Level2", "Level3", "Level4"])).to.be.false;
+                assert.isFalse(metrics.suiteExists(["Level1", "WrongLevel2"]), 'Wrong second level should not exist');
+                assert.isFalse(metrics.suiteExists(["Level1", "Level2", "WrongLevel3"]), 'Wrong third level should not exist');
+                assert.isFalse(metrics.suiteExists(["Level1", "Level2", "Level3", "Level4"]), 'Non-existent fourth level should not exist');
             });
 
-            test("should handle mixed existing and non-existing paths", function() {
+            test("Mixed existing and non-existing paths", function() {
                 // Create multiple suite structures
                 metrics.startTest(["Suite1", "SubSuite1", "Test1"]);
                 metrics.stopTest();
@@ -154,70 +154,70 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
                 metrics.stopTest();
 
                 // Existing paths
-                expect(metrics.suiteExists(["Suite1"])).to.be.true;
-                expect(metrics.suiteExists(["Suite1", "SubSuite1"])).to.be.true;
-                expect(metrics.suiteExists(["Suite1", "SubSuite2"])).to.be.true;
-                expect(metrics.suiteExists(["Suite2"])).to.be.true;
-                expect(metrics.suiteExists(["Suite2", "SubSuite1"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["Suite1"]), 'Suite1 should exist');
+                assert.isTrue(metrics.suiteExists(["Suite1", "SubSuite1"]), 'Suite1/SubSuite1 should exist');
+                assert.isTrue(metrics.suiteExists(["Suite1", "SubSuite2"]), 'Suite1/SubSuite2 should exist');
+                assert.isTrue(metrics.suiteExists(["Suite2"]), 'Suite2 should exist');
+                assert.isTrue(metrics.suiteExists(["Suite2", "SubSuite1"]), 'Suite2/SubSuite1 should exist');
 
                 // Non-existing paths
-                expect(metrics.suiteExists(["Suite1", "SubSuite3"])).to.be.false;
-                expect(metrics.suiteExists(["Suite2", "SubSuite2"])).to.be.false;
-                expect(metrics.suiteExists(["Suite3"])).to.be.false;
-                expect(metrics.suiteExists(["Suite1", "SubSuite1", "SubSubSuite"])).to.be.false;
+                assert.isFalse(metrics.suiteExists(["Suite1", "SubSuite3"]), 'Suite1/SubSuite3 should not exist');
+                assert.isFalse(metrics.suiteExists(["Suite2", "SubSuite2"]), 'Suite2/SubSuite2 should not exist');
+                assert.isFalse(metrics.suiteExists(["Suite3"]), 'Suite3 should not exist');
+                assert.isFalse(metrics.suiteExists(["Suite1", "SubSuite1", "SubSubSuite"]), 'Deeper non-existent suite should not exist');
             });
         });
 
         suite("State Consistency", function() {
-            test("should maintain consistency after multiple test operations", function() {
+            test("Consistency after multiple test operations", function() {
                 // Initial state - nothing exists
-                expect(metrics.suiteExists(["TestSuite"])).to.be.false;
+                assert.isFalse(metrics.suiteExists(["TestSuite"]), 'TestSuite should not exist initially');
 
                 // Create first test
                 metrics.startTest(["TestSuite", "Test1"]);
-                expect(metrics.suiteExists(["TestSuite"])).to.be.false;
+                assert.isFalse(metrics.suiteExists(["TestSuite"]), 'TestSuite should not exist during test execution');
                 metrics.stopTest();
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["TestSuite"]), 'TestSuite should exist after first test completion');
 
                 // Create second test in same suite
                 metrics.startTest(["TestSuite", "Test2"]);
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["TestSuite"]), 'TestSuite should still exist during second test');
                 metrics.stopTest();
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["TestSuite"]), 'TestSuite should still exist after second test completion');
 
                 // Create test in nested suite
                 metrics.startTest(["TestSuite", "NestedSuite", "Test3"]);
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
-                expect(metrics.suiteExists(["TestSuite", "NestedSuite"])).to.be.false;
+                assert.isTrue(metrics.suiteExists(["TestSuite"]), 'Parent suite should exist during nested test');
+                assert.isFalse(metrics.suiteExists(["TestSuite", "NestedSuite"]), 'Nested suite should not exist during test execution');
                 metrics.stopTest();
-                expect(metrics.suiteExists(["TestSuite"])).to.be.true;
-                expect(metrics.suiteExists(["TestSuite", "NestedSuite"])).to.be.true;
+                assert.isTrue(metrics.suiteExists(["TestSuite"]), 'Parent suite should exist after nested test completion');
+                assert.isTrue(metrics.suiteExists(["TestSuite", "NestedSuite"]), 'Nested suite should exist after test completion');
             });
         });
     });
 
     suite("Cross-Method Consistency", function() {
-        test("should maintain consistency between suiteExists and testExists", function() {
+        test("Consistency between suiteExists and testExists", function() {
             // Create a test structure
             metrics.startTest(["ParentSuite", "ChildSuite", "TestName"]);
             metrics.stopTest();
 
             // Suite existence checks
-            expect(metrics.suiteExists(["ParentSuite"])).to.be.true;
-            expect(metrics.suiteExists(["ParentSuite", "ChildSuite"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["ParentSuite"]), 'ParentSuite should exist');
+            assert.isTrue(metrics.suiteExists(["ParentSuite", "ChildSuite"]), 'ChildSuite should exist');
 
             // Test existence check
-            expect(metrics.testExists(["ParentSuite", "ChildSuite", "TestName"])).to.be.true;
+            assert.isTrue(metrics.testExists(["ParentSuite", "ChildSuite", "TestName"]), 'Test should exist');
 
             // Cross-validation: test path components should exist as suites
-            expect(metrics.suiteExists(["ParentSuite"])).to.be.true;
-            expect(metrics.suiteExists(["ParentSuite", "ChildSuite"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["ParentSuite"]), 'Parent component of test path should exist as suite');
+            assert.isTrue(metrics.suiteExists(["ParentSuite", "ChildSuite"]), 'Child component of test path should exist as suite');
 
             // But suite paths should not exist as tests
-            expect(metrics.testExists(["ParentSuite", "ChildSuite"])).to.be.false;
+            assert.isFalse(metrics.testExists(["ParentSuite", "ChildSuite"]), 'Suite path should not exist as test');
         });
 
-        test("should handle complex hierarchies consistently", function() {
+        test("Complex hierarchies consistency", function() {
             // Create complex structure
             metrics.startTest(["Root", "Branch1", "Leaf1"]);
             metrics.stopTest();
@@ -229,25 +229,25 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
             metrics.stopTest();
 
             // Verify all suites exist
-            expect(metrics.suiteExists(["Root"])).to.be.true;
-            expect(metrics.suiteExists(["Root", "Branch1"])).to.be.true;
-            expect(metrics.suiteExists(["Root", "Branch2"])).to.be.true;
-            expect(metrics.suiteExists(["Root", "Branch2", "SubBranch"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["Root"]), 'Root suite should exist');
+            assert.isTrue(metrics.suiteExists(["Root", "Branch1"]), 'Branch1 suite should exist');
+            assert.isTrue(metrics.suiteExists(["Root", "Branch2"]), 'Branch2 suite should exist');
+            assert.isTrue(metrics.suiteExists(["Root", "Branch2", "SubBranch"]), 'SubBranch suite should exist');
 
             // Verify all tests exist
-            expect(metrics.testExists(["Root", "Branch1", "Leaf1"])).to.be.true;
-            expect(metrics.testExists(["Root", "Branch1", "Leaf2"])).to.be.true;
-            expect(metrics.testExists(["Root", "Branch2", "SubBranch", "DeepLeaf"])).to.be.true;
+            assert.isTrue(metrics.testExists(["Root", "Branch1", "Leaf1"]), 'Leaf1 test should exist');
+            assert.isTrue(metrics.testExists(["Root", "Branch1", "Leaf2"]), 'Leaf2 test should exist');
+            assert.isTrue(metrics.testExists(["Root", "Branch2", "SubBranch", "DeepLeaf"]), 'DeepLeaf test should exist');
 
             // Verify non-existent paths
-            expect(metrics.suiteExists(["Root", "Branch3"])).to.be.false;
-            expect(metrics.testExists(["Root", "Branch1", "Leaf3"])).to.be.false;
-            expect(metrics.testExists(["Root", "Branch2", "SubBranch", "ShallowLeaf"])).to.be.false;
+            assert.isFalse(metrics.suiteExists(["Root", "Branch3"]), 'Branch3 suite should not exist');
+            assert.isFalse(metrics.testExists(["Root", "Branch1", "Leaf3"]), 'Leaf3 test should not exist');
+            assert.isFalse(metrics.testExists(["Root", "Branch2", "SubBranch", "ShallowLeaf"]), 'ShallowLeaf test should not exist');
         });
     });
 
     suite("Performance and Stress Tests", function() {
-        test("should handle large number of suites efficiently", function() {
+        test("Large number of suites efficiency", function() {
             const numSuites = 100;
 
             // Create many suites
@@ -258,16 +258,16 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
 
             // Verify all exist
             for (let i = 0; i < numSuites; i++) {
-                expect(metrics.suiteExists([`Suite${i}`])).to.be.true;
-                expect(metrics.testExists([`Suite${i}`, `Test${i}`])).to.be.true;
+                assert.isTrue(metrics.suiteExists([`Suite${i}`]), `Suite${i} should exist`);
+                assert.isTrue(metrics.testExists([`Suite${i}`, `Test${i}`]), `Test${i} in Suite${i} should exist`);
             }
 
             // Verify non-existent ones don't exist
-            expect(metrics.suiteExists([`Suite${numSuites}`])).to.be.false;
-            expect(metrics.testExists([`Suite0`, `Test${numSuites}`])).to.be.false;
+            assert.isFalse(metrics.suiteExists([`Suite${numSuites}`]), `Suite${numSuites} should not exist`);
+            assert.isFalse(metrics.testExists([`Suite0`, `Test${numSuites}`]), `Test${numSuites} in Suite0 should not exist`);
         });
 
-        test("should handle large number of tests in same suite efficiently", function() {
+        test("Large number of tests in same suite efficiency", function() {
             const numTests = 100;
 
             // Create many tests in same suite
@@ -277,24 +277,24 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
             }
 
             // Verify all exist
-            expect(metrics.suiteExists(["LargeSuite"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["LargeSuite"]), 'LargeSuite should exist');
             for (let i = 0; i < numTests; i++) {
-                expect(metrics.testExists(["LargeSuite", `Test${i}`])).to.be.true;
+                assert.isTrue(metrics.testExists(["LargeSuite", `Test${i}`]), `Test${i} in LargeSuite should exist`);
             }
 
             // Verify non-existent test doesn't exist
-            expect(metrics.testExists(["LargeSuite", `Test${numTests}`])).to.be.false;
+            assert.isFalse(metrics.testExists(["LargeSuite", `Test${numTests}`]), `Test${numTests} in LargeSuite should not exist`);
         });
     });
 
     suite("Error Recovery", function() {
-        test("should handle errors gracefully and maintain state", function() {
+        test("Graceful error handling and state maintenance", function() {
             // Create valid structure
             metrics.startTest(["ValidSuite", "ValidTest"]);
             metrics.stopTest();
 
-            expect(metrics.suiteExists(["ValidSuite"])).to.be.true;
-            expect(metrics.testExists(["ValidSuite", "ValidTest"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["ValidSuite"]), 'ValidSuite should exist before error operations');
+            assert.isTrue(metrics.testExists(["ValidSuite", "ValidTest"]), 'ValidTest should exist before error operations');
 
             // Try invalid operations
             try {
@@ -311,8 +311,8 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
             }
 
             // Verify original state is maintained
-            expect(metrics.suiteExists(["ValidSuite"])).to.be.true;
-            expect(metrics.testExists(["ValidSuite", "ValidTest"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["ValidSuite"]), 'ValidSuite should still exist after error operations');
+            assert.isTrue(metrics.testExists(["ValidSuite", "ValidTest"]), 'ValidTest should still exist after error operations');
         });
     });
 });
