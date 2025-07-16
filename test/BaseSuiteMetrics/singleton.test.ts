@@ -499,8 +499,8 @@ suite("[Both] Singleton Pattern", function() {
             const newInstance = SuiteMetrics.getInstance();
 
             const topLevelData = newInstance.getSuiteMetricsRecursive([]);
-            assert.equal(topLevelData.totalTestMetrics.totalTime, 0, "Total time should be null after reset");
-            assert.equal(topLevelData.totalTestMetrics.averageTime, 0, "Average time should be null after reset");
+            assert.equal(topLevelData.totalTestMetrics.totalTime, 0, "Total time should be 0 after reset");
+            assert.equal(topLevelData.totalTestMetrics.averageTime, 0, "Average time should be 0 after reset");
         });
     });
 

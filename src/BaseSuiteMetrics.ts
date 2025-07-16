@@ -90,10 +90,15 @@ abstract class BaseSuiteMetrics {
         this.validatePath(path, { allowTopLevel: true });
         const suite: Suite = this.navigateToSuite(path);
 
+        // Calculate direct, total and sub test metrics
         const directMetrics: { numTests: number, totalTime: number, averageTime: number } = this.calculateDirectTestMetrics(suite);
+
         const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
+        const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
+
         const subTests: number = totalTests - directMetrics.numTests;
         const subTime: number = totalTime - directMetrics.totalTime;
+        const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
 
         return {
             name: suite.name,
@@ -103,12 +108,12 @@ abstract class BaseSuiteMetrics {
             subTestMetrics: {
                 numTests: subTests,
                 totalTime: subTime,
-                averageTime: subTime / subTests
+                averageTime: averageSubTime
             },
             totalTestMetrics: {
                 numTests: totalTests,
                 totalTime: totalTime,
-                averageTime: totalTime / totalTests
+                averageTime: averageTotalTime
             }
         };
     }
