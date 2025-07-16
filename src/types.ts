@@ -31,8 +31,8 @@ type Suite = {
  */
 type SuiteData = {
     readonly name: string;
-    readonly parentSuites: string[] | null;
-    readonly childSuites: string[] | null;
+    readonly parentSuites: string[];
+    readonly childSuites: string[];
     readonly testMetrics: {
         readonly numTests: number;
         readonly totalTime: number | null;

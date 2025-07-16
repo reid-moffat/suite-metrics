@@ -74,8 +74,8 @@ abstract class BaseSuiteMetrics {
 
         return {
             name: suite.name,
-            parentSuites: path.length > 0 ? path.slice(0, -1) : null,
-            childSuites: suite.subSuites ? Array.from(suite.subSuites.keys()) : null,
+            parentSuites: path.slice(0, -1),
+            childSuites: Array.from(suite.subSuites.keys()),
             testMetrics
         };
     }
