@@ -271,15 +271,11 @@ abstract class BaseSuiteMetrics {
      *
      * @param suite Suite object to calculate metrics for
      */
-    private calculateDirectTestMetrics(suite: Suite): {
-        numTests: number;
-        totalTime: number | null;
-        averageTime: number | null;
-    } {
+    private calculateDirectTestMetrics(suite: Suite): { numTests: number; totalTime: number; averageTime: number; } {
         const numTests: number = suite.tests?.size ?? 0;
 
         if (numTests === 0) {
-            return { numTests: 0, totalTime: null, averageTime: null };
+            return { numTests: 0, totalTime: 0, averageTime: 0 };
         }
 
         const totalTime: number = Array.from(suite.tests!.values())

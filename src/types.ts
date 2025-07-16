@@ -35,8 +35,8 @@ type SuiteData = {
     readonly childSuites: string[];
     readonly testMetrics: {
         readonly numTests: number;
-        readonly totalTime: number | null;
-        readonly averageTime: number | null;
+        readonly totalTime: number;
+        readonly averageTime: number;
     }
 };
 
