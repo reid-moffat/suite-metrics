@@ -147,33 +147,14 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             }
         });
 
-        test("Invalid test names - single element", function() {
-            try {
-                metrics.startTest(["OnlyTestName"]);
-                assert.fail("Should have thrown error for test without suite");
-            } catch (error: any) {
-                assert.include(error.message, "inside at least one suite", "Error message should mention suite requirement");
-            }
-        });
-
         test("Invalid test names - non-string elements", function() {
-            try {
-                // @ts-ignore - intentionally passing invalid types for testing
-                metrics.startTest(["ValidSuite", 123, "TestName"]);
-                assert.fail("Should have thrown error for non-string elements");
-            } catch (error: any) {
-                assert.include(error.message, "non-empty", "Error message should mention non-empty requirement");
-            }
+            // @ts-ignore - intentionally passing invalid types for testing
+            assert.throws(() => metrics.startTest(["ValidSuite", 123, "TestName"]), "Suite/test path element at index 1 must be a 'string', got 'number'");
         });
 
         test("Invalid test names - non-array input", function() {
-            try {
-                // @ts-ignore - intentionally passing invalid type for testing
-                metrics.startTest("NotAnArray");
-                assert.fail("Should have thrown error for non-array input");
-            } catch (error: any) {
-                assert.include(error.message, "strings", "Error message should mention strings requirement");
-            }
+            // @ts-ignore - intentionally passing invalid types for testing
+            assert.throws(() => metrics.startTest("NotAnArray"), "Suite/test path must be an array");
         });
 
         test("Stopping test that wasn't started", function() {

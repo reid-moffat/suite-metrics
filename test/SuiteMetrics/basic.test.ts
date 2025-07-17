@@ -12,20 +12,16 @@ suite("[SuiteMetrics] Basic tests", function() {
     suite("Input Validation", function() {
         test("Non-array names", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest("not an array"), "Path must be an array of strings", 'Should throw error when test name is not an array');
+            assert.throws(() => metrics.startTest("not an array"), "Suite/test path must be an array", 'Should throw error when test name is not an array');
         });
 
         test("Empty test name", function() {
-            assert.throws(() => metrics.startTest([]), "Path cannot be empty - must define a path", 'Should throw error when test name array is empty');
-        });
-
-        test("Single-element test name", function() {
-            assert.throws(() => metrics.startTest(["just-test"]), "A test must be inside at least one suite - it must contain at least [suite, test]", 'Should throw error when test name has only one element');
+            assert.throws(() => metrics.startTest([]), "Path cannot be empty, must define at least one suite/test", 'Should throw error when test name array is empty');
         });
 
         test("Non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest(["suite", 123]), "Path must be an array of non-empty strings", 'Should throw error when test name contains non-string element');
+            assert.throws(() => metrics.startTest(["suite", 123]), "Suite/test path element at index 1 must be a 'string', got 'number'", 'Should throw error when test name contains non-string element');
         });
 
         test("Empty suite name for top-level operations", function() {

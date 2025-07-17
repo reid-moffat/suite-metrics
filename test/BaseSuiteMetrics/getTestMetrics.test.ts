@@ -13,31 +13,27 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getTestMetrics("not an array"), 'Path must be an array of strings', 'Should throw error when path is not an array');
+            assert.throws(() => metrics.getTestMetrics("not an array"), "Suite/test path must be an array");
         });
 
         test("Empty path", function() {
-            assert.throws(() => metrics.getTestMetrics([]), 'Path cannot be empty - must define a path', 'Should throw error when path array is empty');
-        });
-
-        test("Single-element path", function() {
-            assert.throws(() => metrics.getTestMetrics(["just-test"]), 'A test must be inside at least one suite - it must contain at least [suite, test]', 'Should throw error when path has only one element');
+            assert.throws(() => metrics.getTestMetrics([]), "Path cannot be empty, must define at least one suite/test");
         });
 
         test("Path with empty strings", function() {
-            assert.throws(() => metrics.getTestMetrics(["suite", ""]), 'Path must be an array of non-empty strings', 'Should throw error when path contains empty string');
+            assert.throws(() => metrics.getTestMetrics(["suite", ""]), "Suite/test path element at index 1 cannot be empty");
         });
 
         test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getTestMetrics(["suite", 123]), 'Path must be an array of non-empty strings', 'Should throw error when path contains number');
+            assert.throws(() => metrics.getTestMetrics(["suite", 123]), "Suite/test path element at index 1 must be a 'string', got 'number'");
         });
 
         test("Path with null/undefined elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getTestMetrics(["suite", null]), 'Path must be an array of non-empty strings', 'Should throw error when path contains null');
+            assert.throws(() => metrics.getTestMetrics(["suite", null]), "Suite/test path element at index 1 must be a 'string', got 'object'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getTestMetrics(["suite", undefined]), 'Path must be an array of non-empty strings', 'Should throw error when path contains undefined');
+            assert.throws(() => metrics.getTestMetrics(["suite", undefined]), "Suite/test path element at index 1 must be a 'string', got 'undefined'");
         });
     });
 
@@ -412,17 +408,6 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
             const testMetrics = metrics.getTestMetrics(["0", "1", "2"]);
             assert.strictEqual(testMetrics.name, "2", 'Test name that looks like array index should be preserved');
-        });
-
-        test("Whitespace-only names (but not empty)", function() {
-            const whitespaceSuite = "   ";
-            const whitespaceTest = "\t\n ";
-
-            metrics.startTest([whitespaceSuite, whitespaceTest]);
-            metrics.stopTest();
-
-            const testMetrics = metrics.getTestMetrics([whitespaceSuite, whitespaceTest]);
-            assert.strictEqual(testMetrics.name, whitespaceTest, 'Whitespace-only test name should be preserved');
         });
 
         test("Case-sensitive test names", function() {

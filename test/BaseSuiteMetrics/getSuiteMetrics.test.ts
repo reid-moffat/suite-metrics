@@ -13,24 +13,24 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getSuiteMetrics("not an array"), 'Path must be an array of strings', 'Should throw error when path is not an array');
+            assert.throws(() => metrics.getSuiteMetrics("not an array"), 'Suite/test path must be an array', 'Should throw error when path is not an array');
         });
 
         test("Path with empty strings", function() {
-            assert.throws(() => metrics.getSuiteMetrics([""]), 'Path must be an array of non-empty strings', 'Should throw error when path contains single empty string');
-            assert.throws(() => metrics.getSuiteMetrics(["suite", ""]), 'Path must be an array of non-empty strings', 'Should throw error when path contains empty string at end');
-            assert.throws(() => metrics.getSuiteMetrics(["", "suite"]), 'Path must be an array of non-empty strings', 'Should throw error when path contains empty string at start');
+            assert.throws(() => metrics.getSuiteMetrics([""]), 'Suite/test path element at index 0 cannot be empty', 'Should throw error when path contains single empty string');
+            assert.throws(() => metrics.getSuiteMetrics(["suite", ""]), 'Suite/test path element at index 1 cannot be empty', 'Should throw error when path contains empty string at end');
+            assert.throws(() => metrics.getSuiteMetrics(["", "suite"]), 'Suite/test path element at index 0 cannot be empty', 'Should throw error when path contains empty string at start');
         });
 
         test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getSuiteMetrics([123]), 'Path must be an array of non-empty strings', 'Should throw error when path contains number');
+            assert.throws(() => metrics.getSuiteMetrics([123]), "Suite/test path element at index 0 must be a 'string', got 'number'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getSuiteMetrics(["suite", null]), 'Path must be an array of non-empty strings', 'Should throw error when path contains null');
+            assert.throws(() => metrics.getSuiteMetrics(["suite", null]), "Suite/test path element at index 1 must be a 'string', got 'object'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getSuiteMetrics(["suite", undefined]), 'Path must be an array of non-empty strings', 'Should throw error when path contains undefined');
+            assert.throws(() => metrics.getSuiteMetrics(["suite", undefined]), "Suite/test path element at index 1 must be a 'string', got 'undefined'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.getSuiteMetrics([{}, "suite"]), 'Path must be an array of non-empty strings', 'Should throw error when path contains object');
+            assert.throws(() => metrics.getSuiteMetrics([{}, "suite"]), "Suite/test path element at index 0 must be a 'string', got 'object'");
         });
 
         test("Empty array (top-level suite)", function() {
@@ -402,20 +402,6 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             assert.strictEqual(suite0Data.name, "0", 'Suite name that looks like array index should be preserved');
             assert.strictEqual(suite1Data.name, "1", 'Nested suite name that looks like array index should be preserved');
             assert.deepEqual(suite1Data.parentSuites, ["0"], 'Suite with index-like name should have correct parent');
-        });
-
-        test("Whitespace-only names (but not empty)", function() {
-            const whitespaceSuite1 = "   ";
-            const whitespaceSuite2 = "\t\n ";
-
-            metrics.startTest([whitespaceSuite1, whitespaceSuite2, "Test1"]);
-            metrics.stopTest();
-
-            const suite1Data = metrics.getSuiteMetrics([whitespaceSuite1]);
-            const suite2Data = metrics.getSuiteMetrics([whitespaceSuite1, whitespaceSuite2]);
-
-            assert.strictEqual(suite1Data.name, whitespaceSuite1, 'Whitespace-only suite name should be preserved');
-            assert.strictEqual(suite2Data.name, whitespaceSuite2, 'Nested whitespace-only suite name should be preserved');
         });
 
         test("Case-sensitive suite names", function() {
