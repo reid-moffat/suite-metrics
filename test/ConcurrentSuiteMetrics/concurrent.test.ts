@@ -1,10 +1,6 @@
 import { assert } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
-import {
-    createPresetData,
-    createSimpleTestData,
-    PRESET_TYPE
-} from "../generators/testDataHelpers.ts";
+import { createPresetData, createSimpleTestData, PRESET_TYPE } from "../generators/testDataHelpers.ts";
 import { sleep } from "../helpers.js";
 
 suite("[ConcurrentSuiteMetrics] Basic tests", function() {

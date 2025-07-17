@@ -148,31 +148,33 @@ abstract class BaseSuiteMetrics {
      * Validates a test or suite path
      *
      * @param path Path to the specified suite or test
-     * @param options Optional flags for specific cases
-     * @param options.isTest Set to true if this is validating a test (default: false)
-     * @param options.alowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
+     * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
      */
-    protected validatePath(path: string[], options: { isTest?: boolean; allowTopLevel?: boolean; } = {}): void {
+    protected validatePath(path: string[], allowTopLevel: boolean): void {
 
-        const { isTest = false, allowTopLevel = false } = options;
-
-        // Ensure the path is an array of non-empty strings
         if (!Array.isArray(path)) {
-            throw new Error('Path must be an array of strings');
-        }
-        if (!path.every((segment: string): boolean => typeof segment === "string" && segment.length > 0)) {
-            throw new Error('Path must be an array of non-empty strings');
+            throw new Error('Suite/test path must be an array');
         }
 
-        // Ensure the configuration is valid
-        if (allowTopLevel && isTest) {
-            throw new Error('Cannot specify both allowTopLevel and isTest');
-        }
         if (!allowTopLevel && path.length === 0) {
-            throw new Error('Path cannot be empty - must define a path');
+            throw new Error('Path cannot be empty, must define at least one suite/test');
         }
-        if (isTest && path.length < 2) {
-            throw new Error('A test must be inside at least one suite - it must contain at least [suite, test]');
+
+        // Check each segment individually to provide specific error locations
+        for (let i: number = 0; i < path.length; i++) {
+            const segment: any = path[i];
+
+            if (typeof segment !== "string") {
+                throw new Error(`Suite/test path element at index ${i} must be a 'string', got '${typeof segment}'`);
+            }
+
+            if (segment.length === 0) {
+                throw new Error(`Suite/test path element at index ${i} cannot be empty`);
+            }
+
+            if (segment.trim().length === 0) {
+                throw new Error(`Suite/test path element at index ${i} cannot be whitespace-only`);
+            }
         }
     }
 
