@@ -118,7 +118,7 @@ abstract class BaseSuiteMetrics {
     public getSuiteMetrics(path: string[]): SuiteData {
         BaseSuiteMetrics.validatePath(path, true);
         const suite: Suite = this.navigateToSuite(path);
-        const testMetrics = this.calculateDirectTestMetrics(suite);
+        const testMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
         return {
             name: suite.name,
@@ -297,7 +297,7 @@ abstract class BaseSuiteMetrics {
      *
      * @param suite Suite object to calculate metrics for
      */
-    private calculateDirectTestMetrics(suite: Suite): { numTests: number; totalTime: number; averageTime: number; } {
+    private calculateDirectTestMetrics(suite: Suite): Metrics {
         const numTests: number = suite.tests.size;
 
         if (numTests === 0) {
