@@ -187,7 +187,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             metrics.stopTest(path);
 
             const test: () => void = (): void => metrics.startTest(path);
-            const expectedError: string = "Test [Error Handling, Duplicate test] is already running";
+            const expectedError: string = "Test [Error Handling, Duplicate test] already exists";
 
             assert.throws(test, expectedError, _, "Starting a test that's already completed should fail");
         });
