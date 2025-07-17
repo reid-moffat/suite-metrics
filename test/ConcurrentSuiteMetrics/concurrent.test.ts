@@ -5,6 +5,8 @@ import { sleep } from "../helpers.js";
 
 suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
+    const _ = null; // Makes 'ignored' parameter for assert.throws() less obvious
+
     let metrics: ConcurrentSuiteMetrics;
 
     setup(function() {
@@ -139,46 +141,55 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
     suite("Error Handling", function() {
         test("Invalid test names - empty array", function() {
-            try {
-                metrics.startTest([]);
-                assert.fail("Should have thrown error for empty test name");
-            } catch (error: any) {
-                assert.include(error.message, "empty", "Error message should mention empty array");
-            }
+            const test: () => void = (): void => metrics.startTest([]);
+            const expectedError: string = "Path cannot be empty, must define at least one suite/test";
+
+            assert.throws(test, expectedError, _, "Providing an empty array for the path should fail");
         });
 
         test("Invalid test names - non-string elements", function() {
             // @ts-ignore - intentionally passing invalid types for testing
-            assert.throws(() => metrics.startTest(["ValidSuite", 123, "TestName"]), "Suite/test path element at index 1 must be a 'string', got 'number'");
+            const test: () => void = (): void => metrics.startTest(["ValidSuite", 123, "TestName"]);
+            const expectedError: string = "Suite/test path element at index 1 must be a 'string', got 'number'";
+
+            assert.throws(test, expectedError, _, "Providing a non-string in the path should fail");
         });
 
         test("Invalid test names - non-array input", function() {
             // @ts-ignore - intentionally passing invalid types for testing
-            assert.throws(() => metrics.startTest("NotAnArray"), "Suite/test path must be an array");
+            const test: () => void = (): void => metrics.startTest("NotAnArray");
+            const expectedError: string = "Suite/test path must be an array";
+
+            assert.throws(test, expectedError, _, "Providing a non-array input to startTest should fail");
         });
 
         test("Stopping test that wasn't started", function() {
-            try {
-                metrics.stopTest(["Error Handling", "Non-existent test"]);
-                assert.fail("Should have thrown error for stopping non-existent test");
-            } catch (error: any) {
-                assert.exists(error, "Error should exist when stopping non-existent test");
-            }
+            const test: () => void = (): void => metrics.stopTest(["Error Handling", "Non-existent test"]);
+            const expectedError: string = "Test [Error Handling, Non-existent test] is not currently running. Call startTest() first to begin testing";
+
+            assert.throws(test, expectedError, _, "Stopping a non-existent test should fail");
         });
 
         test("Starting same test twice", function() {
-            const path = ["Error Handling", "Duplicate test"];
-
+            const path: string[] = ["Error Handling", "Duplicate test"];
             metrics.startTest(path);
 
-            try {
-                metrics.startTest(path); // Should this be allowed or throw an error?
-                // Behavior depends on implementation - might overwrite or throw
-                metrics.stopTest(path);
-            } catch (error: any) {
-                // If it throws, that's also valid behavior
-                console.log("Duplicate test start threw error:", error.message);
-            }
+            const test: () => void = (): void => metrics.startTest(path);
+            const expectedError: string = "Test [Error Handling, Duplicate test] is already running";
+
+            assert.throws(test, expectedError, _, "Starting a test that's already running should fail");
+        });
+
+        test("Starting completed test again", function() {
+            const path: string[] = ["Error Handling", "Duplicate test"];
+            metrics.startTest(path);
+            sleep(100);
+            metrics.stopTest(path);
+
+            const test: () => void = (): void => metrics.startTest(path);
+            const expectedError: string = "Test [Error Handling, Duplicate test] is already running";
+
+            assert.throws(test, expectedError, _, "Starting a test that's already completed should fail");
         });
     });
 
