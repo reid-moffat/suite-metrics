@@ -47,13 +47,13 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         // Validate path and ensure test isn't already completed
         const testExists: boolean = this.testExists(path);
         if (testExists) {
-            throw new Error(`Test [${path.join(', ')}] already exists`);
+            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
         }
 
         // Verify test isn't already running
         const testKey: string = this.createTestKey(path);
         if (this.activeTests.has(testKey)) {
-            throw new Error(`Test [${path.join(', ')}] is already running`);
+            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is already running`);
         }
 
         this.activeTests.set(testKey, microtime.now());
@@ -72,7 +72,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         // Verify test exists
         const testStartTime: number | undefined = this.activeTests.get(testKey);
         if (testStartTime === undefined) {
-            throw new Error(`Test [${path.join(', ')}] is not currently running. Call startTest() first to begin testing`);
+            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is not currently running. Call startTest() first to begin testing`);
         }
 
         // Store test data and remove from active tests

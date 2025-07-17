@@ -103,7 +103,7 @@ abstract class BaseSuiteMetrics {
 
         const test: Test | undefined = suite.tests.get(testName);
         if (test === undefined) {
-            throw new Error(`Test [${path.join(', ')}] does not exist`);
+            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} does not exist`);
         }
 
         return { ...test }; // Return a copy to prevent external modification
@@ -210,8 +210,9 @@ abstract class BaseSuiteMetrics {
             let targetSuite: Suite | undefined = currentSuite.subSuites.get(suiteName);
             if (targetSuite === undefined) {
                 if (!createIfMissing) {
-                    throw new Error(`Suite path [${suitePath.join(', ')}] does not exist`);
+                    throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(suitePath)} does not exist`);
                 }
+
                 targetSuite = {
                     name: suiteName,
                     tests: new Map<string, Test>(),
