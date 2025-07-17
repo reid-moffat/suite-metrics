@@ -19,7 +19,7 @@ class _MockSuiteMetrics extends SuiteMetrics {
      * @param duration Test duration in microseconds. Defaults to a random number in (5ms - 2s)
      */
     public addMockTest(path: string[], duration: number = randomInt(5_000, 2_000_000)): void {
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
 
         this.addTest(path, this.currentMockTime, this.currentMockTime + duration);
 
@@ -50,7 +50,7 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
      * @param duration Duration in microseconds. Defaults to a random value (5ms - 2s).
      */
     public addMockTest(path: string[], duration: number = randomInt(5_000, 2_000_000)): void {
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
 
         // Starting a new batch of concurrent tests: create the concurrent size and set start time
         if (this.currentConcurrentCount === 0) {
