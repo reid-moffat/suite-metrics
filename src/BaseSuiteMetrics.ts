@@ -43,6 +43,42 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Validates a test or suite path, throwing an error is invalid
+     *
+     * @param path Path to the specified suite or test
+     * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
+     * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements, or
+     * empty if allowTopLevel is false)
+     */
+    public validatePath(path: string[], allowTopLevel: boolean): void {
+
+        if (!Array.isArray(path)) {
+            throw new Error('Suite/test path must be an array');
+        }
+
+        if (!allowTopLevel && path.length === 0) {
+            throw new Error('Path cannot be empty, must define at least one suite/test');
+        }
+
+        // Check each segment individually to provide specific error locations
+        for (let i: number = 0; i < path.length; i++) {
+            const segment: any = path[i];
+
+            if (typeof segment !== "string") {
+                throw new Error(`Suite/test path element at index ${i} must be a 'string', got '${typeof segment}'`);
+            }
+
+            if (segment.length === 0) {
+                throw new Error(`Suite/test path element at index ${i} cannot be empty`);
+            }
+
+            if (segment.trim().length === 0) {
+                throw new Error(`Suite/test path element at index ${i} cannot be whitespace-only`);
+            }
+        }
+    }
+
+    /**
      * Gets metrics for a specific test
      *
      * @param path Path to get metrics for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
@@ -143,40 +179,6 @@ abstract class BaseSuiteMetrics {
         return lines.join('\n');
     }
 
-
-    /**
-     * Validates a test or suite path
-     *
-     * @param path Path to the specified suite or test
-     * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
-     */
-    protected validatePath(path: string[], allowTopLevel: boolean): void {
-
-        if (!Array.isArray(path)) {
-            throw new Error('Suite/test path must be an array');
-        }
-
-        if (!allowTopLevel && path.length === 0) {
-            throw new Error('Path cannot be empty, must define at least one suite/test');
-        }
-
-        // Check each segment individually to provide specific error locations
-        for (let i: number = 0; i < path.length; i++) {
-            const segment: any = path[i];
-
-            if (typeof segment !== "string") {
-                throw new Error(`Suite/test path element at index ${i} must be a 'string', got '${typeof segment}'`);
-            }
-
-            if (segment.length === 0) {
-                throw new Error(`Suite/test path element at index ${i} cannot be empty`);
-            }
-
-            if (segment.trim().length === 0) {
-                throw new Error(`Suite/test path element at index ${i} cannot be whitespace-only`);
-            }
-        }
-    }
 
     /**
      * Navigates to a suite in the hierarchy, optionally creating missing suites
