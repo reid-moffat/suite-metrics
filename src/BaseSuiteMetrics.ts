@@ -216,7 +216,7 @@ abstract class BaseSuiteMetrics {
             if (isTest) {
                 const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
                 const testName: string = path[path.length - 1];
-                return suite.tests?.has(testName) ?? false;
+                return suite.tests.has(testName);
             } else {
                 this.navigateToSuite(path);
                 return true;
@@ -299,11 +299,11 @@ abstract class BaseSuiteMetrics {
      * @param suite Suite object to calculate test metrics for recursively
      */
     private calculateRecursiveTestMetrics(suite: Suite): [number, number] {
-        let totalTests: number = suite.tests?.size ?? 0;
+        let totalTests: number = suite.tests.size;
         let totalTime: number = 0;
 
         // Add direct test times
-        suite.tests?.forEach((test: Test): void => { totalTime += test.duration; });
+        suite.tests.forEach((test: Test): void => { totalTime += test.duration; });
 
         // Recursively add sub-suite metrics
         if (suite.subSuites) {
@@ -326,15 +326,15 @@ abstract class BaseSuiteMetrics {
      */
     private formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
         const indent: string = ' '.repeat(indentLevel);
-        const directTestCount: number = suite.tests?.size ?? 0;
-        const directTestDuration: number = Array.from(suite.tests?.values() ?? [])
-            .reduce((sum: number, test: Test) => sum + test.duration, 0);
+        const directTestCount: number = suite.tests.size;
+        const directTestDuration: number = Array.from(suite.tests.values())
+            .reduce((sum: number, test: Test): number => sum + test.duration, 0);
 
         lines.push(`${indent}Suite: ${suite.name}`);
         lines.push(`${indent}  Summary:`);
         lines.push(`${indent}    - Total direct tests: ${directTestCount}`);
         lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(2)} ms`);
-        lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites?.size ?? 0}`);
+        lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites.size}`);
         lines.push(`${indent}    - Total Sub-Suite tests: ${suite.numSubTests}`);
 
         if (suite.tests && suite.tests.size > 0) {
