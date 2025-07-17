@@ -1,4 +1,4 @@
-import { Suite, Test, SuiteData, RecursiveSuiteData } from "./types.ts";
+import { Suite, Test, SuiteData, RecursiveSuiteData, Metrics } from "./types.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -91,30 +91,33 @@ abstract class BaseSuiteMetrics {
         const suite: Suite = this.navigateToSuite(path);
 
         // Calculate direct, total and sub test metrics
-        const directMetrics: { numTests: number, totalTime: number, averageTime: number } = this.calculateDirectTestMetrics(suite);
+        const directMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
         const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
         const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
+        const totalMetrics: Metrics = {
+            numTests: totalTests,
+            totalTime: totalTime,
+            averageTime: averageTotalTime
+        };
 
         const subTests: number = totalTests - directMetrics.numTests;
         const subTime: number = totalTime - directMetrics.totalTime;
         const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
+        const subMetrics: Metrics = {
+            numTests: subTests,
+            totalTime: subTime,
+            averageTime: averageSubTime
+        };
 
         return {
             name: suite.name,
             parentSuites: path.slice(0, -1),
             childSuites: Array.from(suite.subSuites.keys()),
+
             directTestMetrics: directMetrics,
-            subTestMetrics: {
-                numTests: subTests,
-                totalTime: subTime,
-                averageTime: averageSubTime
-            },
-            totalTestMetrics: {
-                numTests: totalTests,
-                totalTime: totalTime,
-                averageTime: averageTotalTime
-            }
+            subTestMetrics: subMetrics,
+            totalTestMetrics: totalMetrics
         };
     }
 

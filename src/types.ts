@@ -60,4 +60,4 @@ type RecursiveSuiteData = {
     readonly totalTestMetrics: Metrics;
 }
 
-export type { Test, Suite, SuiteData, RecursiveSuiteData };
+export type { Test, Suite, Metrics, SuiteData, RecursiveSuiteData };
