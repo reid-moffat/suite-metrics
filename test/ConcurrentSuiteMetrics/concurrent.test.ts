@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
 import {
     createPresetData,
@@ -147,18 +147,18 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
         test("Invalid test names - empty array", async function() {
             try {
                 metrics.startTest([]);
-                expect.fail("Should have thrown error for empty test name");
+                assert.fail("Should have thrown error for empty test name");
             } catch (error: any) {
-                expect(error.message).to.contain("empty");
+                assert.include(error.message, "empty", "Error message should mention empty array");
             }
         });
 
         test("Invalid test names - single element", async function() {
             try {
                 metrics.startTest(["OnlyTestName"]);
-                expect.fail("Should have thrown error for test without suite");
+                assert.fail("Should have thrown error for test without suite");
             } catch (error: any) {
-                expect(error.message).to.contain("inside at least one suite");
+                assert.include(error.message, "inside at least one suite", "Error message should mention suite requirement");
             }
         });
 
@@ -166,9 +166,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             try {
                 // @ts-ignore - intentionally passing invalid types for testing
                 metrics.startTest(["ValidSuite", 123, "TestName"]);
-                expect.fail("Should have thrown error for non-string elements");
+                assert.fail("Should have thrown error for non-string elements");
             } catch (error: any) {
-                expect(error.message).to.contain("non-empty");
+                assert.include(error.message, "non-empty", "Error message should mention non-empty requirement");
             }
         });
 
@@ -176,17 +176,19 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             try {
                 // @ts-ignore - intentionally passing invalid type for testing
                 metrics.startTest("NotAnArray");
-                expect.fail("Should have thrown error for non-array input");
+                assert.fail("Should have thrown error for non-array input");
             } catch (error: any) {
-                expect(error.message).to.contain("strings");
+                assert.include(error.message, "strings", "Error message should mention strings requirement");
             }
         });
 
         test("Stopping test that wasn't started", async function() {
             try {
                 metrics.stopTest(["Error Handling", "Non-existent test"]);
-                expect.fail("Should have thrown error for stopping non-existent test");
-            } catch (error: any) {}
+                assert.fail("Should have thrown error for stopping non-existent test");
+            } catch (error: any) {
+                assert.exists(error, "Error should exist when stopping non-existent test");
+            }
         });
 
         test("Starting same test twice", async function() {
@@ -217,7 +219,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const actualElapsed = Date.now() - startTime;
 
             // Allow some tolerance for timing variations
-            expect(actualElapsed).to.be.closeTo(expectedDuration + 10, 20);
+            assert.closeTo(actualElapsed, expectedDuration + 10, 20, "Actual elapsed time should be close to expected duration");
 
             console.log(metrics.printAllSuiteMetrics());
         });
@@ -239,7 +241,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
         test("Print format verification", function() {
             // This test just verifies the print method doesn't crash
             const output = metrics.printAllSuiteMetrics();
-            expect(output).to.be.a('string');
+            assert.isString(output, "Print output should be a string");
             console.log("Print output:", output);
         });
     });
@@ -250,42 +252,42 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const testPath = [...suitePath, "Sample Test"];
 
             // Initially should not exist
-            expect(metrics.suiteExists(suitePath)).to.be.false;
+            assert.isFalse(metrics.suiteExists(suitePath), "Suite should not exist initially");
 
             // After running a test, suite should exist
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            expect(metrics.suiteExists(suitePath)).to.be.true;
+            assert.isTrue(metrics.suiteExists(suitePath), "Suite should exist after running test");
         });
 
         test("Check test existence", async function() {
             const testPath = ["Suite Existence", "Test Suite", "Existence Test"];
 
             // Initially should not exist
-            expect(metrics.testExists(testPath)).to.be.false;
+            assert.isFalse(metrics.testExists(testPath), "Test should not exist initially");
 
             // After running the test, it should exist
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            expect(metrics.testExists(testPath)).to.be.true;
+            assert.isTrue(metrics.testExists(testPath), "Test should exist after running");
         });
 
         test("Check nested suite existence", async function() {
             const nestedPath = ["Level1", "Level2", "Level3"];
             const testPath = [...nestedPath, "Nested Test"];
 
-            expect(metrics.suiteExists(["Level1"])).to.be.false;
-            expect(metrics.suiteExists(["Level1", "Level2"])).to.be.false;
-            expect(metrics.suiteExists(nestedPath)).to.be.false;
+            assert.isFalse(metrics.suiteExists(["Level1"]), "Level1 should not exist initially");
+            assert.isFalse(metrics.suiteExists(["Level1", "Level2"]), "Level1>Level2 should not exist initially");
+            assert.isFalse(metrics.suiteExists(nestedPath), "Nested path should not exist initially");
 
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            expect(metrics.suiteExists(["Level1"])).to.be.true;
-            expect(metrics.suiteExists(["Level1", "Level2"])).to.be.true;
-            expect(metrics.suiteExists(nestedPath)).to.be.true;
+            assert.isTrue(metrics.suiteExists(["Level1"]), "Level1 should exist after running nested test");
+            assert.isTrue(metrics.suiteExists(["Level1", "Level2"]), "Level1>Level2 should exist after running nested test");
+            assert.isTrue(metrics.suiteExists(nestedPath), "Nested path should exist after running nested test");
         });
     });
 
@@ -302,9 +304,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             }
 
             const suiteMetrics: SuiteData = metrics.getSuiteMetrics(suitePath);
-            expect(suiteMetrics).to.exist;
-            expect(suiteMetrics.name).to.equal("Sample Suite");
-            expect(suiteMetrics.testMetrics.numTests).to.equal(2);
+            assert.exists(suiteMetrics, "Suite metrics should exist");
+            assert.strictEqual(suiteMetrics.name, "Sample Suite", "Suite should have correct name");
+            assert.strictEqual(suiteMetrics.testMetrics.numTests, 2, "Suite should have 2 tests");
         });
 
         test("Get recursive suite metrics", async function() {
@@ -320,8 +322,8 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             metrics.stopTest([...basePath, "Sub Suite", "Nested Test"]);
 
             const recursiveMetrics = metrics.getSuiteMetricsRecursive(basePath);
-            expect(recursiveMetrics).to.exist;
-            expect(recursiveMetrics.name).to.equal("Recursive Suite");
+            assert.exists(recursiveMetrics, "Recursive metrics should exist");
+            assert.strictEqual(recursiveMetrics.name, "Recursive Suite", "Recursive suite should have correct name");
         });
     });
 
@@ -359,7 +361,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
                 metrics.stopTest(["Edge Cases", "", "Test"]);
             } catch (error: any) {
                 console.log("Empty suite name threw error:", error.message);
-                expect(error).to.exist;
+                assert.exists(error, "Error should exist for empty suite name");
             }
         });
 
@@ -415,7 +417,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
     });
 
     suite("Using Test Data Helpers", function() {
-        test("should work with simple test data helper for concurrent metrics", function() {
+        test("Work with simple test data helper for concurrent metrics", function() {
             const metrics = createSimpleTestData(true, {
                 numSuites: 4,
                 testsPerSuite: 3,
@@ -424,17 +426,18 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             });
 
             // Verify the structure was created correctly
-            expect(metrics.suiteExists(["ConcurrentSuite1"])).to.be.true;
-            expect(metrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"])).to.be.true;
-            expect(metrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["ConcurrentSuite1"]), "ConcurrentSuite1 should exist");
+            assert.isTrue(metrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"]), "ConcurrentSuite1>ConcurrentTest1 should exist");
+            assert.isTrue(metrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"]), "ConcurrentSuite4>ConcurrentTest3 should exist");
 
             // Verify metrics work correctly
             const suite1Data = metrics.getSuiteMetrics(["ConcurrentSuite1"]);
-            expect(suite1Data.testMetrics.numTests).to.equal(3);
-            expect(suite1Data.testMetrics.totalTime).to.be.a('number').and.be.above(0);
+            assert.strictEqual(suite1Data.testMetrics.numTests, 3, "ConcurrentSuite1 should have 3 tests");
+            assert.isNumber(suite1Data.testMetrics.totalTime, "Suite should have numeric total time");
+            assert.isAbove(suite1Data.testMetrics.totalTime!, 0, "Suite total time should be positive");
         });
 
-        test("should work with complex test data helper for concurrent metrics", function() {
+        test("Work with complex test data helper for concurrent metrics", function() {
             const metrics = createPresetData(true, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Verify the complex structure was created
@@ -443,21 +446,22 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.suiteExists(["API", "Users", "Validation"]), "Expected 'API > Users > Validation' suite to exist");
 
             // Verify specific tests exist
-            expect(metrics.testExists(["Authentication", "login"])).to.be.true;
-            expect(metrics.testExists(["Authentication", "OAuth", "google_login"])).to.be.true;
-            expect(metrics.testExists(["API", "Users", "Validation", "email_validation"])).to.be.true;
+            assert.isTrue(metrics.testExists(["Authentication", "login"]), "Authentication>login test should exist");
+            assert.isTrue(metrics.testExists(["Authentication", "OAuth", "google_login"]), "Authentication>OAuth>google_login test should exist");
+            assert.isTrue(metrics.testExists(["API", "Users", "Validation", "email_validation"]), "API>Users>Validation>email_validation test should exist");
 
             // Test metrics at different levels
             const authData = metrics.getSuiteMetrics(["Authentication"]);
-            expect(authData.testMetrics.numTests).to.equal(3); // Direct tests only
-            expect(authData.childSuites).to.include.members(["OAuth", "TwoFactor"]);
+            assert.strictEqual(authData.testMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
+            assert.isArray(authData.childSuites, "Authentication suite should have child suites array");
+            assert.includeMembers(authData.childSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
 
             const apiUsersData = metrics.getSuiteMetrics(["API", "Users"]);
-            expect(apiUsersData.testMetrics.numTests).to.equal(4);
-            expect(apiUsersData.childSuites).to.deep.equal(["Validation"]);
+            assert.strictEqual(apiUsersData.testMetrics.numTests, 4, "API>Users suite should have 4 tests");
+            assert.deepEqual(apiUsersData.childSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
         });
 
-        test("should handle large datasets efficiently with concurrent metrics", function() {
+        test("Handle large datasets efficiently with concurrent metrics", function() {
             const startTime = Date.now();
             const metrics = createSimpleTestData(true, {
                 numSuites: 15,
@@ -466,23 +470,25 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             });
             const endTime = Date.now();
 
-            expect(endTime - startTime).to.be.below(300); // Should be very fast
+            assert.isBelow(endTime - startTime, 300, "Large dataset generation should be fast"); // Should be very fast
 
             // Verify random sampling of the data
-            expect(metrics.suiteExists(["Suite1"])).to.be.true;
-            expect(metrics.suiteExists(["Suite8"])).to.be.true;
-            expect(metrics.suiteExists(["Suite15"])).to.be.true;
+            assert.isTrue(metrics.suiteExists(["Suite1"]), "Suite1 should exist in large dataset");
+            assert.isTrue(metrics.suiteExists(["Suite8"]), "Suite8 should exist in large dataset");
+            assert.isTrue(metrics.suiteExists(["Suite15"]), "Suite15 should exist in large dataset");
 
             const suite8Data = metrics.getSuiteMetrics(["Suite8"]);
-            expect(suite8Data.testMetrics.numTests).to.equal(20);
-            expect(suite8Data.testMetrics.totalTime).to.be.a('number').and.be.at.least(0);
+            assert.strictEqual(suite8Data.testMetrics.numTests, 20, "Suite8 should have 20 tests");
+            assert.isNumber(suite8Data.testMetrics.totalTime, "Suite8 should have numeric total time");
+            assert.isAtLeast(suite8Data.testMetrics.totalTime!, 0, "Suite8 total time should be non-negative");
 
             // Verify top-level structure
             const topLevelData = metrics.getSuiteMetrics([]);
-            expect(topLevelData.childSuites).to.have.lengthOf(15);
+            assert.isArray(topLevelData.childSuites, "Top level should have child suites array");
+            assert.lengthOf(topLevelData.childSuites!, 15, "Top level should have 15 child suites");
         });
 
-        test("should provide useful generation information for concurrent metrics", function() {
+        test("Provide useful generation information for concurrent metrics", function() {
             const metrics = createPresetData(true, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Verify GeneratedTestData provides useful information
