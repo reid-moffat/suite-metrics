@@ -25,6 +25,15 @@ type Suite = {
 };
 
 /**
+ * Metric type for returned data: total # tests, total time, and average time for a given suite (or suites)
+ */
+type Metrics = {
+    readonly numTests: number,
+    readonly totalTime: number,
+    readonly averageTime: number
+}
+
+/**
  * Returned data for a given suite's metrics
  *
  * Includes the suite's name, its parent and child suites, and metrics for the tests directly inside it
@@ -33,11 +42,7 @@ type SuiteData = {
     readonly name: string;
     readonly parentSuites: string[];
     readonly childSuites: string[];
-    readonly testMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
+    readonly testMetrics: Metrics;
 };
 
 /**
@@ -50,21 +55,9 @@ type RecursiveSuiteData = {
     readonly name: string;
     readonly parentSuites: string[];
     readonly childSuites: string[];
-    readonly directTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-    readonly subTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-    readonly totalTestMetrics: {
-        readonly numTests: number;
-        readonly totalTime: number;
-        readonly averageTime: number;
-    }
-};
+    readonly directTestMetrics: Metrics;
+    readonly subTestMetrics: Metrics;
+    readonly totalTestMetrics: Metrics;
+}
 
 export type { Test, Suite, SuiteData, RecursiveSuiteData };
