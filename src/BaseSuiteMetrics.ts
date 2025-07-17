@@ -27,7 +27,7 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public suiteExists(suitePath: string[]): boolean {
-        this.validatePath(suitePath, { allowTopLevel: true });
+        this.validatePath(suitePath, true);
         return this.pathExists(suitePath, false);
     }
 
@@ -38,7 +38,7 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public testExists(testPath: string[]): boolean {
-        this.validatePath(testPath, { isTest: true });
+        this.validatePath(testPath, false);
         return this.pathExists(testPath, true);
     }
 
@@ -49,7 +49,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with test's name, timestamps, durations, and number
      */
     public getTestMetrics(path: string[]): Test {
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
         const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
 
@@ -64,11 +64,11 @@ abstract class BaseSuiteMetrics {
     /**
      * Gets metrics for a specific suite
      *
-     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
      * @returns An object with suite's name, parent/child, and test statistics
      */
     public getSuiteMetrics(path: string[]): SuiteData {
-        this.validatePath(path, { allowTopLevel: true });
+        this.validatePath(path, true);
         const suite: Suite = this.navigateToSuite(path);
         const testMetrics = this.calculateDirectTestMetrics(suite);
 
@@ -83,11 +83,11 @@ abstract class BaseSuiteMetrics {
     /**
      * Gets metrics for a given suite and its sub-suites
      *
-     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
     public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
-        this.validatePath(path, { allowTopLevel: true });
+        this.validatePath(path, true);
         const suite: Suite = this.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite

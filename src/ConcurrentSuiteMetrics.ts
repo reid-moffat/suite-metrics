@@ -44,7 +44,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public startTest(path: string[]): void {
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
         const testKey: string = this.createTestKey(path);
 
         if (this.activeTests.has(testKey)) {
@@ -61,7 +61,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      */
     public stopTest(path: string[]): void {
         const endTime: number = microtime.now();
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
         const testKey: string = this.createTestKey(path);
 
         // Verify test exists

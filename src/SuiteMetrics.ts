@@ -49,7 +49,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
                 'starting a new test, or use ConcurrentSuiteMetrics to run multiple tests simultaneously');
         }
 
-        this.validatePath(path, { isTest: true });
+        this.validatePath(path, false);
 
         this.activeTest = {
             testPath: path,
