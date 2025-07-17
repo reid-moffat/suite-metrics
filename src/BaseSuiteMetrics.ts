@@ -90,9 +90,10 @@ abstract class BaseSuiteMetrics {
         this.validatePath(path, { allowTopLevel: true });
         const suite: Suite = this.navigateToSuite(path);
 
-        // Calculate direct, total and sub test metrics
+        // Direct metrics: Test and duration data for just the tests directly in this suite
         const directMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
+        // Total metrics: Test and duration data for all tests in this suite and all sub-suites
         const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
         const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
         const totalMetrics: Metrics = {
@@ -101,6 +102,7 @@ abstract class BaseSuiteMetrics {
             averageTime: averageTotalTime
         };
 
+        // Sub metrics: Test and duration data for all tests in all sub-suites (but not this suite directly)
         const subTests: number = totalTests - directMetrics.numTests;
         const subTime: number = totalTime - directMetrics.totalTime;
         const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
