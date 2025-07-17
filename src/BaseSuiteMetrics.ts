@@ -27,7 +27,7 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public suiteExists(suitePath: string[]): boolean {
-        this.validatePath(suitePath, true);
+        BaseSuiteMetrics.validatePath(suitePath, true);
         return this.pathExists(suitePath, false);
     }
 
@@ -38,7 +38,7 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public testExists(testPath: string[]): boolean {
-        this.validatePath(testPath, false);
+        BaseSuiteMetrics.validatePath(testPath, false);
         return this.pathExists(testPath, true);
     }
 
@@ -50,7 +50,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements, or
      * empty if allowTopLevel is false)
      */
-    public validatePath(path: string[], allowTopLevel: boolean): void {
+    public static validatePath(path: string[], allowTopLevel: boolean): void {
 
         if (!Array.isArray(path)) {
             throw new Error('Suite/test path must be an array');
@@ -86,7 +86,7 @@ abstract class BaseSuiteMetrics {
      * @param path Path to the desired suite or test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      * @return Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
      */
-    public pathToString(path: string[]): string {
+    public static pathToString(path: string[]): string {
         return `[${path.join(", ")}]`;
     }
 
@@ -97,7 +97,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with test's name, timestamps, durations, and number
      */
     public getTestMetrics(path: string[]): Test {
-        this.validatePath(path, false);
+        BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
 
@@ -116,7 +116,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with suite's name, parent/child, and test statistics
      */
     public getSuiteMetrics(path: string[]): SuiteData {
-        this.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, true);
         const suite: Suite = this.navigateToSuite(path);
         const testMetrics = this.calculateDirectTestMetrics(suite);
 
@@ -135,7 +135,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
     public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
-        this.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, true);
         const suite: Suite = this.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite
