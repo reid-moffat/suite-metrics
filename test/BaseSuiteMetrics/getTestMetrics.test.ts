@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
-import { addDelay } from "../helpers.ts";
+import { sleep } from "../helpers.ts";
 
 suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
@@ -79,7 +79,7 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
     suite("Basic Functionality", function() {
         test("Complete test metrics for simple test", function() {
             metrics.startTest(["SimpleSuite", "SimpleTest"]);
-            addDelay(100);
+            sleep(100);
             metrics.stopTest();
 
             const testMetrics = metrics.getTestMetrics(["SimpleSuite", "SimpleTest"]);
@@ -236,12 +236,12 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
         test("Tests with different durations", function() {
             // Fast test
             metrics.startTest(["DurationSuite", "FastTest"]);
-            addDelay(10);
+            sleep(10);
             metrics.stopTest();
 
             // Slow test
             metrics.startTest(["DurationSuite", "SlowTest"]);
-            addDelay(100);
+            sleep(100);
             metrics.stopTest();
 
             const fastTest = metrics.getTestMetrics(["DurationSuite", "FastTest"]);
