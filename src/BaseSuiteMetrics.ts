@@ -84,10 +84,24 @@ abstract class BaseSuiteMetrics {
      * Note: This does not validate the path. Call validatePath to do so
      *
      * @param path Path to the desired suite or test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
-     * @return Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
+     * @returns Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
      */
     public static pathToString(path: string[]): string {
         return `[${path.join(", ")}]`;
+    }
+
+    /**
+     * Returns an array of all the test names in a given suite
+     *
+     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An array of all tests in this suite (not including sub-suites)
+     */
+    public getTestNames(path: string[]): string[] {
+        BaseSuiteMetrics.validatePath(path, true);
+
+        const suite: Suite = this.navigateToSuite(path);
+
+        return Array.from(suite.tests.keys());
     }
 
     /**
@@ -193,7 +207,7 @@ abstract class BaseSuiteMetrics {
 
 
     /**
-     * Navigates to a suite in the hierarchy, optionally creating missing suites
+     * Navigates to (and returns) a suite in the hierarchy, optionally creating missing suites
      *
      * @param path Path of the suite to navigate to (can be a test path with isTestPath, see below)
      * @param options Optional flags for specific cases
