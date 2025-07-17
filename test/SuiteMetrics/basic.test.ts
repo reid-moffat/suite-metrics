@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import SuiteMetrics, { RecursiveSuiteData, Suite, SuiteData } from "../../src/index.ts";
+import SuiteMetrics, { RecursiveSuiteData, SuiteData } from "../../src/index.ts";
 
 suite("[SuiteMetrics] Basic tests", function() {
 
