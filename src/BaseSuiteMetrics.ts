@@ -105,6 +105,20 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Returns an array of all the sub-suites names in a given suite. Top-level suite ([]) allowed
+     *
+     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An array of all sub-suites directly in this suite (not recursive)
+     */
+    public getSuiteNames(path: string[]): string[] {
+        BaseSuiteMetrics.validatePath(path, true);
+
+        const suite: Suite = this.navigateToSuite(path);
+
+        return Array.from(suite.subSuites.keys());
+    }
+
+    /**
      * Gets metrics for a specific test
      *
      * @param path Path to get metrics for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
