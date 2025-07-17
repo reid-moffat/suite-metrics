@@ -91,7 +91,7 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Returns an array of all the test names in a given suite
+     * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
      * @returns An array of all tests in this suite (not including sub-suites)
