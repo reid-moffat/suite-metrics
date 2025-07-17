@@ -53,7 +53,7 @@ abstract class BaseSuiteMetrics {
         const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
 
-        const test: Test | undefined = suite.tests?.get(testName);
+        const test: Test | undefined = suite.tests.get(testName);
         if (test === undefined) {
             throw new Error(`Test [${path.join(', ')}] does not exist`);
         }
