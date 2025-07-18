@@ -308,19 +308,19 @@ abstract class BaseSuiteMetrics {
         suite.tests.set(testName, test);
 
         // Update sub-test counters for all parent suites
-        this.updateSubTestCounters(testPath.slice(0, -1));
+        this.updateSubTestCounters(testPath);
     }
 
     /**
-     * Updates the subtest counter for all suites above this suite
+     * Updates the subtest counter for all suites above this test (including the direct parent suite)
      *
-     * @param suitePath Path of the suite to update
+     * @param testPath Path of the test to update parent suites for
      */
-    private updateSubTestCounters(suitePath: string[]): void {
+    private updateSubTestCounters(testPath: string[]): void {
         let currentSuite: Suite = this.topLevelSuite;
         currentSuite.numSubTests++;
 
-        for (const suiteName of suitePath) {
+        for (const suiteName of testPath.slice(0, -1)) {
             currentSuite = currentSuite.subSuites.get(suiteName)!;
             if (currentSuite === undefined) {
                 throw new Error(`Error - suite '${suiteName}' not found`);
