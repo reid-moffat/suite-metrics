@@ -28,7 +28,7 @@ const validateSuiteData = (data: SuiteData, expected: SuiteDataValidate) => {
     expect(data.name).to.be.a('string');
     expect(data.name).to.equal(expected.name);
     expect(data.parentSuites).to.deep.equal(expected.parentSuites);
-    expect(data.childSuites).to.deep.equal(expected.childSuites);
+    expect(data.subSuites).to.deep.equal(expected.childSuites);
     console.log(`✅ Metadata validated`);
 
     expect(data.testMetrics).to.have.all.keys(['numTests', 'totalTime', 'averageTime']);
@@ -78,7 +78,7 @@ const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: Recursiv
     expect(data.name).to.be.a('string');
     expect(data.name).to.equal(expected.name);
     expect(data.parentSuites).to.deep.equal(expected.parentSuites);
-    expect(data.childSuites).to.deep.equal(expected.childSuites);
+    expect(data.subSuites).to.deep.equal(expected.childSuites);
     console.log(`✅ Metadata validated`);
 
     expect(data.directTestMetrics).to.have.all.keys(['numTests', 'totalTime', 'averageTime']);

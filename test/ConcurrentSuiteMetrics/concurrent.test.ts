@@ -439,12 +439,12 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             // Test metrics at different levels
             const authData = metrics.getSuiteMetrics(["Authentication"]);
             assert.strictEqual(authData.testMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
-            assert.isArray(authData.childSuites, "Authentication suite should have child suites array");
-            assert.includeMembers(authData.childSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
+            assert.isArray(authData.subSuites, "Authentication suite should have child suites array");
+            assert.includeMembers(authData.subSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
 
             const apiUsersData = metrics.getSuiteMetrics(["API", "Users"]);
             assert.strictEqual(apiUsersData.testMetrics.numTests, 4, "API>Users suite should have 4 tests");
-            assert.deepEqual(apiUsersData.childSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
+            assert.deepEqual(apiUsersData.subSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
         });
 
         test("Handle large datasets efficiently with concurrent metrics", function() {
@@ -470,8 +470,8 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             // Verify top-level structure
             const topLevelData = metrics.getSuiteMetrics([]);
-            assert.isArray(topLevelData.childSuites, "Top level should have child suites array");
-            assert.lengthOf(topLevelData.childSuites!, 15, "Top level should have 15 child suites");
+            assert.isArray(topLevelData.subSuites, "Top level should have child suites array");
+            assert.lengthOf(topLevelData.subSuites!, 15, "Top level should have 15 child suites");
         });
 
         test("Provide useful generation information for concurrent metrics", function() {
