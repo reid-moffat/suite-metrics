@@ -16,31 +16,9 @@ abstract class BaseSuiteMetrics {
         subSuites: this.suites
     };
 
-    // Total number of tests in this instance
+    // Total number of completed tests in this instance
     protected testCounter: number = 0;
 
-
-    /**
-     * Checks if a given suite exists
-     *
-     * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
-     * @returns true if the suite exists, false if not
-     */
-    public suiteExists(suitePath: string[]): boolean {
-        BaseSuiteMetrics.validatePath(suitePath, true);
-        return this.pathExists(suitePath, false);
-    }
-
-    /**
-     * Checks if a given test exists
-     *
-     * @param testPath Path to check for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
-     * @returns true if the suite exists, false if not
-     */
-    public testExists(testPath: string[]): boolean {
-        BaseSuiteMetrics.validatePath(testPath, false);
-        return this.pathExists(testPath, true);
-    }
 
     /**
      * Validates a test or suite path, throwing an error is invalid
@@ -88,6 +66,37 @@ abstract class BaseSuiteMetrics {
      */
     public static pathToString(path: string[]): string {
         return `[${path.join(", ")}]`;
+    }
+
+    /**
+     * Gets the total number of completed tests across all suites
+     *
+     * @returns The total number of completed tests in this metrics instance
+     */
+    public getTotalTestCount(): number {
+        return this.testCounter;
+    }
+
+    /**
+     * Checks if a given suite exists
+     *
+     * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
+     * @returns true if the suite exists, false if not
+     */
+    public suiteExists(suitePath: string[]): boolean {
+        BaseSuiteMetrics.validatePath(suitePath, true);
+        return this.pathExists(suitePath, false);
+    }
+
+    /**
+     * Checks if a given test exists
+     *
+     * @param testPath Path to check for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns true if the suite exists, false if not
+     */
+    public testExists(testPath: string[]): boolean {
+        BaseSuiteMetrics.validatePath(testPath, false);
+        return this.pathExists(testPath, true);
     }
 
     /**
