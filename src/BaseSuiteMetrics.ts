@@ -150,7 +150,7 @@ abstract class BaseSuiteMetrics {
      * Gets metrics for a specific suite
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
-     * @returns An object with suite's name, parent/child, and test statistics
+     * @returns An object with suite's name, parent/sub-suites, and test statistics
      */
     public getSuiteMetrics(path: string[]): SuiteData {
         BaseSuiteMetrics.validatePath(path, true);
@@ -160,7 +160,7 @@ abstract class BaseSuiteMetrics {
         return {
             name: suite.name,
             parentSuites: path.slice(0, -1),
-            childSuites: Array.from(suite.subSuites.keys()),
+            subSuites: Array.from(suite.subSuites.keys()),
             testMetrics
         };
     }
@@ -200,7 +200,7 @@ abstract class BaseSuiteMetrics {
         return {
             name: suite.name,
             parentSuites: path.slice(0, -1),
-            childSuites: Array.from(suite.subSuites.keys()),
+            subSuites: Array.from(suite.subSuites.keys()),
 
             directTestMetrics: directMetrics,
             subTestMetrics: subMetrics,
