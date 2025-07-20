@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics from "../../src/index.ts";
+import SuiteMetrics from "suite-metrics";
 import { sleep } from "../helpers.ts";
 
 suite("[BaseSuiteMetrics] getTestMetrics", function() {

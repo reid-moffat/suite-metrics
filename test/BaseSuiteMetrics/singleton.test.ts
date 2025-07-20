@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData } from "../../src/index.ts";
+import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData } from "suite-metrics";
 
 suite("[Both] Singleton Pattern", function() {
 
