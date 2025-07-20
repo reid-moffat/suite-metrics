@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import SuiteMetrics from "../../src/index.ts";
 import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
+import { _MockSuiteMetrics } from "../generators/mocks.js";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
@@ -678,12 +679,12 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     suite("Using Test Data Helpers", function() {
         test("Work correctly with simple test data helper", function() {
-            const metrics: SuiteMetrics = createSimpleTestData(false, {
+            const metrics: _MockSuiteMetrics = createSimpleTestData(false, {
                 numSuites: 3,
                 testsPerSuite: 4,
                 suiteNamePrefix: "HelperSuite",
                 testNamePrefix: "HelperTest"
-            }) as SuiteMetrics;
+            }) as _MockSuiteMetrics;
 
             // Verify suite metrics work correctly
             const suite1Data = metrics.getSuiteMetrics(["HelperSuite1"]);
