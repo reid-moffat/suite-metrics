@@ -366,30 +366,6 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Recursively calculates test metrics for a suite and all its sub-suites
-     *
-     * @param suite Suite object to calculate test metrics for recursively
-     */
-    private calculateRecursiveTestMetrics(suite: Suite): [number, number] {
-        let totalTests: number = suite.tests.size;
-        let totalTime: number = 0;
-
-        // Add direct test times
-        suite.tests.forEach((test: Test): void => { totalTime += test.duration; });
-
-        // Recursively add sub-suite metrics
-        if (suite.subSuites) {
-            for (const subSuite of suite.subSuites.values()) {
-                const [subTests, subTime] = this.calculateRecursiveTestMetrics(subSuite);
-                totalTests += subTests;
-                totalTime += subTime;
-            }
-        }
-
-        return [totalTests, totalTime];
-    }
-
-    /**
      * Formats suite information for printing
      *
      * @param suite Suite object to get information for
