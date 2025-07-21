@@ -381,10 +381,10 @@ abstract class BaseSuiteMetrics {
         lines.push(`${indent}Suite: ${suite.name}`);
         lines.push(`${indent}  Summary:`);
         lines.push(`${indent}    - Total direct tests: ${directTestCount}`);
-        lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(2)} ms`);
+        lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(3)} ms`);
         lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites.size}`);
         lines.push(`${indent}    - Total Sub-Suite tests: ${suite.subSuiteData.numSubTests}`);
-        lines.push(`${indent}    - Total Sub-Suite time: ${suite.subSuiteData.subTestTotalTime}`);
+        lines.push(`${indent}    - Total Sub-Suite time: ${(suite.subSuiteData.subTestTotalTime / 1000).toFixed(3)} ms`);
 
         if (suite.tests && suite.tests.size > 0) {
             lines.push(`\n${indent}  Tests:`);
