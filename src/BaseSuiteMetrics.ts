@@ -12,8 +12,11 @@ abstract class BaseSuiteMetrics {
     private readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
         tests: new Map<string, Test>(),
-        numSubTests: 0,
-        subSuites: this.suites
+        subSuites: this.suites,
+        subSuiteData: {
+            numSubTests: 0,
+            subTestTotalTime: 0
+        }
     };
 
     // Total number of completed tests in this instance
@@ -179,7 +182,8 @@ abstract class BaseSuiteMetrics {
         const directMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
         // Total metrics: Test and duration data for all tests in this suite and all sub-suites
-        const [totalTests, totalTime] = this.calculateRecursiveTestMetrics(suite);
+        const totalTests: number = suite.subSuiteData.numSubTests;
+        const totalTime: number = suite.subSuiteData.subTestTotalTime;
         const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
         const totalMetrics: Metrics = {
             numTests: totalTests,
@@ -253,8 +257,11 @@ abstract class BaseSuiteMetrics {
                 targetSuite = {
                     name: suiteName,
                     tests: new Map<string, Test>(),
-                    numSubTests: 0,
-                    subSuites: new Map<string, Suite>()
+                    subSuites: new Map<string, Suite>(),
+                    subSuiteData: {
+                        numSubTests: 0,
+                        subTestTotalTime: 0
+                    }
                 };
                 currentSuite.subSuites.set(suiteName, targetSuite);
             }
@@ -295,12 +302,13 @@ abstract class BaseSuiteMetrics {
     protected addTest(testPath: string[], startTime: number, endTime: number): void {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
         const testName: string = testPath[testPath.length - 1];
+        const testDuration: number = endTime - startTime;
 
         const test: Test = {
             name: testName,
             startTimestamp: startTime,
             endTimestamp: endTime,
-            duration: endTime - startTime,
+            duration: testDuration,
             testNumber: ++this.testCounter,
             suiteTestNumber: suite.tests.size + 1
         };
@@ -308,25 +316,30 @@ abstract class BaseSuiteMetrics {
         suite.tests.set(testName, test);
 
         // Update sub-test counters for all parent suites
-        this.updateSubTestCounters(testPath);
+        this.updateSubTestCounters(testPath, testDuration);
     }
 
     /**
-     * Updates the subtest counter for all suites above this test (including the direct parent suite)
+     * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
      *
      * @param testPath Path of the test to update parent suites for
+     * @param duration Duration of the test
      */
-    private updateSubTestCounters(testPath: string[]): void {
+    private updateSubTestCounters(testPath: string[], duration: number): void {
+        // Add time and counter to top-level suite
         let currentSuite: Suite = this.topLevelSuite;
-        currentSuite.numSubTests++;
+        currentSuite.subSuiteData.numSubTests++;
+        currentSuite.subSuiteData.subTestTotalTime += duration;
 
+        // Add time and counter to each parent suite
         for (const suiteName of testPath.slice(0, -1)) {
             currentSuite = currentSuite.subSuites.get(suiteName)!;
             if (currentSuite === undefined) {
-                throw new Error(`Error - suite '${suiteName}' not found`);
+                throw new Error(`Error updating counters: suite '${suiteName}' not found`);
             }
 
-            currentSuite.numSubTests++;
+            currentSuite.subSuiteData.numSubTests++;
+            currentSuite.subSuiteData.subTestTotalTime += duration;
         }
     }
 
@@ -394,7 +407,8 @@ abstract class BaseSuiteMetrics {
         lines.push(`${indent}    - Total direct tests: ${directTestCount}`);
         lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(2)} ms`);
         lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites.size}`);
-        lines.push(`${indent}    - Total Sub-Suite tests: ${suite.numSubTests}`);
+        lines.push(`${indent}    - Total Sub-Suite tests: ${suite.subSuiteData.numSubTests}`);
+        lines.push(`${indent}    - Total Sub-Suite time: ${suite.subSuiteData.subTestTotalTime}`);
 
         if (suite.tests && suite.tests.size > 0) {
             lines.push(`\n${indent}  Tests:`);
