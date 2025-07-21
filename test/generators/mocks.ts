@@ -1,4 +1,4 @@
-import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics } from "../../src/index.ts";
+import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics } from "suite-metrics";
 import microtime from "microtime";
 import { randomInt } from "../helpers.ts";
 

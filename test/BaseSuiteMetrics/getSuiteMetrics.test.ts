@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics from "../../src/index.ts";
+import SuiteMetrics from "suite-metrics";
 import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
 import { _MockSuiteMetrics } from "../generators/mocks.js";
 

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { RecursiveSuiteData, SuiteData } from "../../src/index.ts";
+import SuiteMetrics, { RecursiveSuiteData, SuiteData } from "suite-metrics";
 
 suite("[SuiteMetrics] Basic tests", function() {
 

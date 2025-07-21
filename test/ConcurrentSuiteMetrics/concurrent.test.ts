@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ConcurrentSuiteMetrics, SuiteData } from "../../src/index.ts";
+import { ConcurrentSuiteMetrics, SuiteData } from "suite-metrics";
 import { createPresetData, createSimpleTestData, PRESET_TYPE } from "../generators/testDataHelpers.ts";
 import { sleep } from "../helpers.js";
 
