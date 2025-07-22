@@ -388,10 +388,21 @@ abstract class BaseSuiteMetrics {
             path: testPath
         };
 
+        // Add test to the map and update counters for parent suites
         suite.tests.set(testName, test);
-
-        // Update sub-test counters for all parent suites
         this.updateSubTestCounters(testPath, testDuration);
+
+        // Add to flat array and invalidate cache
+        this.allTests.push(test);
+        this.invalidateCache();
+    }
+
+    /**
+     * Invalidates the sorted cache and updates batch tracking
+     */
+    private invalidateCache(): void {
+        this.sortedCacheValid = false;
+        this.newTestsSinceLastSort++;
     }
 
     /**
