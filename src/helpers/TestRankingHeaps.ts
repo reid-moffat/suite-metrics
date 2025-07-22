@@ -1,7 +1,7 @@
 import { Test } from "../types/structures.ts";
 
 /**
- * Heap-based test ranking system for O(log n) insertions and O(1) top-N queries
+ * Heap-based test ranking system for O(log n) insertions and O(M) top-M queries
  */
 class TestRankingHeaps {
 
@@ -10,7 +10,7 @@ class TestRankingHeaps {
     private testCount: number = 0;
 
     /**
-     * Adds a test to both heaps - O(log n)
+     * Adds a test to both heaps
      */
     public addTest(test: Test): void {
         this.insertIntoMaxHeap(test);
@@ -19,7 +19,7 @@ class TestRankingHeaps {
     }
 
     /**
-     * Gets the N slowest tests - O(k log n) where k = min(n, heap_size)
+     * Gets the N slowest tests
      */
     public getNSlowestTests(n: number): Test[] {
         if (n <= 0) return [];
@@ -29,7 +29,7 @@ class TestRankingHeaps {
     }
 
     /**
-     * Gets the N fastest tests - O(k log n) where k = min(n, heap_size)
+     * Gets the N fastest tests
      */
     public getNFastestTests(n: number): Test[] {
         if (n <= 0) return [];
@@ -39,14 +39,14 @@ class TestRankingHeaps {
     }
 
     /**
-     * Gets the slowest test - O(1)
+     * Gets the slowest test
      */
     public getSlowestTest(): Test | null {
         return this.maxHeap.length > 0 ? this.maxHeap[0] : null;
     }
 
     /**
-     * Gets the fastest test - O(1)
+     * Gets the fastest test
      */
     public getFastestTest(): Test | null {
         return this.minHeap.length > 0 ? this.minHeap[0] : null;
@@ -59,8 +59,7 @@ class TestRankingHeaps {
         return this.testCount;
     }
 
-    // ==================== MAX HEAP IMPLEMENTATION ====================
-    // Max heap keeps largest (slowest) durations at the top
+    // === MAX HEAP IMPLEMENTATION ===
 
     private insertIntoMaxHeap(test: Test): void {
         this.maxHeap.push(test);
@@ -146,8 +145,7 @@ class TestRankingHeaps {
         }
     }
 
-    // ==================== MIN HEAP IMPLEMENTATION ====================
-    // Min heap keeps smallest (fastest) durations at the top
+    // === MIN HEAP ===
 
     private insertIntoMinHeap(test: Test): void {
         this.minHeap.push(test);
@@ -233,7 +231,7 @@ class TestRankingHeaps {
         }
     }
 
-    // ==================== HEAP UTILITY METHODS ====================
+    // === UTILITY METHODS ===
 
     private getParentIndex(index: number): number {
         return Math.floor((index - 1) / 2);
