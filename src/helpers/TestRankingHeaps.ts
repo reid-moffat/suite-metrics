@@ -7,7 +7,6 @@ class TestRankingHeaps {
 
     private maxHeap: Test[] = []; // Max duration: slowest tests
     private minHeap: Test[] = []; // Min duration: fastest tests
-    private testCount: number = 0;
 
     /**
      * Adds a test to both heaps
@@ -15,7 +14,6 @@ class TestRankingHeaps {
     public addTest(test: Test): void {
         this.insertIntoMaxHeap(test);
         this.insertIntoMinHeap(test);
-        this.testCount++;
     }
 
     /**
@@ -52,12 +50,6 @@ class TestRankingHeaps {
         return this.minHeap.length > 0 ? this.minHeap[0] : null;
     }
 
-    /**
-     * Gets total number of tests
-     */
-    public getTestCount(): number {
-        return this.testCount;
-    }
 
     // === MAX HEAP IMPLEMENTATION ===
 
@@ -145,6 +137,7 @@ class TestRankingHeaps {
         }
     }
 
+
     // === MIN HEAP ===
 
     private insertIntoMinHeap(test: Test): void {
@@ -230,6 +223,7 @@ class TestRankingHeaps {
             index = smallerChildIndex;
         }
     }
+
 
     // === UTILITY METHODS ===
 
