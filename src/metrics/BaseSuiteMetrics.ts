@@ -23,6 +23,17 @@ abstract class BaseSuiteMetrics {
     // Total number of completed tests in this instance
     protected testCounter: number = 0;
 
+    // Lazy sorted duration array
+    private allTests: Test[] = [];
+    private cachedSortedTests: Test[] | null = null;
+    private sortedCacheValid: boolean = false;
+
+    // Batch invalidation for lazy sorted array
+    private newTestsSinceLastSort: number = 0;
+    private lastSortTimestamp: number = Date.now();
+    private readonly BATCH_SIZE_THRESHOLD: number = 100; // New tests required before forced rebuild
+    private readonly TIME_THRESHOLD_MS: number = 5 * 60 * 1000; // Time between forced rebuild
+
 
     /**
      * Validates a test or suite path, throwing an error is invalid
