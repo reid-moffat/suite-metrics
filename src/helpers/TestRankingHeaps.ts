@@ -1,4 +1,4 @@
-import { Test } from "../types/types.ts";
+import { Test } from "../types/returnTypes.ts";
 
 /**
  * Heap-based test ranking system for O(log n) insertions and O(1) top-N queries
