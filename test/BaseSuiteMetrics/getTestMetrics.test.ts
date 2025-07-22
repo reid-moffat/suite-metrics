@@ -288,7 +288,7 @@ suite("[BaseSuiteMetrics] getTestMetrics", function() {
 
             // Verify all properties from Test type are present
             assert.hasAllKeys(testMetrics, [
-                'name', 'startTimestamp', 'endTimestamp', 'duration', 'testNumber', 'suiteTestNumber'
+                'name', 'startTimestamp', 'endTimestamp', 'duration', 'testNumber', 'suiteTestNumber', 'path'
             ], 'Test metrics should have all required properties');
 
             // Verify property types

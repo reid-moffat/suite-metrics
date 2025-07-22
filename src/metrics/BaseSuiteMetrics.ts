@@ -384,7 +384,8 @@ abstract class BaseSuiteMetrics {
             endTimestamp: endTime,
             duration: testDuration,
             testNumber: ++this.testCounter,
-            suiteTestNumber: suite.tests.size + 1
+            suiteTestNumber: suite.tests.size + 1,
+            path: testPath
         };
 
         suite.tests.set(testName, test);

@@ -1,7 +1,7 @@
 /**
  * A completed test's structure in suite metrics
  *
- * Include the test's name, start/end time & duration, overall test number, and test number within this suite
+ * Include the test's name, start/end time & duration, overall test number, test number within this suite, and path
  */
 type Test = {
     /** The test's name. Determined during startTest(), this is unique for the suite it's in */
@@ -16,6 +16,8 @@ type Test = {
     readonly testNumber: number;
     /** Order this test was completed in for this suite. E.g. the 3rd of 6 test in the suite -> 3 */
     readonly suiteTestNumber: number;
+    /** Path to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3'] */
+    readonly path: string[];
 };
 
 /**
