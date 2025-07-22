@@ -1,4 +1,5 @@
-import { Suite, Test, SuiteData, RecursiveSuiteData, Metrics } from "../types/types.ts";
+import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts";
+import { Test, Suite } from "../types/structures.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
