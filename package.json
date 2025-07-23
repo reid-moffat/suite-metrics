@@ -47,8 +47,11 @@
     "deploy": "git checkout main && git pull && npm run build && npm publish"
   },
   "files": [
+    "dist",
     "CHANGELOG.md",
-    "dist"
+    "LICENSE",
+    "README.md",
+    "package.json"
   ],
   "dependencies": {
     "microtime": "^3.1.1"
