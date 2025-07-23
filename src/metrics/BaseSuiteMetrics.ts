@@ -86,6 +86,20 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Gets the average completion time for all tests in this metrics instance
+     *
+     * @returns The average test completion time, rounded to the nearest microsecond
+     * @throws Error if there are no completed tests in this instance
+     */
+    public getAverageTestTime(): number {
+        if (this.getTotalTestCount() === 0) {
+            throw new Error(`There are no completed tests in this instance`);
+        }
+
+        return Math.round(this.topLevelSuite.subSuiteData.subTestTotalTime / this.topLevelSuite.subSuiteData.numSubTests);
+    }
+
+    /**
      * Checks if a given suite exists
      *
      * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
