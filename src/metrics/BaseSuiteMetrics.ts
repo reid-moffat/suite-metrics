@@ -395,13 +395,6 @@ abstract class BaseSuiteMetrics {
 
         // Add to flat array and invalidate cache
         this.allTests.push(test);
-        this.invalidateCache();
-    }
-
-    /**
-     * Invalidates the sorted cache and updates batch tracking
-     */
-    private invalidateCache(): void {
         this.sortedCacheValid = false;
     }
 
