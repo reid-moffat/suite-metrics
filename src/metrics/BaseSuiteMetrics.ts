@@ -15,9 +15,9 @@ abstract class BaseSuiteMetrics {
         name: "<Top-Level suite>",
         tests: new Map<string, Test>(),
         subSuites: this.suites,
-        subSuiteData: {
-            numSubTests: 0,
-            subTestTotalTime: 0
+        aggregateData: {
+            numTests: 0,
+            totalTestTime: 0
         }
     };
 
@@ -96,7 +96,7 @@ abstract class BaseSuiteMetrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        return Math.round(this.topLevelSuite.subSuiteData.subTestTotalTime / this.topLevelSuite.subSuiteData.numSubTests);
+        return Math.round(this.topLevelSuite.aggregateData.totalTestTime / this.topLevelSuite.aggregateData.numTests);
     }
 
     /**
@@ -263,8 +263,8 @@ abstract class BaseSuiteMetrics {
         const directMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
         // Total metrics: Test and duration data for all tests in this suite and all sub-suites
-        const totalTests: number = suite.subSuiteData.numSubTests;
-        const totalTime: number = suite.subSuiteData.subTestTotalTime;
+        const totalTests: number = suite.aggregateData.numTests;
+        const totalTime: number = suite.aggregateData.totalTestTime;
         const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
         const totalMetrics: Metrics = {
             numTests: totalTests,
@@ -339,9 +339,9 @@ abstract class BaseSuiteMetrics {
                     name: suiteName,
                     tests: new Map<string, Test>(),
                     subSuites: new Map<string, Suite>(),
-                    subSuiteData: {
-                        numSubTests: 0,
-                        subTestTotalTime: 0
+                    aggregateData: {
+                        numTests: 0,
+                        totalTestTime: 0
                     }
                 };
                 currentSuite.subSuites.set(suiteName, targetSuite);
@@ -434,8 +434,8 @@ abstract class BaseSuiteMetrics {
     private updateSubTestCounters(testPath: string[], duration: number): void {
         // Add time and counter to top-level suite
         let currentSuite: Suite = this.topLevelSuite;
-        currentSuite.subSuiteData.numSubTests++;
-        currentSuite.subSuiteData.subTestTotalTime += duration;
+        currentSuite.aggregateData.numTests++;
+        currentSuite.aggregateData.totalTestTime += duration;
 
         // Add time and counter to each parent suite
         for (const suiteName of testPath.slice(0, -1)) {
@@ -444,8 +444,8 @@ abstract class BaseSuiteMetrics {
                 throw new Error(`Error updating counters: suite '${suiteName}' not found`);
             }
 
-            currentSuite.subSuiteData.numSubTests++;
-            currentSuite.subSuiteData.subTestTotalTime += duration;
+            currentSuite.aggregateData.numTests++;
+            currentSuite.aggregateData.totalTestTime += duration;
         }
     }
 
@@ -489,8 +489,8 @@ abstract class BaseSuiteMetrics {
         lines.push(`${indent}    - Total direct tests: ${directTestCount}`);
         lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(3)} ms`);
         lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites.size}`);
-        lines.push(`${indent}    - Total Sub-Suite tests: ${suite.subSuiteData.numSubTests}`);
-        lines.push(`${indent}    - Total Sub-Suite time: ${(suite.subSuiteData.subTestTotalTime / 1000).toFixed(3)} ms`);
+        lines.push(`${indent}    - Total Sub-Suite tests: ${suite.aggregateData.numTests}`);
+        lines.push(`${indent}    - Total Sub-Suite time: ${(suite.aggregateData.totalTestTime / 1000).toFixed(3)} ms`);
 
         if (suite.tests && suite.tests.size > 0) {
             lines.push(`\n${indent}  Tests:`);

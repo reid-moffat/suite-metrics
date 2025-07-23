@@ -33,12 +33,12 @@ type Suite = {
     /** All sub-suites directly within this suite (non-recursive). Maps the suite name to the Suite type object */
     readonly subSuites: Map<string, Suite>;
 
-    /** Stores aggregate test data for all tests in this suite and sub-suites to prevent the need for recursive calls */
-    readonly subSuiteData: {
+    /** Stores aggregate test data for all tests in this suite AND sub-suites to prevent the need for recursive calls */
+    readonly aggregateData: {
         /** Number of tests in this suite AND in all sub-suites of this suite */
-        numSubTests: number;
-        /** Total test time for all tests in this suite AND sub-suite */
-        subTestTotalTime: number;
+        numTests: number;
+        /** Total duration for all tests in this suite AND all sub-suites of this suite */
+        totalTestTime: number;
     };
 };
 
