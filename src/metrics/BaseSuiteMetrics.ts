@@ -28,11 +28,6 @@ abstract class BaseSuiteMetrics {
     private cachedSortedTests: Test[] | null = null;
     private sortedCacheValid: boolean = false;
 
-    // Batch invalidation for lazy sorted array
-    private newTestsSinceLastSort: number = 0;
-    private lastSortTimestamp: number = Date.now();
-    private readonly BATCH_SIZE_THRESHOLD: number = 100; // New tests required before forced rebuild
-
 
     /**
      * Validates a test or suite path, throwing an error is invalid
@@ -408,7 +403,6 @@ abstract class BaseSuiteMetrics {
      */
     private invalidateCache(): void {
         this.sortedCacheValid = false;
-        this.newTestsSinceLastSort++;
     }
 
     /**
@@ -418,17 +412,13 @@ abstract class BaseSuiteMetrics {
         // Sort by duration in descending order (slowest goes first)
         this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test) => b.duration - a.duration);
         this.sortedCacheValid = true;
-        this.newTestsSinceLastSort = 0;
-        this.lastSortTimestamp = Date.now();
     }
 
     /**
      * Ensures sorted cache is built and valid
      */
     private ensureSortedCache(): void {
-        const batchThresholdExceeded: boolean = this.newTestsSinceLastSort >= this.BATCH_SIZE_THRESHOLD;
-
-        if (!this.sortedCacheValid || batchThresholdExceeded) {
+        if (!this.sortedCacheValid) {
             this.rebuildSortedCache();
         }
     }
