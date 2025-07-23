@@ -15,10 +15,15 @@ class SortedTestCache {
     private sortedCacheValid: boolean = false;
 
     /**
+     * Returns the total number of tests
+     */
+    private getNumTests: () => number = (): number => this.originalOrder.length;
+
+    /**
      * Gets the slowest test across all suites
      */
     public getSlowestTest(): Test {
-        if (this.originalOrder.length === 0) {
+        if (this.getNumTests() === 0) {
             throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
@@ -33,8 +38,8 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.originalOrder.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.originalOrder.length})`);
+        if (this.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.getNumTests()})`);
         }
 
         this.ensureSortedCache();
@@ -54,7 +59,7 @@ class SortedTestCache {
      * Gets the fastest test across all suites
      */
     public getFastestTest(): Test {
-        if (this.originalOrder.length === 0) {
+        if (this.getNumTests() === 0) {
             throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
@@ -69,8 +74,8 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.originalOrder.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.originalOrder.length})`);
+        if (this.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.getNumTests()})`);
         }
 
         this.ensureSortedCache();
