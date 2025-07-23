@@ -406,20 +406,13 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Rebuilds the sorted cache
-     */
-    private rebuildSortedCache(): void {
-        // Sort by duration in descending order (slowest goes first)
-        this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test) => b.duration - a.duration);
-        this.sortedCacheValid = true;
-    }
-
-    /**
-     * Ensures sorted cache is built and valid
+     * Rebuilds the sorted cache if invalid
      */
     private ensureSortedCache(): void {
         if (!this.sortedCacheValid) {
-            this.rebuildSortedCache();
+            // Sort by duration in descending order (slowest goes first)
+            this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test) => b.duration - a.duration);
+            this.sortedCacheValid = true;
         }
     }
 
