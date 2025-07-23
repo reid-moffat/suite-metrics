@@ -168,9 +168,8 @@ abstract class BaseSuiteMetrics {
             throw new Error('Number of tests (n) must be a positive integer');
         }
 
-        // TODO
-
-        return [this.topLevelSuite.tests.get('PLACEHOLDER') as Test];
+        this.ensureSortedCache();
+        return this.cachedSortedTests!.slice(0, Math.min(n, this.cachedSortedTests!.length));
     }
 
     /**
@@ -199,9 +198,9 @@ abstract class BaseSuiteMetrics {
             throw new Error('Number of tests (n) must be a positive integer');
         }
 
-        // TODO
-
-        return [this.topLevelSuite.tests.get('PLACEHOLDER') as Test];
+        this.ensureSortedCache();
+        const startIndex: number = Math.max(0, this.cachedSortedTests!.length - n);
+        return this.cachedSortedTests!.slice(startIndex).reverse();
     }
 
     /**
