@@ -148,12 +148,10 @@ abstract class BaseSuiteMetrics {
     /**
      * Gets the k slowest tests across all suites, sorted by duration descending
      *
-     * Note: If k is greater than the total amount of tests (getTotalTestCount()), this method will still run
-     * (no error) but just return a smaller array
-     *
      * @param k Number of slowest tests to return. Must be a positive integer
-     * @returns Array of the (<=) k slowest tests, sorted by duration descending
+     * @returns Array of the k slowest tests, sorted by duration descending
      * @throws Error If k is not a positive integer
+     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
      */
     public getKSlowestTests(k: number): Test[] {
         return this.testPerformance.getKSlowestTests(k);
@@ -172,12 +170,10 @@ abstract class BaseSuiteMetrics {
     /**
      * Gets the k fastest tests across all suites, sorted by duration ascending
      *
-     * Note: If k is greater than the total amount of tests (getTotalTestCount()), this method will still run
-     * (no error) but just return a smaller array
-     *
      * @param k Number of fastest tests to return. Must be a positive integer
-     * @returns Array of the (<=) k fastest tests, sorted by duration ascending
+     * @returns Array of the k fastest tests, sorted by duration ascending
      * @throws Error If k is not a positive integer
+     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
      */
     public getKFastestTests(k: number): Test[] {
         return this.testPerformance.getKFastestTests(k);

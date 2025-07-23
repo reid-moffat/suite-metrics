@@ -19,7 +19,7 @@ class SortedTestCache {
      */
     public getSlowestTest(): Test {
         if (this.allTests.length === 0) {
-            throw new Error(`Error: There are no tests in this cache, could not get the slowest test`);
+            throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
         this.ensureSortedCache();
@@ -31,11 +31,15 @@ class SortedTestCache {
      */
     public getKSlowestTests(k: number): Test[] {
         if (!Number.isInteger(k) || k <= 0) {
-            throw new Error('Number of tests (n) must be a positive integer');
+            throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
+        }
+        if (this.allTests.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.allTests.length})`);
         }
 
         this.ensureSortedCache();
-        return this.cachedSortedTests!.slice(0, Math.min(k, this.cachedSortedTests!.length));
+        const endIndex: number = Math.min(k, this.cachedSortedTests!.length);
+        return this.cachedSortedTests!.slice(0, endIndex);
     }
 
     /**
@@ -43,7 +47,7 @@ class SortedTestCache {
      */
     public getFastestTest(): Test {
         if (this.allTests.length === 0) {
-            throw new Error(`Error: There are no tests in this cache, could not get the fastest test`);
+            throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
         this.ensureSortedCache();
@@ -55,7 +59,10 @@ class SortedTestCache {
      */
     public getKFastestTests(k: number): Test[] {
         if (!Number.isInteger(k) || k <= 0) {
-            throw new Error('Number of tests (k) must be a positive integer');
+            throw new Error('Desired number of tests (k) must be a positive integer, ${k} is invalid');
+        }
+        if (this.allTests.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.allTests.length})`);
         }
 
         this.ensureSortedCache();
