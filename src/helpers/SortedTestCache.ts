@@ -5,8 +5,11 @@ import { Test } from "../types/structures.ts";
  */
 class SortedTestCache {
 
-    // All tests for a given metrics
-    private readonly cache: Test[] = [];
+    // All tests for a given metrics in their original test order
+    private readonly originalOrder: Test[] = [];
+
+    // All tests for a given metrics sorted from slowest to fastest
+    private cache: Test[] = [];
 
     // Whether the cache is sorted
     private sortedCacheValid: boolean = false;
@@ -15,7 +18,7 @@ class SortedTestCache {
      * Gets the slowest test across all suites
      */
     public getSlowestTest(): Test {
-        if (this.cache.length === 0) {
+        if (this.originalOrder.length === 0) {
             throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
@@ -30,8 +33,8 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.cache.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.length})`);
+        if (this.originalOrder.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.originalOrder.length})`);
         }
 
         this.ensureSortedCache();
@@ -51,7 +54,7 @@ class SortedTestCache {
      * Gets the fastest test across all suites
      */
     public getFastestTest(): Test {
-        if (this.cache.length === 0) {
+        if (this.originalOrder.length === 0) {
             throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
@@ -66,8 +69,8 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.cache.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.length})`);
+        if (this.originalOrder.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.originalOrder.length})`);
         }
 
         this.ensureSortedCache();
@@ -89,7 +92,7 @@ class SortedTestCache {
      * @param test The test to add
      */
     public addTest(test: Test): void {
-        this.cache.push(test);
+        this.originalOrder.push(test);
         this.sortedCacheValid = false;
     }
 
@@ -99,7 +102,7 @@ class SortedTestCache {
     private ensureSortedCache(): void {
         if (!this.sortedCacheValid) {
             // Sort by duration in descending order (slowest goes first)
-            this.cache.sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.cache = this.originalOrder.sort((a: Test, b: Test): number => b.duration - a.duration);
             this.sortedCacheValid = true;
         }
     }
