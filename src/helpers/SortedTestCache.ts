@@ -20,6 +20,13 @@ class SortedTestCache {
     private getNumTests: () => number = (): number => this.originalOrder.length;
 
     /**
+     * Gets all tests in the order they were completed
+     */
+    public getTestsInOrder(): Test[] {
+        return this.originalOrder;
+    }
+
+    /**
      * Gets the slowest test across all suites
      */
     public getSlowestTest(): Test {

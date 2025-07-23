@@ -150,6 +150,16 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Gets all tests in order
+     *
+     * @returns An array of all tests in this metrics instance, sorted by time of completion (first test completion
+     * is ordered first)
+     */
+    public getTestsInOrder(): Test[] {
+        return this.deepCopyTests(this.testPerformance.getTestsInOrder());
+    }
+
+    /**
      * Gets the slowest test across all suites
      *
      * @returns The test with the longest duration
