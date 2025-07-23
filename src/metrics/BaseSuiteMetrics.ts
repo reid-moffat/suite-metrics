@@ -146,11 +146,15 @@ abstract class BaseSuiteMetrics {
      * Gets the slowest test across all suites
      *
      * @returns The test with the longest duration
+     * @throws Error if there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
-        // TODO
+        if (this.getTotalTestCount() === 0) {
+            throw new Error(`Error: There are no tests in this metrics instance, could not get the slowest test`);
+        }
 
-        return this.topLevelSuite.tests.get('PLACEHOLDER') as Test;
+        this.ensureSortedCache();
+        return this.cachedSortedTests![0];
     }
 
     /**
@@ -176,11 +180,15 @@ abstract class BaseSuiteMetrics {
      * Gets the fastest test across all suites
      *
      * @returns The test with the shortest duration
+     * @throws Error if there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
-        // TODO
+        if (this.getTotalTestCount() === 0) {
+            throw new Error(`Error: There are no tests in this metrics instance, could not get the slowest test`);
+        }
 
-        return this.topLevelSuite.tests.get('PLACEHOLDER') as Test;
+        this.ensureSortedCache();
+        return this.cachedSortedTests![this.cachedSortedTests!.length - 1];
     }
 
     /**
