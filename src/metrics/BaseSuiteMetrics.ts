@@ -212,12 +212,13 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets metrics for a specific test
+     * Gets the test at a specific path
      *
-     * @param path Path to get metrics for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
-     * @returns An object with test's name, timestamps, durations, and number
+     * @param path Path to get test for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns A copy of the Test object at that path
+     * @throws Error If the test path doesn't exist
      */
-    public getTestMetrics(path: string[]): Test {
+    public getTest(path: string[]): Test {
         BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];

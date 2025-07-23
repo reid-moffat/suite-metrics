@@ -456,9 +456,9 @@ suite("[Both] Singleton Pattern", function() {
             instance.stopTest();
 
             // Verify counters and data
-            const test1 = instance.getTestMetrics(['counter-test', 'test1']);
-            const test2 = instance.getTestMetrics(['counter-test', 'test2']);
-            const test3 = instance.getTestMetrics(['counter-test', 'sub-suite', 'test3']);
+            const test1 = instance.getTest(['counter-test', 'test1']);
+            const test2 = instance.getTest(['counter-test', 'test2']);
+            const test3 = instance.getTest(['counter-test', 'sub-suite', 'test3']);
 
             assert.equal(test1.testNumber, 1, "First test should have testNumber 1");
             assert.equal(test2.testNumber, 2, "Second test should have testNumber 2");
@@ -474,7 +474,7 @@ suite("[Both] Singleton Pattern", function() {
             newInstance.startTest(['new-counter-test', 'test1']);
             newInstance.stopTest();
 
-            const newTest = newInstance.getTestMetrics(['new-counter-test', 'test1']);
+            const newTest = newInstance.getTest(['new-counter-test', 'test1']);
             assert.equal(newTest.testNumber, 1, "Test in new instance should start with testNumber 1");
             assert.equal(newTest.suiteTestNumber, 1, "Test in new instance should start with suiteTestNumber 1");
         });
@@ -623,7 +623,7 @@ suite("[Both] Singleton Pattern", function() {
             instance1.startTest(['memory-test', 'test1']);
             instance1.stopTest();
 
-            const testData1 = instance1.getTestMetrics(['memory-test', 'test1']);
+            const testData1 = instance1.getTest(['memory-test', 'test1']);
             const firstTestNumber = testData1.testNumber;
 
             // Reset
@@ -638,7 +638,7 @@ suite("[Both] Singleton Pattern", function() {
             instance2.startTest(['memory-test', 'test1']);
             instance2.stopTest();
 
-            const testData2 = instance2.getTestMetrics(['memory-test', 'test1']);
+            const testData2 = instance2.getTest(['memory-test', 'test1']);
 
             // Should be different test objects
             // Note: testNumber resets with new instance since testCounter is instance-level
@@ -750,7 +750,7 @@ suite("[Both] Singleton Pattern", function() {
             assert.equal(typeof instance.stopTest, 'function', "stopTest should be a function");
             assert.equal(typeof instance.testExists, 'function', "testExists should be a function");
             assert.equal(typeof instance.suiteExists, 'function', "suiteExists should be a function");
-            assert.equal(typeof instance.getTestMetrics, 'function', "getTestMetrics should be a function");
+            assert.equal(typeof instance.getTest, 'function', "getTest should be a function");
             assert.equal(typeof instance.getSuiteMetrics, 'function', "getSuiteMetrics should be a function");
             assert.equal(typeof instance.getSuiteMetricsRecursive, 'function', "getSuiteMetricsRecursive should be a function");
             assert.equal(typeof instance.printAllSuiteMetrics, 'function', "printAllSuiteMetrics should be a function");

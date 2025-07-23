@@ -154,7 +154,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
             metrics.stopTest();
 
-            const testMetrics = metrics.getTestMetrics(["SingleTestSuite", "OnlyTest"]);
+            const testMetrics = metrics.getTest(["SingleTestSuite", "OnlyTest"]);
             const suiteData = metrics.getSuiteMetrics(["SingleTestSuite"]);
 
             assert.strictEqual(suiteData.testMetrics.numTests, 1, 'Single test suite should have one test');
@@ -177,9 +177,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             while (Date.now() - mediumStart < 5) { /* busy wait medium */ }
             metrics.stopTest();
 
-            const fastTest = metrics.getTestMetrics(["MultiTestSuite", "FastTest"]);
-            const slowTest = metrics.getTestMetrics(["MultiTestSuite", "SlowTest"]);
-            const mediumTest = metrics.getTestMetrics(["MultiTestSuite", "MediumTest"]);
+            const fastTest = metrics.getTest(["MultiTestSuite", "FastTest"]);
+            const slowTest = metrics.getTest(["MultiTestSuite", "SlowTest"]);
+            const mediumTest = metrics.getTest(["MultiTestSuite", "MediumTest"]);
             const suiteData = metrics.getSuiteMetrics(["MultiTestSuite"]);
 
             const expectedTotal = fastTest.duration + slowTest.duration + mediumTest.duration;
@@ -507,8 +507,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["TimingConsistency"]);
-            const test1 = metrics.getTestMetrics(["TimingConsistency", "Test1"]);
-            const test2 = metrics.getTestMetrics(["TimingConsistency", "Test2"]);
+            const test1 = metrics.getTest(["TimingConsistency", "Test1"]);
+            const test2 = metrics.getTest(["TimingConsistency", "Test2"]);
 
             // Verify timing consistency
             assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');

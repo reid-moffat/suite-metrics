@@ -44,14 +44,14 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["NonExistent", "test2"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.getTestMetrics(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
+            assert.throws(() => metrics.getTest(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
         });
 
         test("Test in non-existent suite", function() {
             metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.getTestMetrics(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
+            assert.throws(() => metrics.getTest(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
         });
     });
 
@@ -175,9 +175,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["Suite1", "Test3"]);
             metrics.stopTest();
 
-            const test1 = metrics.getTestMetrics(["Suite1", "Test1"]);
-            const test2 = metrics.getTestMetrics(["Suite2", "Test2"]);
-            const test3 = metrics.getTestMetrics(["Suite1", "Test3"]);
+            const test1 = metrics.getTest(["Suite1", "Test1"]);
+            const test2 = metrics.getTest(["Suite2", "Test2"]);
+            const test3 = metrics.getTest(["Suite1", "Test3"]);
 
             assert.strictEqual(test1.testNumber, 1, 'First test should have global test number 1');
             assert.strictEqual(test2.testNumber, 2, 'Second test should have global test number 2');
@@ -195,7 +195,7 @@ suite("[SuiteMetrics] Basic tests", function() {
             while (Date.now() - start < 1) { /* busy wait */ }
             metrics.stopTest();
 
-            const testMetrics = metrics.getTestMetrics(["TestSuite", "DetailedTest"]);
+            const testMetrics = metrics.getTest(["TestSuite", "DetailedTest"]);
 
             assert.strictEqual(testMetrics.name, "DetailedTest", 'Test should have correct name');
             assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
@@ -222,8 +222,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["TimingSuite"]);
-            const fastTest = metrics.getTestMetrics(["TimingSuite", "FastTest"]);
-            const slowTest = metrics.getTestMetrics(["TimingSuite", "SlowTest"]);
+            const fastTest = metrics.getTest(["TimingSuite", "FastTest"]);
+            const slowTest = metrics.getTest(["TimingSuite", "SlowTest"]);
 
             assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
             assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');
@@ -360,8 +360,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["ImmutableSuite", "Test1"]);
             metrics.stopTest();
 
-            const testMetrics1 = metrics.getTestMetrics(["ImmutableSuite", "Test1"]);
-            const testMetrics2 = metrics.getTestMetrics(["ImmutableSuite", "Test1"]);
+            const testMetrics1 = metrics.getTest(["ImmutableSuite", "Test1"]);
+            const testMetrics2 = metrics.getTest(["ImmutableSuite", "Test1"]);
 
             assert.deepEqual(testMetrics1, testMetrics2, 'Multiple calls should return equal objects');
             assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');
