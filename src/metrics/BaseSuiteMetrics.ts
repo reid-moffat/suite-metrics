@@ -213,7 +213,7 @@ abstract class BaseSuiteMetrics {
             throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} does not exist`);
         }
 
-        return { ...test }; // Return a copy to prevent external modification
+        return this.deepCopyTest(test);
     }
 
     /**
