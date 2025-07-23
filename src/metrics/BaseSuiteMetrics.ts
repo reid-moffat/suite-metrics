@@ -29,7 +29,7 @@ abstract class BaseSuiteMetrics {
 
 
     /**
-     * Validates a test or suite path, throwing an error is invalid
+     * Validates a test or suite path, throwing an error if invalid
      *
      * @param path Path to the specified suite or test
      * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
@@ -385,7 +385,7 @@ abstract class BaseSuiteMetrics {
         suite.tests.set(testName, test);
         this.updateSubTestCounters(testPath, testDuration);
 
-        // Add to flat array & invalidate cache
+        // Add to & invalidate cache
         this.testPerformance.addTest(test);
     }
 
