@@ -27,15 +27,15 @@ class SortedTestCache {
     }
 
     /**
-     * Gets the n slowest tests across all suites, sorted by duration descending
+     * Gets the k slowest tests across all suites, sorted by duration descending
      */
-    public getNSlowestTests(n: number): Test[] {
-        if (!Number.isInteger(n) || n <= 0) {
+    public getKSlowestTests(k: number): Test[] {
+        if (!Number.isInteger(k) || k <= 0) {
             throw new Error('Number of tests (n) must be a positive integer');
         }
 
         this.ensureSortedCache();
-        return this.cachedSortedTests!.slice(0, Math.min(n, this.cachedSortedTests!.length));
+        return this.cachedSortedTests!.slice(0, Math.min(k, this.cachedSortedTests!.length));
     }
 
     /**
@@ -51,15 +51,15 @@ class SortedTestCache {
     }
 
     /**
-     * Gets the n fastest tests across all suites, sorted by duration ascending
+     * Gets the k fastest tests across all suites, sorted by duration ascending
      */
-    public getNFastestTests(n: number): Test[] {
-        if (!Number.isInteger(n) || n <= 0) {
-            throw new Error('Number of tests (n) must be a positive integer');
+    public getKFastestTests(k: number): Test[] {
+        if (!Number.isInteger(k) || k <= 0) {
+            throw new Error('Number of tests (k) must be a positive integer');
         }
 
         this.ensureSortedCache();
-        const startIndex: number = Math.max(0, this.cachedSortedTests!.length - n);
+        const startIndex: number = Math.max(0, this.cachedSortedTests!.length - k);
         return this.cachedSortedTests!.slice(startIndex).reverse();
     }
 

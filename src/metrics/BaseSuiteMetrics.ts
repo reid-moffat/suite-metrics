@@ -146,17 +146,17 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets the n slowest tests across all suites, sorted by duration descending
+     * Gets the k slowest tests across all suites, sorted by duration descending
      *
-     * Note: If n is greater than the total amount of tests (getTotalTestCount()), this method will still run
+     * Note: If k is greater than the total amount of tests (getTotalTestCount()), this method will still run
      * (no error) but just return a smaller array
      *
-     * @param n Number of slowest tests to return. Must be a positive integer
-     * @returns Array of the (<=) n slowest tests, sorted by duration descending
-     * @throws Error If n is not a positive integer
+     * @param k Number of slowest tests to return. Must be a positive integer
+     * @returns Array of the (<=) k slowest tests, sorted by duration descending
+     * @throws Error If k is not a positive integer
      */
-    public getNSlowestTests(n: number): Test[] {
-        return this.testPerformance.getNSlowestTests(n);
+    public getKSlowestTests(k: number): Test[] {
+        return this.testPerformance.getKSlowestTests(k);
     }
 
     /**
@@ -170,17 +170,17 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets the n fastest tests across all suites, sorted by duration ascending
+     * Gets the k fastest tests across all suites, sorted by duration ascending
      *
-     * Note: If n is greater than the total amount of tests (getTotalTestCount()), this method will still run
+     * Note: If k is greater than the total amount of tests (getTotalTestCount()), this method will still run
      * (no error) but just return a smaller array
      *
-     * @param n Number of fastest tests to return. Must be a positive integer
-     * @returns Array of the (<=) n fastest tests, sorted by duration ascending
-     * @throws Error If n is not a positive integer
+     * @param k Number of fastest tests to return. Must be a positive integer
+     * @returns Array of the (<=) k fastest tests, sorted by duration ascending
+     * @throws Error If k is not a positive integer
      */
-    public getNFastestTests(n: number): Test[] {
-        return this.testPerformance.getNFastestTests(n);
+    public getKFastestTests(k: number): Test[] {
+        return this.testPerformance.getKFastestTests(k);
     }
 
     /**
