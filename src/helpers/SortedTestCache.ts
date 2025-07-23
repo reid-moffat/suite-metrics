@@ -1,29 +1,26 @@
 import { Test } from "../types/structures.ts";
 
 /**
- * Manages a lazy-loaded sorted cache of tests for efficient retrieval of fastest/slowest tests
+ * Manages a lazy sorted cache of tests for efficient retrieval of fastest/slowest tests
  */
 class SortedTestCache {
 
-    // All tests in their insertion order
-    private allTests: Test[] = [];
+    // All tests for a given metrics
+    private readonly cache: Test[] = [];
 
-    // Cached sorted tests (slowest first)
-    private cachedSortedTests: Test[] | null = null;
-
-    // Whether the sorted cache is valid
+    // Whether the cache is sorted
     private sortedCacheValid: boolean = false;
 
     /**
      * Gets the slowest test across all suites
      */
     public getSlowestTest(): Test {
-        if (this.allTests.length === 0) {
+        if (this.cache.length === 0) {
             throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
         this.ensureSortedCache();
-        return this.cachedSortedTests![0];
+        return this.cache[0];
     }
 
     /**
@@ -33,13 +30,13 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.allTests.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.allTests.length})`);
+        if (this.cache.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.length})`);
         }
 
         this.ensureSortedCache();
-        const endIndex: number = Math.min(k, this.cachedSortedTests!.length);
-        return this.cachedSortedTests!.slice(0, endIndex);
+        const endIndex: number = Math.min(k, this.cache.length);
+        return this.cache.slice(0, endIndex);
     }
 
     /**
@@ -47,19 +44,19 @@ class SortedTestCache {
      */
     public getAllTestsSlowestFirst(): Test[] {
         this.ensureSortedCache();
-        return [...this.cachedSortedTests!];
+        return [...this.cache];
     }
 
     /**
      * Gets the fastest test across all suites
      */
     public getFastestTest(): Test {
-        if (this.allTests.length === 0) {
+        if (this.cache.length === 0) {
             throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
         this.ensureSortedCache();
-        return this.cachedSortedTests![this.cachedSortedTests!.length - 1];
+        return this.cache[this.cache.length - 1];
     }
 
     /**
@@ -69,13 +66,13 @@ class SortedTestCache {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error('Desired number of tests (k) must be a positive integer, ${k} is invalid');
         }
-        if (this.allTests.length < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.allTests.length})`);
+        if (this.cache.length < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.length})`);
         }
 
         this.ensureSortedCache();
-        const startIndex: number = Math.max(0, this.cachedSortedTests!.length - k);
-        return this.cachedSortedTests!.slice(startIndex).reverse();
+        const startIndex: number = Math.max(0, this.cache.length - k);
+        return this.cache.slice(startIndex).reverse();
     }
 
     /**
@@ -83,7 +80,7 @@ class SortedTestCache {
      */
     public getAllTestsFastestFirst(): Test[] {
         this.ensureSortedCache();
-        return [...this.cachedSortedTests!].reverse();
+        return [...this.cache].reverse();
     }
 
     /**
@@ -92,7 +89,7 @@ class SortedTestCache {
      * @param test The test to add
      */
     public addTest(test: Test): void {
-        this.allTests.push(test);
+        this.cache.push(test);
         this.sortedCacheValid = false;
     }
 
@@ -102,7 +99,7 @@ class SortedTestCache {
     private ensureSortedCache(): void {
         if (!this.sortedCacheValid) {
             // Sort by duration in descending order (slowest goes first)
-            this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.cache.sort((a: Test, b: Test): number => b.duration - a.duration);
             this.sortedCacheValid = true;
         }
     }
