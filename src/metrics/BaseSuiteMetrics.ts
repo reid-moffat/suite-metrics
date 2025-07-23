@@ -406,6 +406,30 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Rebuilds the sorted cache
+     */
+    private rebuildSortedCache(): void {
+        // Sort by duration in descending order (slowest goes first)
+        this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test) => b.duration - a.duration);
+        this.sortedCacheValid = true;
+        this.newTestsSinceLastSort = 0;
+        this.lastSortTimestamp = Date.now();
+    }
+
+    /**
+     * Ensures sorted cache is built and valid
+     */
+    private ensureSortedCache(): void {
+        const now: number = Date.now();
+        const timeThresholdExceeded: boolean = (now - this.lastSortTimestamp) > this.TIME_THRESHOLD_MS;
+        const batchThresholdExceeded: boolean = this.newTestsSinceLastSort >= this.BATCH_SIZE_THRESHOLD;
+
+        if (!this.sortedCacheValid || timeThresholdExceeded || batchThresholdExceeded) {
+            this.rebuildSortedCache();
+        }
+    }
+
+    /**
      * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
      *
      * @param testPath Path of the test to update parent suites for
