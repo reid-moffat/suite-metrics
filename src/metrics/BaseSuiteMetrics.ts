@@ -158,6 +158,15 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Gets all tests sorted by duration descending (slowest first)
+     *
+     * @returns Array of all tests sorted by duration in descending order
+     */
+    public getAllTestsSlowestFirst(): Test[] {
+        return this.testPerformance.getAllTestsSlowestFirst();
+    }
+
+    /**
      * Gets the fastest test across all suites
      *
      * @returns The test with the shortest duration
@@ -177,6 +186,15 @@ abstract class BaseSuiteMetrics {
      */
     public getKFastestTests(k: number): Test[] {
         return this.testPerformance.getKFastestTests(k);
+    }
+
+    /**
+     * Gets all tests sorted by duration ascending (fastest first)
+     *
+     * @returns Array of all tests sorted by duration in ascending order
+     */
+    public getAllTestsFastestFirst(): Test[] {
+        return this.testPerformance.getAllTestsFastestFirst();
     }
 
     /**

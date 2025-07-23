@@ -43,6 +43,14 @@ class SortedTestCache {
     }
 
     /**
+     * Gets all tests sorted by duration descending (slowest first)
+     */
+    public getAllTestsSlowestFirst(): Test[] {
+        this.ensureSortedCache();
+        return [...this.cachedSortedTests!];
+    }
+
+    /**
      * Gets the fastest test across all suites
      */
     public getFastestTest(): Test {
@@ -68,6 +76,14 @@ class SortedTestCache {
         this.ensureSortedCache();
         const startIndex: number = Math.max(0, this.cachedSortedTests!.length - k);
         return this.cachedSortedTests!.slice(startIndex).reverse();
+    }
+
+    /**
+     * Gets all tests sorted by duration ascending (fastest first)
+     */
+    public getAllTestsFastestFirst(): Test[] {
+        this.ensureSortedCache();
+        return [...this.cachedSortedTests!].reverse();
     }
 
     /**
