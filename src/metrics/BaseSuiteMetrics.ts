@@ -1,5 +1,6 @@
 import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts";
 import { Test, Suite } from "../types/structures.ts";
+import SortedTestCache from "../helpers/SortedTestCache.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -23,10 +24,8 @@ abstract class BaseSuiteMetrics {
     // Total number of completed tests in this instance
     protected testCounter: number = 0;
 
-    // Lazy sorted duration array
-    private allTests: Test[] = [];
-    private cachedSortedTests: Test[] | null = null;
-    private sortedCacheValid: boolean = false;
+    // Efficiently manages fastest and slowest tests
+    private readonly testPerformance: SortedTestCache = new SortedTestCache();
 
 
     /**
@@ -143,12 +142,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
-        if (this.getTotalTestCount() === 0) {
-            throw new Error(`Error: There are no tests in this metrics instance, could not get the slowest test`);
-        }
-
-        this.ensureSortedCache();
-        return this.cachedSortedTests![0];
+        return this.testPerformance.getSlowestTest();
     }
 
     /**
@@ -162,12 +156,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error If n is not a positive integer
      */
     public getNSlowestTests(n: number): Test[] {
-        if (!Number.isInteger(n) || n <= 0) {
-            throw new Error('Number of tests (n) must be a positive integer');
-        }
-
-        this.ensureSortedCache();
-        return this.cachedSortedTests!.slice(0, Math.min(n, this.cachedSortedTests!.length));
+        return this.testPerformance.getNSlowestTests(n);
     }
 
     /**
@@ -177,12 +166,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
-        if (this.getTotalTestCount() === 0) {
-            throw new Error(`Error: There are no tests in this metrics instance, could not get the slowest test`);
-        }
-
-        this.ensureSortedCache();
-        return this.cachedSortedTests![this.cachedSortedTests!.length - 1];
+        return this.testPerformance.getFastestTest();
     }
 
     /**
@@ -196,13 +180,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error If n is not a positive integer
      */
     public getNFastestTests(n: number): Test[] {
-        if (!Number.isInteger(n) || n <= 0) {
-            throw new Error('Number of tests (n) must be a positive integer');
-        }
-
-        this.ensureSortedCache();
-        const startIndex: number = Math.max(0, this.cachedSortedTests!.length - n);
-        return this.cachedSortedTests!.slice(startIndex).reverse();
+        return this.testPerformance.getNFastestTests(n);
     }
 
     /**
@@ -393,20 +371,8 @@ abstract class BaseSuiteMetrics {
         suite.tests.set(testName, test);
         this.updateSubTestCounters(testPath, testDuration);
 
-        // Add to flat array and invalidate cache
-        this.allTests.push(test);
-        this.sortedCacheValid = false;
-    }
-
-    /**
-     * Rebuilds the sorted cache if invalid
-     */
-    private ensureSortedCache(): void {
-        if (!this.sortedCacheValid) {
-            // Sort by duration in descending order (slowest goes first)
-            this.cachedSortedTests = [...this.allTests].sort((a: Test, b: Test) => b.duration - a.duration);
-            this.sortedCacheValid = true;
-        }
+        // Add to flat array & invalidate cache
+        this.testPerformance.addTest(test);
     }
 
     /**
