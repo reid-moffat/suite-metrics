@@ -142,7 +142,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
-        return this.testPerformance.getSlowestTest();
+        return this.deepCopyTest(this.testPerformance.getSlowestTest());
     }
 
     /**
@@ -154,7 +154,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if k is greater than the total number of tests (getTotalTestCount())
      */
     public getKSlowestTests(k: number): Test[] {
-        return this.testPerformance.getKSlowestTests(k);
+        return this.deepCopyTests(this.testPerformance.getKSlowestTests(k));
     }
 
     /**
@@ -163,7 +163,7 @@ abstract class BaseSuiteMetrics {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        return this.testPerformance.getAllTestsSlowestFirst();
+        return this.deepCopyTests(this.testPerformance.getAllTestsSlowestFirst());
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
-        return this.testPerformance.getFastestTest();
+        return this.deepCopyTest(this.testPerformance.getFastestTest());
     }
 
     /**
@@ -185,7 +185,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if k is greater than the total number of tests (getTotalTestCount())
      */
     public getKFastestTests(k: number): Test[] {
-        return this.testPerformance.getKFastestTests(k);
+        return this.deepCopyTests(this.testPerformance.getKFastestTests(k));
     }
 
     /**
@@ -194,7 +194,7 @@ abstract class BaseSuiteMetrics {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        return this.testPerformance.getAllTestsFastestFirst();
+        return this.deepCopyTests(this.testPerformance.getAllTestsFastestFirst());
     }
 
     /**
@@ -387,6 +387,28 @@ abstract class BaseSuiteMetrics {
 
         // Add to flat array & invalidate cache
         this.testPerformance.addTest(test);
+    }
+
+    /**
+     * Creates a deep copy of a test object to prevent external modifications
+     */
+    private deepCopyTest(test: Test): Test {
+        return {
+            ...test,
+            path: [...test.path] // Deep copy the path array
+        };
+    }
+
+    /**
+     * Creates a deep copy of an array of test objects to prevent external modifications
+     */
+    private deepCopyTests(tests: Test[]): Test[] {
+        return tests.map((test: Test): Test => (
+            {
+                ...test,
+                path: [...test.path] // Deep copy the path array
+            }
+        ));
     }
 
     /**
