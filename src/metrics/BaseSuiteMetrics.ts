@@ -32,7 +32,6 @@ abstract class BaseSuiteMetrics {
     private newTestsSinceLastSort: number = 0;
     private lastSortTimestamp: number = Date.now();
     private readonly BATCH_SIZE_THRESHOLD: number = 100; // New tests required before forced rebuild
-    private readonly TIME_THRESHOLD_MS: number = 5 * 60 * 1000; // Time between forced rebuild
 
 
     /**
@@ -428,10 +427,9 @@ abstract class BaseSuiteMetrics {
      */
     private ensureSortedCache(): void {
         const now: number = Date.now();
-        const timeThresholdExceeded: boolean = (now - this.lastSortTimestamp) > this.TIME_THRESHOLD_MS;
         const batchThresholdExceeded: boolean = this.newTestsSinceLastSort >= this.BATCH_SIZE_THRESHOLD;
 
-        if (!this.sortedCacheValid || timeThresholdExceeded || batchThresholdExceeded) {
+        if (!this.sortedCacheValid || batchThresholdExceeded) {
             this.rebuildSortedCache();
         }
     }
