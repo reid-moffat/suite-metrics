@@ -426,7 +426,6 @@ abstract class BaseSuiteMetrics {
      * Ensures sorted cache is built and valid
      */
     private ensureSortedCache(): void {
-        const now: number = Date.now();
         const batchThresholdExceeded: boolean = this.newTestsSinceLastSort >= this.BATCH_SIZE_THRESHOLD;
 
         if (!this.sortedCacheValid || batchThresholdExceeded) {
