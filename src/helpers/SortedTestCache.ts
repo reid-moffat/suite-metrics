@@ -64,7 +64,7 @@ class SortedTestCache {
      */
     public getKFastestTests(k: number): Test[] {
         if (!Number.isInteger(k) || k <= 0) {
-            throw new Error('Desired number of tests (k) must be a positive integer, ${k} is invalid');
+            throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
         if (this.cache.length < k) {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.length})`);
