@@ -121,22 +121,21 @@ class Statistics {
             throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
         }
 
-        // Calculate mean
-        const durations: number[] = this.suites.getAllTestsInOrder().map((test: Test): number => test.duration);
-        const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length; // TODO: avg?
-
         // Calculate variance
-        const sumSquaredDifferences: number = durations.reduce((sum: number, duration: number): number => {
-            const difference: number = duration - mean;
+        const allTests: Test[] = this.suites.getAllTestsInOrder();
+        const mean: number = this.suites.getAverageTestDuration();
+
+        const sumSquaredDifferences: number = allTests.reduce((sum: number, test: Test): number => {
+            const difference: number = test.duration - mean;
             return sum + (difference * difference);
         }, 0);
 
         // Update population std dev
-        const populationVariance: number = sumSquaredDifferences / durations.length;
+        const populationVariance: number = sumSquaredDifferences / allTests.length;
         this.stdDevPopulation = Math.sqrt(populationVariance);
 
         // Update sample std dev
-        const sampleVariance: number = sumSquaredDifferences / durations.length - 1;
+        const sampleVariance: number = sumSquaredDifferences / allTests.length - 1;
         this.stdDevSample = Math.sqrt(sampleVariance);
     }
 }
