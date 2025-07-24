@@ -1,4 +1,7 @@
 import Suites from "../helpers/Suites.ts";
+import { Suite, Test } from "../types/structures.ts";
+import { RecursiveSuiteData, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 
 /**
  * Methods for calculating overall test metrics
@@ -10,6 +13,153 @@ class Metrics {
 
     constructor(suites: Suites) {
         this.suites = suites;
+    }
+
+    /**
+     * Gets metrics for a specific suite
+     *
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
+     * @returns An object with suite's name, parent/sub-suites, and test statistics
+     */
+    public getSuiteMetrics(path: string[]): SuiteData {
+        BaseSuiteMetrics.validatePath(path, false);
+        const suite: Suite = this.suites.navigateToSuite(path);
+        const testMetrics: SuiteTestMetrics = this.calculateDirectTestMetrics(suite);
+
+        return {
+            name: suite.name,
+            parentSuites: path.slice(0, -1),
+            subSuites: Array.from(suite.subSuites.keys()),
+            testMetrics
+        };
+    }
+
+    /**
+     * Gets metrics for a given suite and its sub-suites
+     *
+     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
+     * @returns An object with suite metadata, and metrics for direct & subtests
+     */
+    public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
+        BaseSuiteMetrics.validatePath(path, false);
+        const suite: Suite = this.suites.navigateToSuite(path);
+
+        // Direct metrics: Test and duration data for just the tests directly in this suite
+        const directMetrics: SuiteTestMetrics = this.calculateDirectTestMetrics(suite);
+
+        // Total metrics: Test and duration data for all tests in this suite and all sub-suites
+        const totalTests: number = suite.aggregateData.numTests;
+        const totalTime: number = suite.aggregateData.totalTestTime;
+        const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
+        const totalMetrics: SuiteTestMetrics = {
+            numTests: totalTests,
+            totalTime: totalTime,
+            averageTime: averageTotalTime
+        };
+
+        // Sub metrics: Test and duration data for all tests in all sub-suites (but not this suite directly)
+        const subTests: number = totalTests - directMetrics.numTests;
+        const subTime: number = totalTime - directMetrics.totalTime;
+        const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
+        const subMetrics: SuiteTestMetrics = {
+            numTests: subTests,
+            totalTime: subTime,
+            averageTime: averageSubTime
+        };
+
+        return {
+            name: suite.name,
+            parentSuites: path.slice(0, -1),
+            subSuites: Array.from(suite.subSuites.keys()),
+
+            directTestMetrics: directMetrics,
+            subTestMetrics: subMetrics,
+            totalTestMetrics: totalMetrics
+        };
+    }
+
+    /**
+     * Returns a formatted string with all suite's data regarding tests
+     *
+     * @param topLevelSuite Include a top-level suite with all suite data summed up at the top (default: true)
+     * @returns Formatted string (warning: may be very long for large contexts)
+     */
+    public printAllSuiteMetrics(topLevelSuite: boolean = true): string {
+        const lines: string[] = [];
+
+        if (topLevelSuite) {
+            this.formatSuiteForPrint(this.suites.topLevelSuite, lines, 0);
+        } else {
+            for (const suite of this.suites.allSuites.values()) {
+                this.formatSuiteForPrint(suite, lines, 0);
+            }
+        }
+
+        return lines.join('\n');
+    }
+
+
+    /**
+     * Calculates metrics for all tests directly in a suite
+     *
+     * @param suite Suite object to calculate metrics for
+     */
+    private calculateDirectTestMetrics(suite: Suite): SuiteTestMetrics {
+        const numTests: number = suite.tests.size;
+
+        if (numTests === 0) {
+            return { numTests: 0, totalTime: 0, averageTime: 0 };
+        }
+
+        const totalTime: number = Array.from(suite.tests.values())
+            .reduce((sum: number, test: Test): number => sum + test.duration, 0);
+
+        return {
+            numTests,
+            totalTime,
+            averageTime: totalTime / numTests
+        };
+    }
+
+    /**
+     * Formats suite information for printing
+     *
+     * @param suite Suite object to get information for
+     * @param lines Current array of lines (pass [] on initial call)
+     * @param indentLevel Number of indents for each level of information separation
+     */
+    private formatSuiteForPrint(suite: Suite, lines: string[], indentLevel: number): void {
+        const indent: string = ' '.repeat(indentLevel);
+        const directTestCount: number = suite.tests.size;
+        const directTestDuration: number = Array.from(suite.tests.values())
+            .reduce((sum: number, test: Test): number => sum + test.duration, 0);
+
+        const directDuration: number = directTestDuration / 1000;
+        const subDuration: number = suite.aggregateData.totalTestTime / 1000;
+
+        lines.push(`${indent}Suite: ${suite.name}`);
+        lines.push(`${indent}  Summary:`);
+        lines.push(`${indent}    Direct tests:`);
+        lines.push(`${indent}    - Total: ${directTestCount}`);
+        lines.push(`${indent}    - Total duration: ${directDuration.toFixed(3)} ms`);
+        lines.push(`${indent}    Sub-suites (recursive):`);
+        lines.push(`${indent}    - Total tests: ${suite.aggregateData.numTests - directTestCount}`);
+        lines.push(`${indent}    - Total duration: ${(subDuration - directDuration).toFixed(3)} ms`);
+
+        if (suite.tests && suite.tests.size > 0) {
+            lines.push(`\n${indent}  Tests:`);
+            let testNumber: number = 1;
+            for (const test of suite.tests.values()) {
+                lines.push(`${indent}    ${testNumber++}) '${test.name}': ${(test.duration / 1000).toFixed(2)} ms`);
+            }
+        }
+
+        if (suite.subSuites && suite.subSuites.size > 0) {
+            lines.push(`\n${indent}  Sub-Suites:`);
+            for (const subSuite of suite.subSuites.values()) {
+                this.formatSuiteForPrint(subSuite, lines, indentLevel + 4);
+            }
+        }
     }
 }
 
