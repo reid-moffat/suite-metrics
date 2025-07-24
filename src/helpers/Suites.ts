@@ -7,10 +7,10 @@ import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 class Suites {
 
     // All suite and test data
-    public readonly allSuites: Map<string, Suite> = new Map<string, Suite>();
+    private readonly allSuites: Map<string, Suite> = new Map<string, Suite>();
 
     // Top-level suite makes top-level metrics and functions easier to handle
-    public readonly topLevelSuite: Suite = {
+    private readonly topLevelSuite: Suite = {
         name: "<Top-Level suite>",
         tests: new Map<string, Test>(),
         subSuites: this.allSuites,
@@ -23,6 +23,20 @@ class Suites {
     // All tests in order of insertion
     private readonly testsInOrder: Test[] = [];
 
+
+    /**
+     * Gets a reference to all suites in this metrics instance (excluding the top-level suite)
+     */
+    public getAllSuites(): Map<string, Suite> {
+        return this.allSuites;
+    }
+
+    /**
+     * Gets a reference to the top-level suite
+     */
+    public getTopLevelSuite(): Suite {
+        return this.topLevelSuite;
+    }
 
     /**
      * Gets the total number of tests in this metrics instance

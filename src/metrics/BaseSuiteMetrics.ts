@@ -87,7 +87,7 @@ abstract class BaseSuiteMetrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        return Math.round(this.suites.topLevelSuite.aggregateData.totalTestTime / this.getTotalTestCount());
+        return Math.round(this.suites.getTopLevelSuite().aggregateData.totalTestTime / this.getTotalTestCount());
     }
 
     /**
@@ -108,7 +108,7 @@ abstract class BaseSuiteMetrics {
      */
     public toJSON(indent: number = 4): string {
         const serializableSuites: Record<string, SerializableSuite> = Object.fromEntries(
-            Array.from(this.suites.allSuites.entries())
+            Array.from(this.suites.getAllSuites().entries())
                 .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, this.suiteToSerializable(suite)])
         );
 

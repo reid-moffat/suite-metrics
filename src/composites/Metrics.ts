@@ -88,9 +88,9 @@ class Metrics {
         const lines: string[] = [];
 
         if (topLevelSuite) {
-            this.formatSuiteForPrint(this.suites.topLevelSuite, lines, 0);
+            this.formatSuiteForPrint(this.suites.getTopLevelSuite(), lines, 0);
         } else {
-            for (const suite of this.suites.allSuites.values()) {
+            for (const suite of this.suites.getAllSuites().values()) {
                 this.formatSuiteForPrint(suite, lines, 0);
             }
         }
