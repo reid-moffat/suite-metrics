@@ -1,5 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
+import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 
 /**
  * Statistical methods surrounding Tests and Suites
@@ -46,6 +47,48 @@ class Statistics {
         const variance: number = sumSquaredDifferences / divisor;
 
         return Math.sqrt(variance);
+    }
+
+    /**
+     * Calculates the Z-score (standard score) for a given test
+     *
+     * Key Interpretations:
+     * - Z = 0: Test duration equals the mean
+     * - Z = +1: Test is 1 standard deviation slower than average (84th percentile)
+     * - Z = +2: Test is 2 standard deviations slower (97.7th percentile) - Notably slow
+     * - Z = +3: Test is 3 standard deviations slower (99.9th percentile) - Extremely slow
+     * - Z = -1: Test is 1 standard deviation faster than average (16th percentile)
+     * - Z = -2: Test is 2 standard deviations faster (2.3rd percentile) - Notably fast
+     * - Z = -3: Test is 3 standard deviations faster (0.13th percentile) - Extremely fast
+     *
+     * @param test Test object to get (can use query.getTest(path) to get the test object from its path)
+     * @returns Z-score value:
+     *          - Positive values: test is slower than average
+     *          - Negative values: test is faster than average
+     *          - 0: test duration equals the mean
+     *          - Typical range: -3 to +3 (99.7% of data falls within this range)
+     * @throws Error if test doesn't exist, or insufficient data for calculation (<2 total tests, or all tests have
+     * the same duration)
+     */
+    public getTestZScore(test: Test): number {
+
+        const totalTests: number = this.suites.getNumTests();
+        if (totalTests < 2) {
+            throw new Error('Need at least 2 tests to calculate Z-score');
+        }
+
+        // Get statistical measures
+        const mean: number = this.suites.getAverageTestDuration();
+        const stdDev: number = this.getStandardDeviation();
+
+        if (stdDev === 0) {
+            throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
+        }
+
+        // Calculate Z-score: (X - μ) / σ
+        const zScore: number = (test.duration - mean) / stdDev;
+
+        return Math.round(zScore * 1000) / 1000;
     }
 }
 
