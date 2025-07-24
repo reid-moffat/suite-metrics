@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
+import Mutex from "../helpers/Mutex.ts";
 
 // Path segments joined with '::'
 type TestKey = string;
@@ -17,6 +18,10 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
+
+    // Mutexes for the lazy singleton and any instance
+    private static readonly instanceMutex: Mutex = new Mutex();
+    private readonly testMutex: Mutex = new Mutex();
 
 
     /**
