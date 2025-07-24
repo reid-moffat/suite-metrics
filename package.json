@@ -42,7 +42,7 @@
   "scripts": {
     "lint": "tsc",
     "build": "tsup src/index.ts --format cjs,esm --dts --minify --clean",
-    "test": "npm run build && cross-env TS_NODE_PROJECT='./tsconfig.json' nyc mocha",
+    "test": "npm run build && cross-env TS_NODE_PROJECT='./tsconfig.json' mocha",
     "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) npm run deploy (verify files look good)\"",
     "deploy": "git checkout main && git pull && npm run build && npm publish"
   },
@@ -67,7 +67,6 @@
     "cross-env": "^7.0.3",
     "generate-arrays": "^2.0.0",
     "mocha": "^10.7.0",
-    "nyc": "^17.0.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.2.4",
     "typescript": "^5.5.4"
