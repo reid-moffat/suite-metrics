@@ -443,7 +443,7 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Creates a deep copy of a test object to prevent external modifications
+     * Creates a deep copy of a Test object to prevent external modifications
      */
     private deepCopyTest(test: Test): Test {
         return {
@@ -453,18 +453,36 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Creates a deep copy of an array of test objects to prevent external modifications
+     * Creates a deep copy of an array of Test objects to prevent external modifications
      */
     private deepCopyTests(tests: Test[]): Test[] {
         return tests.map((test: Test): Test => this.deepCopyTest(test));
     }
 
     /**
-     * Creates a deep copy of a test object to prevent external modifications
+     * Creates a deep copy of a Suite object to prevent external modifications
      */
     private deepCopySuite(suite: Suite): Suite {
+        // Deep copy the tests Map
+        const copiedTests = new Map<string, Test>();
+        for (const [testName, test] of suite.tests) {
+            copiedTests.set(testName, this.deepCopyTest(test));
+        }
+
+        // Deep copy the subSuites Map (recursive)
+        const copiedSubSuites = new Map<string, Suite>();
+        for (const [suiteName, subSuite] of suite.subSuites) {
+            copiedSubSuites.set(suiteName, this.deepCopySuite(subSuite));
+        }
+
         return {
-            ...suite
+            name: suite.name,
+            tests: copiedTests,
+            subSuites: copiedSubSuites,
+            aggregateData: {
+                numTests: suite.aggregateData.numTests,
+                totalTestTime: suite.aggregateData.totalTestTime
+            }
         };
     }
 
