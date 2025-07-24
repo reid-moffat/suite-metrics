@@ -1,6 +1,5 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
-import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 
 /**
  * Statistical methods surrounding Tests and Suites
@@ -9,6 +8,13 @@ class Statistics {
 
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
+
+    // Store calculated standard deviation (population & sample) for efficiency
+    private stdDevPopulation: number = 0;
+    private stdDevSample: number = 0;
+
+    // Number of tests present when the stDev was calculated (used to verify if recalculation is required)
+    private stdDevTests: number = 0;
 
     constructor(suites: Suites) {
         this.suites = suites;
@@ -20,7 +26,7 @@ class Statistics {
      * @param usePopulation Set to true for population standard deviation (divide by N),
      *                      false for sample standard deviation (divide by N-1) (default: false)
      * @returns The standard deviation of test durations in microseconds
-     * @throws Error If there are no tests in this metrics, or only one for a sample standard deviation
+     * @throws Error If there is insufficient data (less than two total tests)
      */
     public getStandardDeviation(usePopulation: boolean = false): number {
         const totalTests: number = this.suites.getAllTestsInOrder().length;
@@ -89,6 +95,49 @@ class Statistics {
         const zScore: number = (test.duration - mean) / stdDev;
 
         return Math.round(zScore * 1000) / 1000;
+    }
+
+
+    /**
+     * Updates the stored stdDev value if required (tests added since last calculation)
+     *
+     * Must be called before any method that uses this.stdDev
+     */
+    private ensureValidCachedStdDev(): void {
+        const isCacheValid: boolean = this.stdDevTests !== this.suites.getNumTests();
+
+        if (!isCacheValid) {
+            this.updateCachedStdDev();
+        }
+    }
+
+    /**
+     * Updates the cached this.stdDev value to reflect new test additions
+     */
+    private updateCachedStdDev(): void {
+        const totalTests: number = this.suites.getNumTests();
+
+        if (totalTests < 2) {
+            throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
+        }
+
+        // Calculate mean
+        const durations: number[] = this.suites.getAllTestsInOrder().map((test: Test): number => test.duration);
+        const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length; // TODO: avg?
+
+        // Calculate variance
+        const sumSquaredDifferences: number = durations.reduce((sum: number, duration: number): number => {
+            const difference: number = duration - mean;
+            return sum + (difference * difference);
+        }, 0);
+
+        // Update population std dev
+        const populationVariance: number = sumSquaredDifferences / durations.length;
+        this.stdDevPopulation = Math.sqrt(populationVariance);
+
+        // Update sample std dev
+        const sampleVariance: number = sumSquaredDifferences / durations.length - 1;
+        this.stdDevSample = Math.sqrt(sampleVariance);
     }
 }
 
