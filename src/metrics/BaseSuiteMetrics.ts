@@ -545,13 +545,17 @@ abstract class BaseSuiteMetrics {
         const directTestDuration: number = Array.from(suite.tests.values())
             .reduce((sum: number, test: Test): number => sum + test.duration, 0);
 
+        const directDuration: number = directTestDuration / 1000;
+        const subDuration: number = suite.aggregateData.totalTestTime / 1000;
+
         lines.push(`${indent}Suite: ${suite.name}`);
         lines.push(`${indent}  Summary:`);
-        lines.push(`${indent}    - Total direct tests: ${directTestCount}`);
-        lines.push(`${indent}      Total duration: ${(directTestDuration / 1000).toFixed(3)} ms`);
-        lines.push(`${indent}    - Total direct Sub-Suites: ${suite.subSuites.size}`);
-        lines.push(`${indent}    - Total Sub-Suite tests: ${suite.aggregateData.numTests}`);
-        lines.push(`${indent}    - Total Sub-Suite time: ${(suite.aggregateData.totalTestTime / 1000).toFixed(3)} ms`);
+        lines.push(`${indent}    Direct tests:`);
+        lines.push(`${indent}    - Total: ${directTestCount}`);
+        lines.push(`${indent}    - Total duration: ${directDuration.toFixed(3)} ms`);
+        lines.push(`${indent}    Sub-suites (recursive):`);
+        lines.push(`${indent}    - Total tests: ${suite.aggregateData.numTests - directTestCount}`);
+        lines.push(`${indent}    - Total duration: ${(subDuration - directDuration).toFixed(3)} ms`);
 
         if (suite.tests && suite.tests.size > 0) {
             lines.push(`\n${indent}  Tests:`);
