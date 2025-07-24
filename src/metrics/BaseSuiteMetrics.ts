@@ -73,7 +73,7 @@ abstract class BaseSuiteMetrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.suites.testCounter;
+        return this.suites.getNumTests();
     }
 
     /**

@@ -20,9 +20,6 @@ class Suites {
         }
     };
 
-    // Total number of completed tests in this instance
-    public testCounter: number = 0;
-
     // All tests in order of insertion
     private readonly testsInOrder: Test[] = [];
 
@@ -51,7 +48,7 @@ class Suites {
             startTimestamp: startTime,
             endTimestamp: endTime,
             duration: testDuration,
-            testNumber: ++this.testCounter,
+            testNumber: this.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
         };
