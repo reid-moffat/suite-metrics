@@ -45,7 +45,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      */
     public startTest(path: string[]): void {
         // Validate path and ensure test isn't already completed
-        const testExists: boolean = this.testExists(path);
+        const testExists: boolean = this.queries.testExists(path);
         if (testExists) {
             throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
         }
