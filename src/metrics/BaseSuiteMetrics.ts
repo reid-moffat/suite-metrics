@@ -107,30 +107,24 @@ abstract class BaseSuiteMetrics {
      * @returns JSON string representing the structure and data of all suites in this metrics instance
      */
     public toJSON(indent: number = 4): string {
-        const serializableSuites: Record<string, SerializableSuite> = Object.fromEntries(
-            Array.from(this.suites.getAllSuites().entries())
-                .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, this.suiteToSerializable(suite)])
-        );
 
-        return JSON.stringify(serializableSuites, null, indent);
-    }
-
-
-    /**
-     * Converts a Suite object into a serializable object (maps can't be natively serialized)
-     */
-    private suiteToSerializable(suite: Suite): SerializableSuite {
-        return {
+        const suiteToSerializable = (suite: Suite) => ({
             name: suite.name,
             tests: Object.fromEntries(suite.tests),
             subSuites: Object.fromEntries(
-                Array.from(suite.subSuites.entries()).map(([key, subSuite]: [string, Suite]): [string, SerializableSuite] => [
-                    key,
-                    this.suiteToSerializable(subSuite)
-                ])
+                Array.from(suite.subSuites.entries()).map(([key, subSuite]: [string, Suite]): [string, SerializableSuite] =>
+                    [key, suiteToSerializable(subSuite)]
+                )
             ),
             aggregateData: suite.aggregateData
-        };
+        });
+
+        const serializableSuites: Record<string, SerializableSuite> = Object.fromEntries(
+            Array.from(this.suites.getAllSuites().entries())
+                .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, suiteToSerializable(suite)])
+        );
+
+        return JSON.stringify(serializableSuites, null, indent);
     }
 }
 
