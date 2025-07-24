@@ -35,7 +35,7 @@ class Statistics {
     }
 
     /**
-     * Calculates the Z-score (standard score) for a given test to 3 decimal places
+     * Calculates the exact Z-score for a given test
      *
      * Key Interpretations:
      * - Z = 0: Test duration equals the mean
@@ -69,9 +69,7 @@ class Statistics {
         }
 
         // Calculate Z-score: (X - μ) / σ
-        const zScore: number = (test.duration - mean) / stdDev;
-
-        return Math.round(zScore * 1000) / 1000;
+        return (test.duration - mean) / stdDev;
     }
 
     /**
