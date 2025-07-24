@@ -29,23 +29,6 @@ class SortedTestCache {
     }
 
     /**
-     * Gets all tests in the order they were completed
-     */
-    public getTestsInOrder(): Test[] {
-        return this.originalOrder;
-    }
-
-    /**
-     * Adds a test to the cache and invalidates the sorted cache
-     *
-     * @param test The test to add
-     */
-    public addTest(test: Test): void {
-        this.originalOrder.push(test);
-        this.sortedCacheValid = false;
-    }
-
-    /**
      * Rebuilds the sorted cache if invalid
      */
     public ensureSortedCache(): void {
