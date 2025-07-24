@@ -1,17 +1,22 @@
 import SortedTestCache from "../helpers/SortedTestCache.ts";
 import { Test } from "../types/structures.ts";
-import Utils from "../helpers/Utils.js";
+import Utils from "../helpers/Utils.ts";
+import Suites from "../helpers/Suites.ts";
 
 /**
  * Performance-related queries for finding slow and fast tests
  */
 class Performance {
 
+    // Ref to suites instance with all this metrics' data
+    private readonly suites: Suites;
+
     // Efficiently manages fastest and slowest tests
     private readonly cache: SortedTestCache;
 
-    public constructor(cache: SortedTestCache) {
-        this.cache = cache;
+    public constructor(suites: Suites) {
+        this.suites = suites;
+        this.cache = new SortedTestCache();
     }
 
     /**

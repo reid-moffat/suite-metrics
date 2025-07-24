@@ -1,14 +1,16 @@
 import { Test } from "../types/structures.ts";
+import Suites from "../helpers/Suites.js";
 
 /**
  * Statistical methods surrounding Tests and Suites
  */
 class Statistics {
 
-    private readonly allTests: Test[];
+    // Ref to suites instance with all this metrics' data
+    private readonly suites: Suites;
 
-    constructor(allTests: Test[]) {
-        this.allTests = allTests;
+    constructor(suites: Suites) {
+        this.suites = suites;
     }
 
     /**
@@ -20,7 +22,7 @@ class Statistics {
      * @throws Error If there are no tests in this metrics, or only one for a sample standard deviation
      */
     public getStandardDeviation(usePopulation: boolean = false): number {
-        const totalTests: number = this.allTests.length;
+        const totalTests: number = this.suites.getAllTestsInOrder().length;
 
         if (totalTests === 0) {
             throw new Error('Cannot calculate standard deviation: no tests available');
@@ -31,7 +33,7 @@ class Statistics {
         }
 
         // Calculate mean
-        const durations: number[] = this.allTests.map((test: Test): number => test.duration);
+        const durations: number[] = this.suites.getAllTestsInOrder().map((test: Test): number => test.duration);
         const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length;
 
         // Calculate variance

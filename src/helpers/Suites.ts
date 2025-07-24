@@ -23,6 +23,21 @@ class Suites {
     // Total number of completed tests in this instance
     public testCounter: number = 0;
 
+    // All tests in order of insertion
+    private readonly testsInOrder: Test[] = [];
+
+
+    /**
+     * Adds a test to the specified suite
+     */
+    public addTest(suite: Suite, test: Test): void {
+        // Adds test to its parent suite and updates stats counter
+        suite.tests.set(test.name, test);
+        this.updateSubTestCounters(test.path, test.duration);
+
+        // Adds to the list of all suites in order
+        this.testsInOrder.push(test);
+    }
 
     /**
      * Navigates to (and returns) a suite in the hierarchy, optionally creating missing suites
@@ -62,6 +77,37 @@ class Suites {
         return currentSuite;
     }
 
+    /**
+     * Returns an array with all tests in this metrics instance, in the order they were inserted in
+     */
+    public getAllTestsInOrder(): Test[] {
+        return this.testsInOrder;
+    }
+
+
+    /**
+     * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
+     *
+     * @param testPath Path of the test to update parent suites for
+     * @param duration Duration of the test
+     */
+    private updateSubTestCounters(testPath: string[], duration: number): void {
+        // Add time and counter to top-level suite
+        let currentSuite: Suite = this.topLevelSuite;
+        currentSuite.aggregateData.numTests++;
+        currentSuite.aggregateData.totalTestTime += duration;
+
+        // Add time and counter to each parent suite
+        for (const suiteName of testPath.slice(0, -1)) {
+            currentSuite = currentSuite.subSuites.get(suiteName)!;
+            if (currentSuite === undefined) {
+                throw new Error(`Error updating counters: suite '${suiteName}' not found`);
+            }
+
+            currentSuite.aggregateData.numTests++;
+            currentSuite.aggregateData.totalTestTime += duration;
+        }
+    }
 }
 
 export default Suites;

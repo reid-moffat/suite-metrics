@@ -2,7 +2,6 @@ import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts"
 import { Test, Suite } from "../types/structures.ts";
 import { SerializableSuite } from "../types/helpers.ts";
 import Performance from "../composites/Performance.ts";
-import SortedTestCache from "../helpers/SortedTestCache.ts";
 import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
@@ -14,12 +13,9 @@ abstract class BaseSuiteMetrics {
 
     private readonly suites: Suites = new Suites();
 
-    private readonly performanceCache: SortedTestCache = new SortedTestCache();
-    public readonly performance: Performance = new Performance(this.performanceCache);
-
+    public readonly performance: Performance = new Performance(this.suites);
     public readonly queries: Queries = new Queries(this.suites);
-
-    public readonly statistics: Statistics = new Statistics(this.performanceCache.getTestsInOrder());
+    public readonly statistics: Statistics = new Statistics(this.suites);
 
     /**
      * Validates a test or suite path, throwing an error if invalid
@@ -99,7 +95,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return this.deepCopyTests(this.performanceCache.getTestsInOrder());
+        return this.deepCopyTests(this.suites.getAllTestsInOrder());
     }
 
     /**
@@ -222,12 +218,7 @@ abstract class BaseSuiteMetrics {
             path: testPath
         };
 
-        // Add test to the map and update counters for parent suites
-        suite.tests.set(testName, test);
-        this.updateSubTestCounters(testPath, testDuration);
-
-        // Add to & invalidate cache
-        this.performanceCache.addTest(test);
+        this.suites.addTest(suite, test);
     }
 
     /**
@@ -245,30 +236,6 @@ abstract class BaseSuiteMetrics {
      */
     private deepCopyTests(tests: Test[]): Test[] {
         return tests.map((test: Test): Test => this.deepCopyTest(test));
-    }
-
-    /**
-     * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
-     *
-     * @param testPath Path of the test to update parent suites for
-     * @param duration Duration of the test
-     */
-    private updateSubTestCounters(testPath: string[], duration: number): void {
-        // Add time and counter to top-level suite
-        let currentSuite: Suite = this.suites.topLevelSuite;
-        currentSuite.aggregateData.numTests++;
-        currentSuite.aggregateData.totalTestTime += duration;
-
-        // Add time and counter to each parent suite
-        for (const suiteName of testPath.slice(0, -1)) {
-            currentSuite = currentSuite.subSuites.get(suiteName)!;
-            if (currentSuite === undefined) {
-                throw new Error(`Error updating counters: suite '${suiteName}' not found`);
-            }
-
-            currentSuite.aggregateData.numTests++;
-            currentSuite.aggregateData.totalTestTime += duration;
-        }
     }
 
     /**
