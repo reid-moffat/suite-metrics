@@ -142,7 +142,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
     suite("Error Handling", function() {
         test("Invalid test names - empty array", function() {
             const test: () => void = (): void => metrics.startTest([]);
-            const expectedError: string = "Path cannot be empty, must define at least one suite/test";
+            const expectedError: string = "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)";
 
             assert.throws(test, expectedError, _, "Providing an empty array for the path should fail");
         });

@@ -66,7 +66,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      */
     public stopTest(path: string[]): void {
         const endTime: number = microtime.now();
-        BaseSuiteMetrics.validatePath(path, false, true);
+        BaseSuiteMetrics.validatePath(path, true);
         const testKey: string = this.createTestKey(path);
 
         // Verify test exists

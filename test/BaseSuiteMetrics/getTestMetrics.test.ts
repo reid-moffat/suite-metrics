@@ -17,7 +17,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
         });
 
         test("Empty path", function() {
-            assert.throws(() => metrics.getTest([]), "Path cannot be empty, must define at least one suite/test");
+            assert.throws(() => metrics.getTest([]), "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)");
         });
 
         test("Path with empty strings", function() {

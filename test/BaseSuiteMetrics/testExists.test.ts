@@ -32,7 +32,7 @@ suite("[BaseSuiteMetrics] testExists", function() {
         });
 
         test("Empty array", function() {
-            assert.throws(() => metrics.testExists([]), 'Path cannot be empty, must define at least one suite/test', 'Should throw error when path array is empty');
+            assert.throws(() => metrics.testExists([]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Should throw error when path array is empty');
         });
 
         test("Single-element array", function() {
