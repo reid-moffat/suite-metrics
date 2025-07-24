@@ -1,4 +1,3 @@
-import { SuiteData, RecursiveSuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
 import { Test, Suite } from "../types/structures.ts";
 import { SerializableSuite } from "../types/helpers.ts";
 import Performance from "../composites/Performance.ts";
@@ -6,6 +5,7 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
+import Utils from "../helpers/Utils.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -97,7 +97,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return this.deepCopyTests(this.suites.getAllTestsInOrder());
+        return Utils.deepCopyTests(this.suites.getAllTestsInOrder());
     }
 
     /**
@@ -138,23 +138,6 @@ abstract class BaseSuiteMetrics {
         };
 
         this.suites.addTest(suite, test);
-    }
-
-    /**
-     * Creates a deep copy of a Test object to prevent external modifications
-     */
-    private deepCopyTest(test: Test): Test {
-        return {
-            ...test,
-            path: [...test.path]
-        };
-    }
-
-    /**
-     * Creates a deep copy of an array of Test objects to prevent external modifications
-     */
-    private deepCopyTests(tests: Test[]): Test[] {
-        return tests.map((test: Test): Test => this.deepCopyTest(test));
     }
 
     /**
