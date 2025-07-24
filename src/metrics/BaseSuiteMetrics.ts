@@ -132,7 +132,6 @@ abstract class BaseSuiteMetrics {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.navigateToSuite(path);
-
         return Array.from(suite.subSuites.keys());
     }
 
@@ -146,7 +145,6 @@ abstract class BaseSuiteMetrics {
         BaseSuiteMetrics.validatePath(path, true);
 
         const suite: Suite = this.navigateToSuite(path);
-
         return Array.from(suite.tests.keys());
     }
 
@@ -223,10 +221,10 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets the test at a specific path
+     * Gets the Test at a specific path
      *
-     * @param path Path to get test for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
-     * @returns A copy of the Test object at that path
+     * @param path Path of the desired test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns A copy of the Test object at the given path
      * @throws Error If the test path doesn't exist
      */
     public getTest(path: string[]): Test {
@@ -240,6 +238,20 @@ abstract class BaseSuiteMetrics {
         }
 
         return this.deepCopyTest(test);
+    }
+
+    /**
+     * Gets the Suite at a specific path
+     *
+     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
+     * @returns A copy of the Suite object at the given path
+     * @throws Error if the Suite path doesn't exist
+     */
+    public getSuite(path: string[]): Suite {
+        BaseSuiteMetrics.validatePath(path, false);
+
+        const suite: Suite = this.navigateToSuite(path);
+        return this.deepCopySuite(suite);
     }
 
     /**
@@ -344,10 +356,10 @@ abstract class BaseSuiteMetrics {
     /**
      * Navigates to (and returns) a suite in the hierarchy, optionally creating missing suites
      *
-     * @param path Path of the suite to navigate to (can be a test path with isTestPath, see below)
+     * @param path Valid path of the suite to navigate to (can be a test path with isTestPath, see below)
      * @param options Optional flags for specific cases
      * @param options.createIfMissing Set to true to create the suite and all parent suites above it if required (default: false)
-     * @param options.isTestPath Set to true if the path is a test (default: false). Will use the test's suite
+     * @param options.isTestPath Set to true if the path is a test (default: false). Will use the test's parent suite
      */
     protected navigateToSuite(path: string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
@@ -436,7 +448,7 @@ abstract class BaseSuiteMetrics {
     private deepCopyTest(test: Test): Test {
         return {
             ...test,
-            path: [...test.path] // Deep copy the path array
+            path: [...test.path]
         };
     }
 
@@ -447,9 +459,18 @@ abstract class BaseSuiteMetrics {
         return tests.map((test: Test): Test => (
             {
                 ...test,
-                path: [...test.path] // Deep copy the path array
+                path: [...test.path]
             }
         ));
+    }
+
+    /**
+     * Creates a deep copy of a test object to prevent external modifications
+     */
+    private deepCopySuite(suite: Suite): Suite {
+        return {
+            ...suite
+        };
     }
 
     /**
