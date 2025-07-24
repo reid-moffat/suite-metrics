@@ -24,11 +24,11 @@ class Statistics {
      * Gets the standard deviation of the set of all test durations
      *
      * @param usePopulation Set to true for population standard deviation (divide by N),
-     *                      false for sample standard deviation (divide by N-1) (default: false)
+     *                      false for sample standard deviation (divide by N-1) (default: true)
      * @returns The standard deviation of test durations in microseconds
      * @throws Error If there is insufficient data (less than two total tests)
      */
-    public getStandardDeviation(usePopulation: boolean = false): number {
+    public getStandardDeviation(usePopulation: boolean = true): number {
         this.ensureValidCachedStdDev();
 
         return usePopulation ? this.stdDevPopulation : this.stdDevSample;
@@ -48,7 +48,7 @@ class Statistics {
      *
      * @param test Test object to get (can use query.getTest(path) to get the test object from its path)
      * @param usePopulation Set to true for population standard deviation (divide by N),
-     *                      false for sample standard deviation (divide by N-1) (default: false)
+     *                      false for sample standard deviation (divide by N-1) (default: true)
      * @returns Z-score value:
      *          - Positive values: test is slower than average
      *          - Negative values: test is faster than average
@@ -57,7 +57,7 @@ class Statistics {
      * @throws Error if test doesn't exist, or insufficient data for calculation (<2 total tests, or all tests have
      * the same duration)
      */
-    public getTestZScore(test: Test, usePopulation: boolean = false): number {
+    public getTestZScore(test: Test, usePopulation: boolean = true): number {
         this.ensureValidCachedStdDev();
 
         // Get statistical measures
