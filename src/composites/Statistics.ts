@@ -1,5 +1,5 @@
 import { Test } from "../types/structures.ts";
-import Suites from "../helpers/Suites.js";
+import Suites from "../helpers/Suites.ts";
 
 /**
  * Statistical methods surrounding Tests and Suites
