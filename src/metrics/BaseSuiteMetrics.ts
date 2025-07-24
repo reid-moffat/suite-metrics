@@ -77,17 +77,17 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets the average completion time for all tests in this metrics instance
+     * Gets the average completion duration for all tests in this metrics instance
      *
-     * @returns The average test completion time, rounded to the nearest microsecond
+     * @returns The average test completion duration, rounded to the nearest microsecond
      * @throws Error if there are no completed tests in this instance
      */
-    public getAverageTestTime(): number {
+    public getAverageTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        return Math.round(this.suites.getTopLevelSuite().aggregateData.totalTestTime / this.getTotalTestCount());
+        return this.suites.getAverageTestDuration();
     }
 
     /**

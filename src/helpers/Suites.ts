@@ -46,6 +46,13 @@ class Suites {
     }
 
     /**
+     * Gets the average completion duration for all tests in this metrics instance
+     */
+    public getAverageTestDuration(): number {
+        return Math.round(this.getTopLevelSuite().aggregateData.totalTestTime / this.getNumTests());
+    }
+
+    /**
      * Stores a completed test's data in this metrics instance
      *
      * @param testPath Path to this test
