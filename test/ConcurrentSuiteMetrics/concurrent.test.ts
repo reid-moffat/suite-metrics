@@ -22,7 +22,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(10); // Simulate some work
             metrics.stopTest(path);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Multiple tests in same suite", function() {
@@ -39,7 +39,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(15);
             metrics.stopTest(path2);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Deeply nested suites", function() {
@@ -50,7 +50,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(8);
             metrics.stopTest(path);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
     });
 
@@ -77,7 +77,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             Promise.all([promise1, promise2]);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Multiple concurrent tests in same suite", function() {
@@ -111,7 +111,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             Promise.all(promises);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Interleaved test execution", function() {
@@ -135,7 +135,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             // Stop second test
             metrics.stopTest(path2);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
     });
 
@@ -207,7 +207,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             // Allow some tolerance for timing variations
             assert.closeTo(actualElapsed, expectedDuration + 10, 20, "Actual elapsed time should be close to expected duration");
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Suite metrics with multiple tests", function() {
@@ -221,12 +221,12 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
                 metrics.stopTest(testPath);
             }
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Print format verification", function() {
             // This test just verifies the print method doesn't crash
-            const output = metrics.printAllSuiteMetrics();
+            const output = metrics.metrics.printAllSuiteMetrics();
             assert.isString(output, "Print output should be a string");
             console.log("Print output:", output);
         });
@@ -289,7 +289,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
                 metrics.stopTest(testPath);
             }
 
-            const suiteMetrics: SuiteData = metrics.getSuiteMetrics(suitePath);
+            const suiteMetrics: SuiteData = metrics.metrics.getSuiteMetrics(suitePath);
             assert.exists(suiteMetrics, "Suite metrics should exist");
             assert.strictEqual(suiteMetrics.name, "Sample Suite", "Suite should have correct name");
             assert.strictEqual(suiteMetrics.testMetrics.numTests, 2, "Suite should have 2 tests");
@@ -307,7 +307,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(15);
             metrics.stopTest([...basePath, "Sub Suite", "Nested Test"]);
 
-            const recursiveMetrics = metrics.getSuiteMetricsRecursive(basePath);
+            const recursiveMetrics = metrics.metrics.getSuiteMetricsRecursive(basePath);
             assert.exists(recursiveMetrics, "Recursive metrics should exist");
             assert.strictEqual(recursiveMetrics.name, "Recursive Suite", "Recursive suite should have correct name");
         });
@@ -326,7 +326,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(20);
             metrics.stopTest(path2);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Very long test names", function() {
@@ -337,7 +337,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(5);
             metrics.stopTest(path);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Empty suite name components", function() {
@@ -359,7 +359,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(5);
             metrics.stopTest(deepPath);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
     });
 
@@ -383,7 +383,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             Promise.all(promises);
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
 
         test("Sequential test performance", function() {
@@ -398,7 +398,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
                 metrics.stopTest(testPath);
             }
 
-            console.log(metrics.printAllSuiteMetrics());
+            console.log(metrics.metrics.printAllSuiteMetrics());
         });
     });
 
@@ -417,7 +417,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.testExists(["ConcurrentSuite4", "ConcurrentTest3"]), "ConcurrentSuite4>ConcurrentTest3 should exist");
 
             // Verify metrics work correctly
-            const suite1Data = metrics.getSuiteMetrics(["ConcurrentSuite1"]);
+            const suite1Data = metrics.metrics.getSuiteMetrics(["ConcurrentSuite1"]);
             assert.strictEqual(suite1Data.testMetrics.numTests, 3, "ConcurrentSuite1 should have 3 tests");
             assert.isNumber(suite1Data.testMetrics.totalTime, "Suite should have numeric total time");
             assert.isAbove(suite1Data.testMetrics.totalTime!, 0, "Suite total time should be positive");
@@ -437,12 +437,12 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.testExists(["API", "Users", "Validation", "email_validation"]), "API>Users>Validation>email_validation test should exist");
 
             // Test metrics at different levels
-            const authData = metrics.getSuiteMetrics(["Authentication"]);
+            const authData = metrics.metrics.getSuiteMetrics(["Authentication"]);
             assert.strictEqual(authData.testMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
             assert.isArray(authData.subSuites, "Authentication suite should have child suites array");
             assert.includeMembers(authData.subSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
 
-            const apiUsersData = metrics.getSuiteMetrics(["API", "Users"]);
+            const apiUsersData = metrics.metrics.getSuiteMetrics(["API", "Users"]);
             assert.strictEqual(apiUsersData.testMetrics.numTests, 4, "API>Users suite should have 4 tests");
             assert.deepEqual(apiUsersData.subSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
         });
@@ -463,13 +463,13 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.suiteExists(["Suite8"]), "Suite8 should exist in large dataset");
             assert.isTrue(metrics.queries.suiteExists(["Suite15"]), "Suite15 should exist in large dataset");
 
-            const suite8Data = metrics.getSuiteMetrics(["Suite8"]);
+            const suite8Data = metrics.metrics.getSuiteMetrics(["Suite8"]);
             assert.strictEqual(suite8Data.testMetrics.numTests, 20, "Suite8 should have 20 tests");
             assert.isNumber(suite8Data.testMetrics.totalTime, "Suite8 should have numeric total time");
             assert.isAtLeast(suite8Data.testMetrics.totalTime!, 0, "Suite8 total time should be non-negative");
 
             // Verify top-level structure
-            const topLevelData = metrics.getSuiteMetrics([]);
+            const topLevelData = metrics.metrics.getSuiteMetrics([]);
             assert.isArray(topLevelData.subSuites, "Top level should have child suites array");
             assert.lengthOf(topLevelData.subSuites!, 15, "Top level should have 15 child suites");
         });
