@@ -68,7 +68,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
         }
 
         const { testPath, startTime }: TestMetadata = this.activeTest;
-        this.addTest(testPath, startTime, endTime);
+        this.suites.addTest(testPath, startTime, endTime);
 
         this.activeTest = null;
     }

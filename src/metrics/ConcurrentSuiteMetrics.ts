@@ -76,7 +76,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         }
 
         // Store test data and remove from active tests
-        this.addTest(path, testStartTime, endTime);
+        this.suites.addTest(path, testStartTime, endTime);
         this.activeTests.delete(testKey);
     }
 

@@ -12,7 +12,7 @@ import Utils from "../helpers/Utils.ts";
  */
 abstract class BaseSuiteMetrics {
 
-    private readonly suites: Suites = new Suites();
+    protected readonly suites: Suites = new Suites();
 
     public readonly queries: Queries = new Queries(this.suites);
     public readonly metrics: Metrics = new Metrics(this.suites);
@@ -115,30 +115,6 @@ abstract class BaseSuiteMetrics {
         return JSON.stringify(serializableSuites, null, indent);
     }
 
-    /**
-     * Stores a completed test's data in this metrics instance
-     *
-     * @param testPath Path to this test
-     * @param startTime Time the test was started at
-     * @param endTime Time the test was completed at
-     */
-    protected addTest(testPath: string[], startTime: number, endTime: number): void {
-        const suite: Suite = this.suites.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
-        const testName: string = testPath[testPath.length - 1];
-        const testDuration: number = endTime - startTime;
-
-        const test: Test = {
-            name: testName,
-            startTimestamp: startTime,
-            endTimestamp: endTime,
-            duration: testDuration,
-            testNumber: ++this.suites.testCounter,
-            suiteTestNumber: suite.tests.size + 1,
-            path: testPath
-        };
-
-        this.suites.addTest(suite, test);
-    }
 
     /**
      * Converts a Suite object into a serializable object (maps can't be natively serialized)

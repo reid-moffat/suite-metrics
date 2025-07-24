@@ -35,9 +35,27 @@ class Suites {
     }
 
     /**
-     * Adds a test to the specified suite
+     * Stores a completed test's data in this metrics instance
+     *
+     * @param testPath Path to this test
+     * @param startTime Time the test was started at
+     * @param endTime Time the test was completed at
      */
-    public addTest(suite: Suite, test: Test): void {
+    public addTest(testPath: string[], startTime: number, endTime: number): void {
+        const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
+        const testName: string = testPath[testPath.length - 1];
+        const testDuration: number = endTime - startTime;
+
+        const test: Test = {
+            name: testName,
+            startTimestamp: startTime,
+            endTimestamp: endTime,
+            duration: testDuration,
+            testNumber: ++this.testCounter,
+            suiteTestNumber: suite.tests.size + 1,
+            path: testPath
+        };
+
         // Adds test to its parent suite and updates stats counter
         suite.tests.set(test.name, test);
         this.updateSubTestCounters(test.path, test.duration);
