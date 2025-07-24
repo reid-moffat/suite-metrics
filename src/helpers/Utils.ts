@@ -1,5 +1,8 @@
 import { Test } from "../types/structures.ts";
 
+/**
+ * Miscellaneous helper methods
+ */
 class Utils {
 
     /**

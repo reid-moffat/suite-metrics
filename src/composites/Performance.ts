@@ -2,6 +2,9 @@ import SortedTestCache from "../helpers/SortedTestCache.ts";
 import { Test } from "../types/structures.ts";
 import Utils from "../helpers/Utils.js";
 
+/**
+ * Performance-related queries for finding slow and fast tests
+ */
 class Performance {
 
     // Efficiently manages fastest and slowest tests
