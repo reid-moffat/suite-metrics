@@ -28,6 +28,13 @@ class Suites {
 
 
     /**
+     * Gets the total number of tests in this metrics instance
+     */
+    public getNumTests(): number {
+        return this.testsInOrder.length;
+    }
+
+    /**
      * Adds a test to the specified suite
      */
     public addTest(suite: Suite, test: Test): void {

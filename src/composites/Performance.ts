@@ -1,4 +1,3 @@
-import SortedTestCache from "../helpers/SortedTestCache.ts";
 import { Test } from "../types/structures.ts";
 import Utils from "../helpers/Utils.ts";
 import Suites from "../helpers/Suites.ts";
@@ -11,12 +10,11 @@ class Performance {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    // Efficiently manages fastest and slowest tests
-    private readonly cache: SortedTestCache;
+    // All tests for a given metrics sorted from slowest to fastest (requires rebuild for each test addition)
+    private cache: Test[] = [];
 
     public constructor(suites: Suites) {
         this.suites = suites;
-        this.cache = new SortedTestCache();
     }
 
     /**
@@ -26,12 +24,12 @@ class Performance {
      * @throws Error if there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
-        if (this.cache.getNumTests() === 0) {
+        if (this.suites.getNumTests() === 0) {
             throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
-        this.cache.ensureSortedCache();
-        const slowestTest: Test = this.cache.get()[0];
+        this.ensureSortedCache();
+        const slowestTest: Test = this.cache[0];
 
         return Utils.deepCopyTest(slowestTest);
     }
@@ -48,13 +46,13 @@ class Performance {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.cache.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.getNumTests()})`);
+        if (this.suites.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        this.cache.ensureSortedCache();
-        const endIndex: number = Math.min(k, this.cache.getNumTests());
-        const slowestTests: Test[] = this.cache.get().slice(0, endIndex);
+        this.ensureSortedCache();
+        const endIndex: number = Math.min(k, this.suites.getNumTests());
+        const slowestTests: Test[] = this.cache.slice(0, endIndex);
 
         return Utils.deepCopyTests(slowestTests);
     }
@@ -65,8 +63,8 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        this.cache.ensureSortedCache();
-        return Utils.deepCopyTests(this.cache.get());
+        this.ensureSortedCache();
+        return Utils.deepCopyTests(this.cache);
     }
 
     /**
@@ -76,12 +74,12 @@ class Performance {
      * @throws Error if there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
-        if (this.cache.getNumTests() === 0) {
+        if (this.suites.getNumTests() === 0) {
             throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
-        this.cache.ensureSortedCache();
-        const fastestTest: Test = this.cache.get()[this.cache.getNumTests() - 1];
+        this.ensureSortedCache();
+        const fastestTest: Test = this.cache[this.suites.getNumTests() - 1];
 
         return Utils.deepCopyTest(fastestTest);
     }
@@ -98,13 +96,13 @@ class Performance {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.cache.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.cache.getNumTests()})`);
+        if (this.suites.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        this.cache.ensureSortedCache();
-        const startIndex: number = Math.max(0, this.cache.getNumTests() - k);
-        const fastestTests: Test[] = this.cache.get().slice(startIndex).reverse();
+        this.ensureSortedCache();
+        const startIndex: number = Math.max(0, this.suites.getNumTests() - k);
+        const fastestTests: Test[] = this.cache.slice(startIndex).reverse();
 
         return Utils.deepCopyTests(fastestTests);
     }
@@ -115,8 +113,21 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        this.cache.ensureSortedCache();
-        return Utils.deepCopyTests(this.cache.get()).reverse();
+        this.ensureSortedCache();
+        return Utils.deepCopyTests(this.cache).reverse();
+    }
+
+
+    /**
+     * Rebuilds the sorted cache if invalid
+     */
+    private ensureSortedCache(): void {
+        const sortedCacheValid: boolean = this.cache.length !== this.suites.getNumTests();
+
+        if (!sortedCacheValid) {
+            // Sort by duration in descending order (slowest goes first)
+            this.cache = [...this.suites.getAllTestsInOrder()].sort((a: Test, b: Test): number => b.duration - a.duration);
+        }
     }
 }
 
