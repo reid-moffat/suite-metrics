@@ -1,7 +1,8 @@
 import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts";
 import { Test, Suite } from "../types/structures.ts";
-import SortedTestCache from "../helpers/SortedTestCache.ts";
 import { SerializableSuite } from "../types/helpers.js";
+import Performance from "../composites/Performance.js";
+import SortedTestCache from "../helpers/SortedTestCache.js";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -25,9 +26,8 @@ abstract class BaseSuiteMetrics {
     // Total number of completed tests in this instance
     protected testCounter: number = 0;
 
-    // Efficiently manages fastest and slowest tests
-    private readonly testPerformance: SortedTestCache = new SortedTestCache();
-
+    private readonly performanceCache: SortedTestCache = new SortedTestCache();
+    public readonly performance: Performance = new Performance(this.performanceCache);
 
     /**
      * Validates a test or suite path, throwing an error if invalid
@@ -155,69 +155,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return this.deepCopyTests(this.testPerformance.getTestsInOrder());
-    }
-
-    /**
-     * Gets the slowest test across all suites
-     *
-     * @returns The test with the longest duration
-     * @throws Error if there are no tests in this metrics instance
-     */
-    public getSlowestTest(): Test {
-        return this.deepCopyTest(this.testPerformance.getSlowestTest());
-    }
-
-    /**
-     * Gets the k slowest tests across all suites, sorted by duration descending
-     *
-     * @param k Number of slowest tests to return. Must be a positive integer
-     * @returns Array of the k slowest tests, sorted by duration descending
-     * @throws Error If k is not a positive integer
-     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
-     */
-    public getKSlowestTests(k: number): Test[] {
-        return this.deepCopyTests(this.testPerformance.getKSlowestTests(k));
-    }
-
-    /**
-     * Gets all tests sorted by duration descending (slowest first)
-     *
-     * @returns Array of all tests sorted by duration in descending order
-     */
-    public getAllTestsSlowestFirst(): Test[] {
-        return this.deepCopyTests(this.testPerformance.getAllTestsSlowestFirst());
-    }
-
-    /**
-     * Gets the fastest test across all suites
-     *
-     * @returns The test with the shortest duration
-     * @throws Error if there are no tests in this metrics instance
-     */
-    public getFastestTest(): Test {
-        return this.deepCopyTest(this.testPerformance.getFastestTest());
-    }
-
-    /**
-     * Gets the k fastest tests across all suites, sorted by duration ascending
-     *
-     * @param k Number of fastest tests to return. Must be a positive integer
-     * @returns Array of the k fastest tests, sorted by duration ascending
-     * @throws Error If k is not a positive integer
-     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
-     */
-    public getKFastestTests(k: number): Test[] {
-        return this.deepCopyTests(this.testPerformance.getKFastestTests(k));
-    }
-
-    /**
-     * Gets all tests sorted by duration ascending (fastest first)
-     *
-     * @returns Array of all tests sorted by duration in ascending order
-     */
-    public getAllTestsFastestFirst(): Test[] {
-        return this.deepCopyTests(this.testPerformance.getAllTestsFastestFirst());
+        return this.deepCopyTests(this.performanceCache.getTestsInOrder());
     }
 
     /**
@@ -357,7 +295,7 @@ abstract class BaseSuiteMetrics {
         }
 
         // Calculate mean
-        const allTests: Test[] = this.testPerformance.getTestsInOrder();
+        const allTests: Test[] = this.performanceCache.getTestsInOrder();
         const durations: number[] = allTests.map((test: Test): number => test.duration);
         const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length;
 
@@ -475,7 +413,7 @@ abstract class BaseSuiteMetrics {
         this.updateSubTestCounters(testPath, testDuration);
 
         // Add to & invalidate cache
-        this.testPerformance.addTest(test);
+        this.performanceCache.addTest(test);
     }
 
     /**
