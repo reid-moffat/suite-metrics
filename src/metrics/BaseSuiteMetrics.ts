@@ -97,7 +97,7 @@ abstract class BaseSuiteMetrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        return Math.round(this.topLevelSuite.aggregateData.totalTestTime / this.topLevelSuite.aggregateData.numTests);
+        return Math.round(this.topLevelSuite.aggregateData.totalTestTime / this.getTotalTestCount());
     }
 
     /**
