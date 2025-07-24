@@ -74,6 +74,36 @@ class Statistics {
         return Math.round(zScore * 1000) / 1000;
     }
 
+    /**
+     * Gets all tests with their Z scores
+     *
+     * @param usePopulation Set to true for population standard deviation (divide by N),
+     *                      false for sample standard deviation (divide by N-1) (default: true)
+     * @returns Array of all tests in this metrics instance with its corresponding Z-score (exact),
+     *          sorted by completion data ascending
+     * @throws Error If there is insufficient data for calculation (<2 total tests, or all tests have the same duration)
+     */
+    public getAllTestsWithZScores(usePopulation: boolean = true): { test: Test, zScore: number }[] {
+        this.ensureValidCachedStdDev();
+
+        // Get statistical measures
+        const mean: number = this.suites.getAverageTestDuration();
+        const stdDev: number = usePopulation ? this.stdDevPopulation : this.stdDevSample;
+
+        if (stdDev === 0) {
+            throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
+        }
+
+        // Calculate Z scores
+        const allTests: Test[] = this.suites.getAllTestsInOrder();
+        return allTests.map((test: Test) => {
+            return {
+                test: test,
+                zScore: (test.duration - mean) / stdDev
+            };
+        });
+    }
+
 
     /**
      * Updates the stored stdDev value if required (tests added since last calculation)
