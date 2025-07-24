@@ -29,34 +29,13 @@ class Statistics {
      * @throws Error If there is insufficient data (less than two total tests)
      */
     public getStandardDeviation(usePopulation: boolean = false): number {
-        const totalTests: number = this.suites.getAllTestsInOrder().length;
+        this.ensureValidCachedStdDev();
 
-        if (totalTests === 0) {
-            throw new Error('Cannot calculate standard deviation: no tests available');
-        }
-
-        if (!usePopulation && totalTests < 2) {
-            throw new Error('Cannot calculate sample standard deviation: need at least 2 tests');
-        }
-
-        // Calculate mean
-        const durations: number[] = this.suites.getAllTestsInOrder().map((test: Test): number => test.duration);
-        const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length;
-
-        // Calculate variance
-        const sumSquaredDifferences: number = durations.reduce((sum: number, duration: number): number => {
-            const difference: number = duration - mean;
-            return sum + (difference * difference);
-        }, 0);
-
-        const divisor: number = usePopulation ? durations.length : durations.length - 1;
-        const variance: number = sumSquaredDifferences / divisor;
-
-        return Math.sqrt(variance);
+        return usePopulation ? this.stdDevPopulation : this.stdDevSample;
     }
 
     /**
-     * Calculates the Z-score (standard score) for a given test
+     * Calculates the Z-score (standard score) for a given test to 3 decimal places
      *
      * Key Interpretations:
      * - Z = 0: Test duration equals the mean
@@ -68,6 +47,8 @@ class Statistics {
      * - Z = -3: Test is 3 standard deviations faster (0.13th percentile) - Extremely fast
      *
      * @param test Test object to get (can use query.getTest(path) to get the test object from its path)
+     * @param usePopulation Set to true for population standard deviation (divide by N),
+     *                      false for sample standard deviation (divide by N-1) (default: false)
      * @returns Z-score value:
      *          - Positive values: test is slower than average
      *          - Negative values: test is faster than average
@@ -76,16 +57,12 @@ class Statistics {
      * @throws Error if test doesn't exist, or insufficient data for calculation (<2 total tests, or all tests have
      * the same duration)
      */
-    public getTestZScore(test: Test): number {
-
-        const totalTests: number = this.suites.getNumTests();
-        if (totalTests < 2) {
-            throw new Error('Need at least 2 tests to calculate Z-score');
-        }
+    public getTestZScore(test: Test, usePopulation: boolean = false): number {
+        this.ensureValidCachedStdDev();
 
         // Get statistical measures
         const mean: number = this.suites.getAverageTestDuration();
-        const stdDev: number = this.getStandardDeviation();
+        const stdDev: number = usePopulation ? this.stdDevPopulation : this.stdDevSample;
 
         if (stdDev === 0) {
             throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
