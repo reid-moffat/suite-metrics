@@ -1,6 +1,7 @@
 import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts";
 import { Test, Suite } from "../types/structures.ts";
 import SortedTestCache from "../helpers/SortedTestCache.ts";
+import { SerializableSuite } from "../types/helpers.js";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -324,6 +325,21 @@ abstract class BaseSuiteMetrics {
         return lines.join('\n');
     }
 
+    /**
+     * Stringifies all data in this metrics instance into JSON
+     *
+     * @param indent Number of indents for each line (default 4)
+     * @returns JSON string representing the structure and data of all suites in this metrics instance
+     */
+    public toJSON(indent: number = 4): string {
+        const serializableSuites: Record<string, SerializableSuite> = Object.fromEntries(
+            Array.from(this.suites.entries())
+                .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, this.suiteToSerializable(suite)])
+        );
+
+        return JSON.stringify(serializableSuites, null, indent);
+    }
+
 
     /**
      * Navigates to (and returns) a suite in the hierarchy, optionally creating missing suites
@@ -517,6 +533,23 @@ abstract class BaseSuiteMetrics {
                 this.formatSuiteForPrint(subSuite, lines, indentLevel + 4);
             }
         }
+    }
+
+    /**
+     * Converts a Suite object into a serializable object (maps can't be natively serialized)
+     */
+    private suiteToSerializable(suite: Suite): SerializableSuite {
+        return {
+            name: suite.name,
+            tests: Object.fromEntries(suite.tests),
+            subSuites: Object.fromEntries(
+                Array.from(suite.subSuites.entries()).map(([key, subSuite]: [string, Suite]): [string, SerializableSuite] => [
+                    key,
+                    this.suiteToSerializable(subSuite)
+                ])
+            ),
+            aggregateData: suite.aggregateData
+        };
     }
 }
 
