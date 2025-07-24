@@ -1,10 +1,11 @@
-import { SuiteData, RecursiveSuiteData, Metrics } from "../types/returnTypes.ts";
+import { SuiteData, RecursiveSuiteData, SuiteMetrics } from "../types/returnTypes.ts";
 import { Test, Suite } from "../types/structures.ts";
 import { SerializableSuite } from "../types/helpers.ts";
 import Performance from "../composites/Performance.ts";
 import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
+import Metrics from "../composites/Metrics.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -13,8 +14,9 @@ abstract class BaseSuiteMetrics {
 
     private readonly suites: Suites = new Suites();
 
-    public readonly performance: Performance = new Performance(this.suites);
     public readonly queries: Queries = new Queries(this.suites);
+    public readonly metrics: Metrics = new Metrics(this.suites);
+    public readonly performance: Performance = new Performance(this.suites);
     public readonly statistics: Statistics = new Statistics(this.suites);
 
     /**
@@ -107,7 +109,7 @@ abstract class BaseSuiteMetrics {
     public getSuiteMetrics(path: string[]): SuiteData {
         BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.suites.navigateToSuite(path);
-        const testMetrics: Metrics = this.calculateDirectTestMetrics(suite);
+        const testMetrics: SuiteMetrics = this.calculateDirectTestMetrics(suite);
 
         return {
             name: suite.name,
@@ -128,13 +130,13 @@ abstract class BaseSuiteMetrics {
         const suite: Suite = this.suites.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite
-        const directMetrics: Metrics = this.calculateDirectTestMetrics(suite);
+        const directMetrics: SuiteMetrics = this.calculateDirectTestMetrics(suite);
 
         // Total metrics: Test and duration data for all tests in this suite and all sub-suites
         const totalTests: number = suite.aggregateData.numTests;
         const totalTime: number = suite.aggregateData.totalTestTime;
         const averageTotalTime: number = totalTests === 0 ? 0 : totalTime / totalTests;
-        const totalMetrics: Metrics = {
+        const totalMetrics: SuiteMetrics = {
             numTests: totalTests,
             totalTime: totalTime,
             averageTime: averageTotalTime
@@ -144,7 +146,7 @@ abstract class BaseSuiteMetrics {
         const subTests: number = totalTests - directMetrics.numTests;
         const subTime: number = totalTime - directMetrics.totalTime;
         const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
-        const subMetrics: Metrics = {
+        const subMetrics: SuiteMetrics = {
             numTests: subTests,
             totalTime: subTime,
             averageTime: averageSubTime
@@ -243,7 +245,7 @@ abstract class BaseSuiteMetrics {
      *
      * @param suite Suite object to calculate metrics for
      */
-    private calculateDirectTestMetrics(suite: Suite): Metrics {
+    private calculateDirectTestMetrics(suite: Suite): SuiteMetrics {
         const numTests: number = suite.tests.size;
 
         if (numTests === 0) {

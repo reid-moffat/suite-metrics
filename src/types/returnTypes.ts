@@ -3,7 +3,7 @@
  *
  * Used to package test metrics together for suite/suites, such as getSuiteMetrics and getSuiteMetricsRecursive
  */
-type Metrics = {
+type SuiteMetrics = {
     /** Number of tests in the given suite(s) */
     readonly numTests: number,
     /** Total time for all tests in the given suite(s) */
@@ -25,7 +25,7 @@ type SuiteData = {
     /** All sub-suite names directly within this suite (non-recursive) */
     readonly subSuites: string[];
     /** Metrics for this suite's direct tests (not including sub-suites). Total # tests, total time, average time */
-    readonly testMetrics: Metrics;
+    readonly testMetrics: SuiteMetrics;
 };
 
 /**
@@ -42,11 +42,11 @@ type RecursiveSuiteData = {
     /** All sub-suite names directly within this suite (non-recursive) */
     readonly subSuites: string[];
     /** Test metrics (total # tests, total time, average time) for tests directly in this suite only (non-recursive) */
-    readonly directTestMetrics: Metrics;
+    readonly directTestMetrics: SuiteMetrics;
     /** Test metrics (total # tests, total time, average time) for tests in sub-suites only */
-    readonly subTestMetrics: Metrics;
+    readonly subTestMetrics: SuiteMetrics;
     /** Test metrics (total # tests, total time, average time) for all tests in this suite and all sub-suites */
-    readonly totalTestMetrics: Metrics;
+    readonly totalTestMetrics: SuiteMetrics;
 }
 
-export type { Metrics, SuiteData, RecursiveSuiteData };
+export type { SuiteMetrics, SuiteData, RecursiveSuiteData };
