@@ -16,14 +16,28 @@ function randomInt(min: number, max: number): number {
  */
 function sleep(millis: number): void {
     if (millis < 0) {
-        throw new Error(`[addDelay] Error: millis (${millis}) must be at least 0`);
+        throw new Error(`[sleep] Error: millis (${millis}) must be at least 0`);
     }
     if (millis === 0) {
         return;
     }
 
-    const endTime: number = microtime.now() + millis * 1000;
+    sleepMicroseconds(millis * 1000);
+}
+
+/**
+ * Delay of at least the specified number of microseconds
+ */
+function sleepMicroseconds(microseconds: number): void {
+    if (microseconds < 0) {
+        throw new Error(`[sleepMicroseconds] Error: millis (${microseconds}) must be at least 0`);
+    }
+    if (microseconds === 0) {
+        return;
+    }
+
+    const endTime: number = microtime.now() + microseconds;
     while (microtime.now() < endTime) { /* busy wait */ }
 }
 
-export { randomInt, sleep };
+export { randomInt, sleep, sleepMicroseconds };
