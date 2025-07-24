@@ -33,11 +33,12 @@ abstract class BaseSuiteMetrics {
      * Validates a test or suite path, throwing an error if invalid
      *
      * @param path Path to the specified suite or test
-     * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid (default: false)
-     * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements, or
-     * empty if allowTopLevel is false)
+     * @param allowTopLevel Set to true to allow the top-level suite, [], to be valid
+     * @param isTest Set to true if this path is for a test (will require an explicit Suite to be in)
+     * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements,
+     * empty if allowTopLevel is false, allowTopLevel && isTest, or a test without a suite)
      */
-    public static validatePath(path: string[], allowTopLevel: boolean): void {
+    public static validatePath(path: string[], allowTopLevel: boolean, isTest: boolean): void {
 
         if (!Array.isArray(path)) {
             throw new Error('Suite/test path must be an array');
@@ -45,6 +46,14 @@ abstract class BaseSuiteMetrics {
 
         if (!allowTopLevel && path.length === 0) {
             throw new Error('Path cannot be empty, must define at least one suite/test');
+        }
+
+        if (allowTopLevel && isTest) {
+            throw new Error('Both allowTopLevel and isTest cannot be true: top-level is a Suite, not a Test');
+        }
+
+        if (isTest && path.length === 1) {
+            throw new Error('A test must be inside a suite. E.g. ["Suite 1", "Test 2"]');
         }
 
         // Check each segment individually to provide specific error locations
@@ -107,7 +116,7 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public suiteExists(suitePath: string[]): boolean {
-        BaseSuiteMetrics.validatePath(suitePath, true);
+        BaseSuiteMetrics.validatePath(suitePath, true, false);
         return this.pathExists(suitePath, false);
     }
 
@@ -118,22 +127,8 @@ abstract class BaseSuiteMetrics {
      * @returns true if the suite exists, false if not
      */
     public testExists(testPath: string[]): boolean {
-        BaseSuiteMetrics.validatePath(testPath, false);
+        BaseSuiteMetrics.validatePath(testPath, false, true);
         return this.pathExists(testPath, true);
-    }
-
-    /**
-     * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
-     *
-     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
-     * @returns An array of all tests in this suite (not including sub-suites)
-     */
-    public getTestNames(path: string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, true);
-
-        const suite: Suite = this.navigateToSuite(path);
-
-        return Array.from(suite.tests.keys());
     }
 
     /**
@@ -143,11 +138,25 @@ abstract class BaseSuiteMetrics {
      * @returns An array of all sub-suites directly in this suite (not recursive)
      */
     public getSuiteNames(path: string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, true, false);
 
         const suite: Suite = this.navigateToSuite(path);
 
         return Array.from(suite.subSuites.keys());
+    }
+
+    /**
+     * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
+     *
+     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An array of all tests in this suite (not including sub-suites)
+     */
+    public getTestNames(path: string[]): string[] {
+        BaseSuiteMetrics.validatePath(path, true, true);
+
+        const suite: Suite = this.navigateToSuite(path);
+
+        return Array.from(suite.tests.keys());
     }
 
     /**
@@ -230,7 +239,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error If the test path doesn't exist
      */
     public getTest(path: string[]): Test {
-        BaseSuiteMetrics.validatePath(path, false);
+        BaseSuiteMetrics.validatePath(path, false, true);
         const suite: Suite = this.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
 
@@ -249,7 +258,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with suite's name, parent/sub-suites, and test statistics
      */
     public getSuiteMetrics(path: string[]): SuiteData {
-        BaseSuiteMetrics.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, true, false);
         const suite: Suite = this.navigateToSuite(path);
         const testMetrics: Metrics = this.calculateDirectTestMetrics(suite);
 
@@ -268,7 +277,7 @@ abstract class BaseSuiteMetrics {
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
     public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
-        BaseSuiteMetrics.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, true, false);
         const suite: Suite = this.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite
