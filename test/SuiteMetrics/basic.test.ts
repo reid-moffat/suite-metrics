@@ -25,7 +25,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         });
 
         test("Empty suite name for top-level operations", function() {
-            assert.doesNotThrow(() => metrics.suiteExists([]), 'suiteExists should allow empty array for top-level');
+            assert.doesNotThrow(() => metrics.queries.suiteExists([]), 'suiteExists should allow empty array for top-level');
             assert.doesNotThrow(() => metrics.getSuiteMetrics([]), 'getSuiteMetrics should allow empty array for top-level');
             assert.doesNotThrow(() => metrics.getSuiteMetricsRecursive([]), 'getSuiteMetricsRecursive should allow empty array for top-level');
         });
@@ -44,14 +44,14 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["NonExistent", "test2"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.getTest(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
+            assert.throws(() => metrics.queries.getTest(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
         });
 
         test("Test in non-existent suite", function() {
             metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.getTest(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
+            assert.throws(() => metrics.queries.getTest(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
         });
     });
 
@@ -67,9 +67,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["MultiTestSuite", "Test3"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test1"]), 'Test1 should exist');
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test2"]), 'Test2 should exist');
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test3"]), 'Test3 should exist');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test1"]), 'Test1 should exist');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test2"]), 'Test2 should exist');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test3"]), 'Test3 should exist');
 
             const suiteData = metrics.getSuiteMetrics(["MultiTestSuite"]);
             assert.strictEqual(suiteData.testMetrics.numTests, 3, 'Suite should have 3 tests');
@@ -89,9 +89,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["Suite3", "Test3"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.suiteExists(["Suite1"]), 'Suite1 should exist');
-            assert.isTrue(metrics.suiteExists(["Suite2"]), 'Suite2 should exist');
-            assert.isTrue(metrics.suiteExists(["Suite3"]), 'Suite3 should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Suite1"]), 'Suite1 should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Suite2"]), 'Suite2 should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Suite3"]), 'Suite3 should exist');
 
             const topLevelData = metrics.getSuiteMetricsRecursive([]);
             assert.strictEqual(topLevelData.subTestMetrics.numTests, 3, 'Top level should have 3 sub-tests');
@@ -175,9 +175,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["Suite1", "Test3"]);
             metrics.stopTest();
 
-            const test1 = metrics.getTest(["Suite1", "Test1"]);
-            const test2 = metrics.getTest(["Suite2", "Test2"]);
-            const test3 = metrics.getTest(["Suite1", "Test3"]);
+            const test1 = metrics.queries.getTest(["Suite1", "Test1"]);
+            const test2 = metrics.queries.getTest(["Suite2", "Test2"]);
+            const test3 = metrics.queries.getTest(["Suite1", "Test3"]);
 
             assert.strictEqual(test1.testNumber, 1, 'First test should have global test number 1');
             assert.strictEqual(test2.testNumber, 2, 'Second test should have global test number 2');
@@ -195,7 +195,7 @@ suite("[SuiteMetrics] Basic tests", function() {
             while (Date.now() - start < 1) { /* busy wait */ }
             metrics.stopTest();
 
-            const testMetrics = metrics.getTest(["TestSuite", "DetailedTest"]);
+            const testMetrics = metrics.queries.getTest(["TestSuite", "DetailedTest"]);
 
             assert.strictEqual(testMetrics.name, "DetailedTest", 'Test should have correct name');
             assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
@@ -222,8 +222,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["TimingSuite"]);
-            const fastTest = metrics.getTest(["TimingSuite", "FastTest"]);
-            const slowTest = metrics.getTest(["TimingSuite", "SlowTest"]);
+            const fastTest = metrics.queries.getTest(["TimingSuite", "FastTest"]);
+            const slowTest = metrics.queries.getTest(["TimingSuite", "SlowTest"]);
 
             assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
             assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');
@@ -238,18 +238,18 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["ExistingSuite", "Test1"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.suiteExists(["ExistingSuite"]), 'Existing suite should be found');
-            assert.isFalse(metrics.suiteExists(["NonExistingSuite"]), 'Non-existing suite should not be found');
-            assert.isFalse(metrics.suiteExists(["ExistingSuite", "SubSuite"]), 'Non-existing sub-suite should not be found');
+            assert.isTrue(metrics.queries.suiteExists(["ExistingSuite"]), 'Existing suite should be found');
+            assert.isFalse(metrics.queries.suiteExists(["NonExistingSuite"]), 'Non-existing suite should not be found');
+            assert.isFalse(metrics.queries.suiteExists(["ExistingSuite", "SubSuite"]), 'Non-existing sub-suite should not be found');
         });
 
         test("Correctly identify existing and non-existing tests", function() {
             metrics.startTest(["TestSuite", "ExistingTest"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["TestSuite", "ExistingTest"]), 'Existing test should be found');
-            assert.isFalse(metrics.testExists(["TestSuite", "NonExistingTest"]), 'Non-existing test should not be found');
-            assert.isFalse(metrics.testExists(["NonExistingSuite", "Test"]), 'Test in non-existing suite should not be found');
+            assert.isTrue(metrics.queries.testExists(["TestSuite", "ExistingTest"]), 'Existing test should be found');
+            assert.isFalse(metrics.queries.testExists(["TestSuite", "NonExistingTest"]), 'Non-existing test should not be found');
+            assert.isFalse(metrics.queries.testExists(["NonExistingSuite", "Test"]), 'Test in non-existing suite should not be found');
         });
     });
 
@@ -327,15 +327,15 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["StateSuite", "Test1"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["StateSuite", "Test1"]), 'Test1 should exist after creation');
+            assert.isTrue(metrics.queries.testExists(["StateSuite", "Test1"]), 'Test1 should exist after creation');
 
             // Add more tests
             metrics.startTest(["StateSuite", "Test2"]);
             metrics.stopTest();
 
             // State should persist
-            assert.isTrue(metrics.testExists(["StateSuite", "Test1"]), 'Test1 should still exist after adding Test2');
-            assert.isTrue(metrics.testExists(["StateSuite", "Test2"]), 'Test2 should exist after creation');
+            assert.isTrue(metrics.queries.testExists(["StateSuite", "Test1"]), 'Test1 should still exist after adding Test2');
+            assert.isTrue(metrics.queries.testExists(["StateSuite", "Test2"]), 'Test2 should exist after creation');
 
             const suiteData = metrics.getSuiteMetrics(["StateSuite"]);
             assert.strictEqual(suiteData.testMetrics.numTests, 2, 'Suite should have 2 tests after adding both');
@@ -345,13 +345,13 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["ResetSuite", "Test1"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["ResetSuite", "Test1"]), 'Test should exist before reset');
+            assert.isTrue(metrics.queries.testExists(["ResetSuite", "Test1"]), 'Test should exist before reset');
 
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assert.isFalse(newMetrics.testExists(["ResetSuite", "Test1"]), 'Test should not exist after reset');
-            assert.isFalse(newMetrics.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
+            assert.isFalse(newMetrics.queries.testExists(["ResetSuite", "Test1"]), 'Test should not exist after reset');
+            assert.isFalse(newMetrics.queries.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
         });
     });
 
@@ -360,8 +360,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["ImmutableSuite", "Test1"]);
             metrics.stopTest();
 
-            const testMetrics1 = metrics.getTest(["ImmutableSuite", "Test1"]);
-            const testMetrics2 = metrics.getTest(["ImmutableSuite", "Test1"]);
+            const testMetrics1 = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
+            const testMetrics2 = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
 
             assert.deepEqual(testMetrics1, testMetrics2, 'Multiple calls should return equal objects');
             assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');

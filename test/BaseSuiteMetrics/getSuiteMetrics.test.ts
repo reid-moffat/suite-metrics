@@ -154,7 +154,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             while (Date.now() - startTime < 5) { /* Simulate 5 millisecond test time */ }
             metrics.stopTest();
 
-            const testMetrics = metrics.getTest(["SingleTestSuite", "OnlyTest"]);
+            const testMetrics = metrics.queries.getTest(["SingleTestSuite", "OnlyTest"]);
             const suiteData = metrics.getSuiteMetrics(["SingleTestSuite"]);
 
             assert.strictEqual(suiteData.testMetrics.numTests, 1, 'Single test suite should have one test');
@@ -177,9 +177,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             while (Date.now() - mediumStart < 5) { /* busy wait medium */ }
             metrics.stopTest();
 
-            const fastTest = metrics.getTest(["MultiTestSuite", "FastTest"]);
-            const slowTest = metrics.getTest(["MultiTestSuite", "SlowTest"]);
-            const mediumTest = metrics.getTest(["MultiTestSuite", "MediumTest"]);
+            const fastTest = metrics.queries.getTest(["MultiTestSuite", "FastTest"]);
+            const slowTest = metrics.queries.getTest(["MultiTestSuite", "SlowTest"]);
+            const mediumTest = metrics.queries.getTest(["MultiTestSuite", "MediumTest"]);
             const suiteData = metrics.getSuiteMetrics(["MultiTestSuite"]);
 
             const expectedTotal = fastTest.duration + slowTest.duration + mediumTest.duration;
@@ -507,8 +507,8 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             const suiteData = metrics.getSuiteMetrics(["TimingConsistency"]);
-            const test1 = metrics.getTest(["TimingConsistency", "Test1"]);
-            const test2 = metrics.getTest(["TimingConsistency", "Test2"]);
+            const test1 = metrics.queries.getTest(["TimingConsistency", "Test1"]);
+            const test2 = metrics.queries.getTest(["TimingConsistency", "Test2"]);
 
             // Verify timing consistency
             assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');
@@ -547,7 +547,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ResetSuite", "Test1"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.suiteExists(["ResetSuite"]), 'Suite should exist before reset');
+            assert.isTrue(metrics.queries.suiteExists(["ResetSuite"]), 'Suite should exist before reset');
             const originalData = metrics.getSuiteMetrics(["ResetSuite"]);
             assert.strictEqual(originalData.testMetrics.numTests, 1, 'Suite should have one test before reset');
 
@@ -555,7 +555,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const newMetrics = SuiteMetrics.getInstance();
 
             assert.throws(() => newMetrics.getSuiteMetrics(["ResetSuite"]), 'Suite path [ResetSuite] does not exist');
-            assert.isFalse(newMetrics.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
+            assert.isFalse(newMetrics.queries.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
 
             // Should work with new instance
             newMetrics.startTest(["NewSuite", "NewTest"]);
@@ -652,7 +652,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ValidSuite", "ValidTest"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.suiteExists(["ValidSuite"]), 'Valid suite should exist');
+            assert.isTrue(metrics.queries.suiteExists(["ValidSuite"]), 'Valid suite should exist');
             const validData = metrics.getSuiteMetrics(["ValidSuite"]);
             assert.strictEqual(validData.testMetrics.numTests, 1, 'Valid suite should have one test');
 
@@ -671,7 +671,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             }
 
             // Verify original state is maintained
-            assert.isTrue(metrics.suiteExists(["ValidSuite"]), 'Valid suite should still exist after invalid operations');
+            assert.isTrue(metrics.queries.suiteExists(["ValidSuite"]), 'Valid suite should still exist after invalid operations');
             const stillValidData = metrics.getSuiteMetrics(["ValidSuite"]);
             assert.deepEqual(stillValidData, validData, 'Valid suite data should remain unchanged after invalid operations');
         });
@@ -708,9 +708,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             });
 
             // Verify nested structure
-            assert.isTrue(metrics.suiteExists(["Nested1"]), 'Nested1 suite should exist');
-            assert.isTrue(metrics.suiteExists(["Nested1", "Nested2_1"]), 'Nested2_1 suite should exist');
-            assert.isTrue(metrics.suiteExists(["Nested1", "Nested2_1", "Nested3_1"]), 'Nested3_1 suite should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Nested1"]), 'Nested1 suite should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Nested1", "Nested2_1"]), 'Nested2_1 suite should exist');
+            assert.isTrue(metrics.queries.suiteExists(["Nested1", "Nested2_1", "Nested3_1"]), 'Nested3_1 suite should exist');
 
             // Verify metrics at different levels
             const level1Data = metrics.getSuiteMetrics(["Nested1"]);
@@ -734,9 +734,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             assert.isBelow(endTime - startTime, 200, 'Large dataset generation should be fast');
 
             // Verify random sampling of the data
-            assert.isTrue(metrics.suiteExists(["Suite1"]), 'Suite1 should exist in large dataset');
-            assert.isTrue(metrics.suiteExists(["Suite10"]), 'Suite10 should exist in large dataset');
-            assert.isTrue(metrics.suiteExists(["Suite20"]), 'Suite20 should exist in large dataset');
+            assert.isTrue(metrics.queries.suiteExists(["Suite1"]), 'Suite1 should exist in large dataset');
+            assert.isTrue(metrics.queries.suiteExists(["Suite10"]), 'Suite10 should exist in large dataset');
+            assert.isTrue(metrics.queries.suiteExists(["Suite20"]), 'Suite20 should exist in large dataset');
 
             const suite10Data = metrics.getSuiteMetrics(["Suite10"]);
             assert.strictEqual(suite10Data.testMetrics.numTests, 25, 'Suite10 should have correct number of tests');

@@ -238,42 +238,42 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const testPath = [...suitePath, "Sample Test"];
 
             // Initially should not exist
-            assert.isFalse(metrics.suiteExists(suitePath), "Suite should not exist initially");
+            assert.isFalse(metrics.queries.suiteExists(suitePath), "Suite should not exist initially");
 
             // After running a test, suite should exist
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            assert.isTrue(metrics.suiteExists(suitePath), "Suite should exist after running test");
+            assert.isTrue(metrics.queries.suiteExists(suitePath), "Suite should exist after running test");
         });
 
         test("Check test existence", function() {
             const testPath = ["Suite Existence", "Test Suite", "Existence Test"];
 
             // Initially should not exist
-            assert.isFalse(metrics.testExists(testPath), "Test should not exist initially");
+            assert.isFalse(metrics.queries.testExists(testPath), "Test should not exist initially");
 
             // After running the test, it should exist
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            assert.isTrue(metrics.testExists(testPath), "Test should exist after running");
+            assert.isTrue(metrics.queries.testExists(testPath), "Test should exist after running");
         });
 
         test("Check nested suite existence", function() {
             const nestedPath = ["Level1", "Level2", "Level3"];
             const testPath = [...nestedPath, "Nested Test"];
 
-            assert.isFalse(metrics.suiteExists(["Level1"]), "Level1 should not exist initially");
-            assert.isFalse(metrics.suiteExists(["Level1", "Level2"]), "Level1>Level2 should not exist initially");
-            assert.isFalse(metrics.suiteExists(nestedPath), "Nested path should not exist initially");
+            assert.isFalse(metrics.queries.suiteExists(["Level1"]), "Level1 should not exist initially");
+            assert.isFalse(metrics.queries.suiteExists(["Level1", "Level2"]), "Level1>Level2 should not exist initially");
+            assert.isFalse(metrics.queries.suiteExists(nestedPath), "Nested path should not exist initially");
 
             metrics.startTest(testPath);
             metrics.stopTest(testPath);
 
-            assert.isTrue(metrics.suiteExists(["Level1"]), "Level1 should exist after running nested test");
-            assert.isTrue(metrics.suiteExists(["Level1", "Level2"]), "Level1>Level2 should exist after running nested test");
-            assert.isTrue(metrics.suiteExists(nestedPath), "Nested path should exist after running nested test");
+            assert.isTrue(metrics.queries.suiteExists(["Level1"]), "Level1 should exist after running nested test");
+            assert.isTrue(metrics.queries.suiteExists(["Level1", "Level2"]), "Level1>Level2 should exist after running nested test");
+            assert.isTrue(metrics.queries.suiteExists(nestedPath), "Nested path should exist after running nested test");
         });
     });
 
@@ -412,9 +412,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             });
 
             // Verify the structure was created correctly
-            assert.isTrue(metrics.suiteExists(["ConcurrentSuite1"]), "ConcurrentSuite1 should exist");
-            assert.isTrue(metrics.testExists(["ConcurrentSuite1", "ConcurrentTest1"]), "ConcurrentSuite1>ConcurrentTest1 should exist");
-            assert.isTrue(metrics.testExists(["ConcurrentSuite4", "ConcurrentTest3"]), "ConcurrentSuite4>ConcurrentTest3 should exist");
+            assert.isTrue(metrics.queries.suiteExists(["ConcurrentSuite1"]), "ConcurrentSuite1 should exist");
+            assert.isTrue(metrics.queries.testExists(["ConcurrentSuite1", "ConcurrentTest1"]), "ConcurrentSuite1>ConcurrentTest1 should exist");
+            assert.isTrue(metrics.queries.testExists(["ConcurrentSuite4", "ConcurrentTest3"]), "ConcurrentSuite4>ConcurrentTest3 should exist");
 
             // Verify metrics work correctly
             const suite1Data = metrics.getSuiteMetrics(["ConcurrentSuite1"]);
@@ -427,14 +427,14 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const metrics = createPresetData(true, PRESET_TYPE.REALISTIC_PREMADE);
 
             // Verify the complex structure was created
-            assert.isTrue(metrics.suiteExists(["Authentication"]), "Expected 'Authentication' suite to exist");
-            assert.isTrue(metrics.suiteExists(["Authentication", "OAuth"]), "Expected 'Authentication > OAuth' suite to exist");
-            assert.isTrue(metrics.suiteExists(["API", "Users", "Validation"]), "Expected 'API > Users > Validation' suite to exist");
+            assert.isTrue(metrics.queries.suiteExists(["Authentication"]), "Expected 'Authentication' suite to exist");
+            assert.isTrue(metrics.queries.suiteExists(["Authentication", "OAuth"]), "Expected 'Authentication > OAuth' suite to exist");
+            assert.isTrue(metrics.queries.suiteExists(["API", "Users", "Validation"]), "Expected 'API > Users > Validation' suite to exist");
 
             // Verify specific tests exist
-            assert.isTrue(metrics.testExists(["Authentication", "login"]), "Authentication>login test should exist");
-            assert.isTrue(metrics.testExists(["Authentication", "OAuth", "google_login"]), "Authentication>OAuth>google_login test should exist");
-            assert.isTrue(metrics.testExists(["API", "Users", "Validation", "email_validation"]), "API>Users>Validation>email_validation test should exist");
+            assert.isTrue(metrics.queries.testExists(["Authentication", "login"]), "Authentication>login test should exist");
+            assert.isTrue(metrics.queries.testExists(["Authentication", "OAuth", "google_login"]), "Authentication>OAuth>google_login test should exist");
+            assert.isTrue(metrics.queries.testExists(["API", "Users", "Validation", "email_validation"]), "API>Users>Validation>email_validation test should exist");
 
             // Test metrics at different levels
             const authData = metrics.getSuiteMetrics(["Authentication"]);
@@ -459,9 +459,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isBelow(endTime - startTime, 300, "Large dataset generation should be fast"); // Should be very fast
 
             // Verify random sampling of the data
-            assert.isTrue(metrics.suiteExists(["Suite1"]), "Suite1 should exist in large dataset");
-            assert.isTrue(metrics.suiteExists(["Suite8"]), "Suite8 should exist in large dataset");
-            assert.isTrue(metrics.suiteExists(["Suite15"]), "Suite15 should exist in large dataset");
+            assert.isTrue(metrics.queries.suiteExists(["Suite1"]), "Suite1 should exist in large dataset");
+            assert.isTrue(metrics.queries.suiteExists(["Suite8"]), "Suite8 should exist in large dataset");
+            assert.isTrue(metrics.queries.suiteExists(["Suite15"]), "Suite15 should exist in large dataset");
 
             const suite8Data = metrics.getSuiteMetrics(["Suite8"]);
             assert.strictEqual(suite8Data.testMetrics.numTests, 20, "Suite8 should have 20 tests");

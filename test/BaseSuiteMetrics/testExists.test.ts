@@ -12,37 +12,37 @@ suite("[BaseSuiteMetrics] testExists", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.testExists("not an array"), 'Suite/test path must be an array', 'Should throw error when path is not an array');
+            assert.throws(() => metrics.queries.testExists("not an array"), 'Suite/test path must be an array', 'Should throw error when path is not an array');
         });
 
         test("Array with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.testExists([123, "test"]), "Suite/test path element at index 0 must be a 'string', got 'number'");
+            assert.throws(() => metrics.queries.testExists([123, "test"]), "Suite/test path element at index 0 must be a 'string', got 'number'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.testExists(["suite", null]), 'Suite/test path element at index 1 must be a' +
+            assert.throws(() => metrics.queries.testExists(["suite", null]), 'Suite/test path element at index 1 must be a' +
                 ' \'string\', got \'object\'', 'Should throw error when array contains null');
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.testExists(["suite", undefined]), 'Suite/test path element at index 1 must' +
+            assert.throws(() => metrics.queries.testExists(["suite", undefined]), 'Suite/test path element at index 1 must' +
                 ' be a \'string\', got \'undefined\'', 'Should throw error when array contains undefined');
         });
 
         test("Array with empty string elements", function() {
-            assert.throws(() => metrics.testExists(["suite", ""]), 'Suite/test path element at index 1 cannot be empty', 'Should throw error when array contains empty string at end');
-            assert.throws(() => metrics.testExists(["", "test"]), 'Suite/test path element at index 0 cannot be empty', 'Should throw error when array contains empty string at start');
+            assert.throws(() => metrics.queries.testExists(["suite", ""]), 'Suite/test path element at index 1 cannot be empty', 'Should throw error when array contains empty string at end');
+            assert.throws(() => metrics.queries.testExists(["", "test"]), 'Suite/test path element at index 0 cannot be empty', 'Should throw error when array contains empty string at start');
         });
 
         test("Empty array", function() {
-            assert.throws(() => metrics.testExists([]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Should throw error when path array is empty');
+            assert.throws(() => metrics.queries.testExists([]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Should throw error when path array is empty');
         });
 
         test("Single-element array", function() {
-            assert.isFalse(metrics.testExists(["suite1", "just-test"]), 'Single-element array should return false');
+            assert.isFalse(metrics.queries.testExists(["suite1", "just-test"]), 'Single-element array should return false');
         });
     });
 
     suite("Basic Functionality", function() {
         test("Non-existent test in non-existent suite", function() {
-            assert.isFalse(metrics.testExists(["NonExistentSuite", "NonExistentTest"]), 'Non-existent test in non-existent suite should return false');
+            assert.isFalse(metrics.queries.testExists(["NonExistentSuite", "NonExistentTest"]), 'Non-existent test in non-existent suite should return false');
         });
 
         test("Non-existent test in existing suite", function() {
@@ -50,21 +50,21 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(["ExistingSuite", "ExistingTest"]);
             metrics.stopTest();
 
-            assert.isFalse(metrics.testExists(["ExistingSuite", "NonExistentTest"]), 'Non-existent test in existing suite should return false');
+            assert.isFalse(metrics.queries.testExists(["ExistingSuite", "NonExistentTest"]), 'Non-existent test in existing suite should return false');
         });
 
         test("Existing test", function() {
             metrics.startTest(["TestSuite", "ExistingTest"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["TestSuite", "ExistingTest"]), 'Existing test should return true');
+            assert.isTrue(metrics.queries.testExists(["TestSuite", "ExistingTest"]), 'Existing test should return true');
         });
 
         test("Existing test in nested suite", function() {
             metrics.startTest(["Level1", "Level2", "Level3", "DeepTest"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Level1", "Level2", "Level3", "DeepTest"]), 'Existing test in nested suite should return true');
+            assert.isTrue(metrics.queries.testExists(["Level1", "Level2", "Level3", "DeepTest"]), 'Existing test in nested suite should return true');
         });
 
         test("Test path that points to suite", function() {
@@ -73,8 +73,8 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.stopTest();
 
             // These are suites, not tests
-            assert.isFalse(metrics.testExists(["Suite1", "Suite2"]), 'Path pointing to suite should return false');
-            assert.isFalse(metrics.testExists(["Suite1", "test1"]), 'Path pointing to non-existent test in suite should return false');
+            assert.isFalse(metrics.queries.testExists(["Suite1", "Suite2"]), 'Path pointing to suite should return false');
+            assert.isFalse(metrics.queries.testExists(["Suite1", "test1"]), 'Path pointing to non-existent test in suite should return false');
         });
     });
 
@@ -90,10 +90,10 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(["MultiTestSuite", "Test3"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test1"]), 'First test should exist');
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test2"]), 'Second test should exist');
-            assert.isTrue(metrics.testExists(["MultiTestSuite", "Test3"]), 'Third test should exist');
-            assert.isFalse(metrics.testExists(["MultiTestSuite", "Test4"]), 'Non-existent fourth test should return false');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test1"]), 'First test should exist');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test2"]), 'Second test should exist');
+            assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test3"]), 'Third test should exist');
+            assert.isFalse(metrics.queries.testExists(["MultiTestSuite", "Test4"]), 'Non-existent fourth test should return false');
         });
 
         test("Tests with same name in different suites", function() {
@@ -103,9 +103,9 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(["Suite2", "SameName"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Suite1", "SameName"]), 'Test with same name in first suite should exist');
-            assert.isTrue(metrics.testExists(["Suite2", "SameName"]), 'Test with same name in second suite should exist');
-            assert.isFalse(metrics.testExists(["Suite3", "SameName"]), 'Test with same name in non-existent suite should return false');
+            assert.isTrue(metrics.queries.testExists(["Suite1", "SameName"]), 'Test with same name in first suite should exist');
+            assert.isTrue(metrics.queries.testExists(["Suite2", "SameName"]), 'Test with same name in second suite should exist');
+            assert.isFalse(metrics.queries.testExists(["Suite3", "SameName"]), 'Test with same name in non-existent suite should return false');
         });
     });
 
@@ -114,16 +114,16 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(["Suite", "Test@#$%^&*()"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Suite", "Test@#$%^&*()"]), 'Test with special characters should exist');
-            assert.isFalse(metrics.testExists(["Suite", "Test@#$%^&*()_different"]), 'Similar test with different special characters should return false');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test@#$%^&*()"]), 'Test with special characters should exist');
+            assert.isFalse(metrics.queries.testExists(["Suite", "Test@#$%^&*()_different"]), 'Similar test with different special characters should return false');
         });
 
         test("Tests with spaces", function() {
             metrics.startTest(["Suite", "Test With Spaces"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Suite", "Test With Spaces"]), 'Test with spaces should exist');
-            assert.isFalse(metrics.testExists(["Suite", "TestWithSpaces"]), 'Test without spaces should return false');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test With Spaces"]), 'Test with spaces should exist');
+            assert.isFalse(metrics.queries.testExists(["Suite", "TestWithSpaces"]), 'Test without spaces should return false');
         });
 
         test("Very long test names", function() {
@@ -131,17 +131,17 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(["Suite", longTestName]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Suite", longTestName]), 'Test with very long name should exist');
+            assert.isTrue(metrics.queries.testExists(["Suite", longTestName]), 'Test with very long name should exist');
         });
 
         test("Case sensitivity for test names", function() {
             metrics.startTest(["Suite", "CaseSensitiveTest"]);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(["Suite", "CaseSensitiveTest"]), 'Test with original case should exist');
-            assert.isFalse(metrics.testExists(["Suite", "casesensitivetest"]), 'Test with lowercase should return false');
-            assert.isFalse(metrics.testExists(["Suite", "CASESENSITIVETEST"]), 'Test with uppercase should return false');
-            assert.isFalse(metrics.testExists(["Suite", "CaseSENSITIVETest"]), 'Test with mixed case should return false');
+            assert.isTrue(metrics.queries.testExists(["Suite", "CaseSensitiveTest"]), 'Test with original case should exist');
+            assert.isFalse(metrics.queries.testExists(["Suite", "casesensitivetest"]), 'Test with lowercase should return false');
+            assert.isFalse(metrics.queries.testExists(["Suite", "CASESENSITIVETEST"]), 'Test with uppercase should return false');
+            assert.isFalse(metrics.queries.testExists(["Suite", "CaseSENSITIVETest"]), 'Test with mixed case should return false');
         });
 
         test("Deeply nested test paths", function() {
@@ -154,13 +154,13 @@ suite("[BaseSuiteMetrics] testExists", function() {
             metrics.startTest(deepPath);
             metrics.stopTest();
 
-            assert.isTrue(metrics.testExists(deepPath), 'Deeply nested test should exist');
+            assert.isTrue(metrics.queries.testExists(deepPath), 'Deeply nested test should exist');
 
             // Verify that partial paths don't work as test paths
             for (let i = 1; i < deepPath.length; i++) {
                 const partialPath = deepPath.slice(0, i);
                 if (partialPath.length >= 2) {
-                    assert.isFalse(metrics.testExists(partialPath), `Partial path ${partialPath.join('/')} should return false`);
+                    assert.isFalse(metrics.queries.testExists(partialPath), `Partial path ${partialPath.join('/')} should return false`);
                 }
             }
         });
@@ -169,31 +169,31 @@ suite("[BaseSuiteMetrics] testExists", function() {
     suite("State Consistency", function() {
         test("Consistency during test lifecycle", function() {
             // Before test creation
-            assert.isFalse(metrics.testExists(["Suite", "Test"]), 'Test should not exist before creation');
+            assert.isFalse(metrics.queries.testExists(["Suite", "Test"]), 'Test should not exist before creation');
 
             // During test execution
             metrics.startTest(["Suite", "Test"]);
-            assert.isFalse(metrics.testExists(["Suite", "Test"]), 'Test should not exist during execution');
+            assert.isFalse(metrics.queries.testExists(["Suite", "Test"]), 'Test should not exist during execution');
 
             // After test completion
             metrics.stopTest();
-            assert.isTrue(metrics.testExists(["Suite", "Test"]), 'Test should exist after completion');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test"]), 'Test should exist after completion');
         });
 
         test("Multiple test creation and completion cycles", function() {
             // First cycle
             metrics.startTest(["Suite", "Test1"]);
-            assert.isFalse(metrics.testExists(["Suite", "Test1"]), 'First test should not exist during execution');
+            assert.isFalse(metrics.queries.testExists(["Suite", "Test1"]), 'First test should not exist during execution');
             metrics.stopTest();
-            assert.isTrue(metrics.testExists(["Suite", "Test1"]), 'First test should exist after completion');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test1"]), 'First test should exist after completion');
 
             // Second cycle
             metrics.startTest(["Suite", "Test2"]);
-            assert.isTrue(metrics.testExists(["Suite", "Test1"]), 'First test should still exist during second test execution');
-            assert.isFalse(metrics.testExists(["Suite", "Test2"]), 'Second test should not exist during execution');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test1"]), 'First test should still exist during second test execution');
+            assert.isFalse(metrics.queries.testExists(["Suite", "Test2"]), 'Second test should not exist during execution');
             metrics.stopTest();
-            assert.isTrue(metrics.testExists(["Suite", "Test1"]), 'First test should still exist after second test completion');
-            assert.isTrue(metrics.testExists(["Suite", "Test2"]), 'Second test should exist after completion');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test1"]), 'First test should still exist after second test completion');
+            assert.isTrue(metrics.queries.testExists(["Suite", "Test2"]), 'Second test should exist after completion');
         });
     });
 });
