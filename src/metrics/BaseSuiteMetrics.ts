@@ -103,12 +103,13 @@ abstract class BaseSuiteMetrics {
     /**
      * Stringifies all data in this metrics instance into JSON
      *
+     * @param includeTopLevel true to include the top-level suite as the top level object
      * @param indent Number of indents for each line (default 4)
      * @returns JSON string representing the structure and data of all suites in this metrics instance
      */
-    public toJSON(indent: number = 4): string {
+    public toJSON(includeTopLevel = true, indent: number = 4): string {
 
-        const suiteToSerializable = (suite: Suite) => ({
+        const suiteToSerializable: (suite: Suite) => SerializableSuite = (suite: Suite): SerializableSuite => ({
             name: suite.name,
             tests: Object.fromEntries(suite.tests),
             subSuites: Object.fromEntries(
@@ -119,12 +120,17 @@ abstract class BaseSuiteMetrics {
             aggregateData: suite.aggregateData
         });
 
-        const serializableSuites: Record<string, SerializableSuite> = Object.fromEntries(
+        if (includeTopLevel) {
+            const serializableData: SerializableSuite = suiteToSerializable(this.suites.getTopLevelSuite());
+            return JSON.stringify(serializableData, null, indent);
+        }
+
+        const serializableData: Record<string, SerializableSuite> = Object.fromEntries(
             Array.from(this.suites.getAllSuites().entries())
                 .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, suiteToSerializable(suite)])
         );
 
-        return JSON.stringify(serializableSuites, null, indent);
+        return JSON.stringify(serializableData, null, indent);
     }
 }
 
