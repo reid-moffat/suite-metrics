@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import SuiteMetrics from "suite-metrics";
 import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
 import { _MockSuiteMetrics } from "../generators/mocks.js";
+import { sleep } from "../helpers.js";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
@@ -165,16 +166,15 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
         test("Correct metrics for suite with multiple tests", function() {
             // Create tests with different durations
             metrics.startTest(["MultiTestSuite", "FastTest"]);
-            metrics.stopTest();
-
-            metrics.startTest(["MultiTestSuite", "SlowTest"]);
-            const startTime = Date.now();
-            while (Date.now() - startTime < 10) { /* busy wait longer */ }
+            sleep(2);
             metrics.stopTest();
 
             metrics.startTest(["MultiTestSuite", "MediumTest"]);
-            const mediumStart = Date.now();
-            while (Date.now() - mediumStart < 5) { /* busy wait medium */ }
+            sleep(20);
+            metrics.stopTest();
+
+            metrics.startTest(["MultiTestSuite", "SlowTest"]);
+            sleep(200);
             metrics.stopTest();
 
             const fastTest = metrics.queries.getTest(["MultiTestSuite", "FastTest"]);
