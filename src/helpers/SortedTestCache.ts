@@ -17,85 +17,22 @@ class SortedTestCache {
     /**
      * Returns the total number of tests
      */
-    private getNumTests: () => number = (): number => this.originalOrder.length;
+    public getNumTests(): number {
+        return this.originalOrder.length;
+    }
+
+    /**
+     * Returns a reference to the cache
+     */
+    public get(): Test[] {
+        return this.cache
+    }
 
     /**
      * Gets all tests in the order they were completed
      */
     public getTestsInOrder(): Test[] {
         return this.originalOrder;
-    }
-
-    /**
-     * Gets the slowest test across all suites
-     */
-    public getSlowestTest(): Test {
-        if (this.getNumTests() === 0) {
-            throw new Error(`There are no tests in this cache, could not get the slowest test`);
-        }
-
-        this.ensureSortedCache();
-        return this.cache[0];
-    }
-
-    /**
-     * Gets the k slowest tests across all suites, sorted by duration descending
-     */
-    public getKSlowestTests(k: number): Test[] {
-        if (!Number.isInteger(k) || k <= 0) {
-            throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
-        }
-        if (this.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.getNumTests()})`);
-        }
-
-        this.ensureSortedCache();
-        const endIndex: number = Math.min(k, this.cache.length);
-        return this.cache.slice(0, endIndex);
-    }
-
-    /**
-     * Gets all tests sorted by duration descending (slowest first)
-     */
-    public getAllTestsSlowestFirst(): Test[] {
-        this.ensureSortedCache();
-        return [...this.cache];
-    }
-
-    /**
-     * Gets the fastest test across all suites
-     */
-    public getFastestTest(): Test {
-        if (this.getNumTests() === 0) {
-            throw new Error(`There are no tests in this cache, could not get the fastest test`);
-        }
-
-        this.ensureSortedCache();
-        return this.cache[this.cache.length - 1];
-    }
-
-    /**
-     * Gets the k fastest tests across all suites, sorted by duration ascending
-     */
-    public getKFastestTests(k: number): Test[] {
-        if (!Number.isInteger(k) || k <= 0) {
-            throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
-        }
-        if (this.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.getNumTests()})`);
-        }
-
-        this.ensureSortedCache();
-        const startIndex: number = Math.max(0, this.cache.length - k);
-        return this.cache.slice(startIndex).reverse();
-    }
-
-    /**
-     * Gets all tests sorted by duration ascending (fastest first)
-     */
-    public getAllTestsFastestFirst(): Test[] {
-        this.ensureSortedCache();
-        return [...this.cache].reverse();
     }
 
     /**
@@ -111,7 +48,7 @@ class SortedTestCache {
     /**
      * Rebuilds the sorted cache if invalid
      */
-    private ensureSortedCache(): void {
+    public ensureSortedCache(): void {
         if (!this.sortedCacheValid) {
             // Sort by duration in descending order (slowest goes first)
             this.cache = this.originalOrder.sort((a: Test, b: Test): number => b.duration - a.duration);
