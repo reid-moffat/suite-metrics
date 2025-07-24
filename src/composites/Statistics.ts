@@ -102,6 +102,44 @@ class Statistics {
         });
     }
 
+    /**
+     * Returns a human-readable interpretation of a test's Z-score
+     *
+     * @param zScore The Z-score of a test
+     * @returns Strings to explain the Z-score's meaning: notability and speed
+     */
+    public interpretZScore(zScore: number): { interpretation: string; severity: 'normal' | 'notable' | 'unusual' | 'extreme'; description: string; } {
+
+        const absZ: number = Math.abs(zScore);
+        let interpretation: string;
+        let severity: 'normal' | 'notable' | 'unusual' | 'extreme';
+        let description: string;
+
+        if (absZ < 1) {
+            interpretation = 'Within normal range';
+            severity = 'normal';
+            description = 'Test performance is close to average';
+        } else if (absZ < 2) {
+            interpretation = 'Notable deviation';
+            severity = 'notable';
+            description = `Test is notably ${zScore > 0 ? "slower" : "faster"} than average`;
+        } else if (absZ < 3) {
+            interpretation = 'Unusual performance';
+            severity = 'unusual';
+            description = `Test is unusually ${zScore > 0 ? "slow" : "fast"}`;
+        } else {
+            interpretation = 'Extreme outlier';
+            severity = 'extreme';
+            description = `Test is extremely ${zScore > 0 ? "slow" : "fast"} (potential issue)`;
+        }
+
+        return {
+            interpretation,
+            severity,
+            description
+        };
+    }
+
 
     /**
      * Updates the stored stdDev value if required (tests added since last calculation)
