@@ -5,6 +5,7 @@ import Performance from "../composites/Performance.ts";
 import SortedTestCache from "../helpers/SortedTestCache.ts";
 import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
+import Statistics from "../composites/Statistics.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -17,6 +18,8 @@ abstract class BaseSuiteMetrics {
     public readonly performance: Performance = new Performance(this.performanceCache);
 
     public readonly queries: Queries = new Queries(this.suites);
+
+    public readonly statistics: Statistics = new Statistics(this.performanceCache.getTestsInOrder());
 
     /**
      * Validates a test or suite path, throwing an error if invalid
@@ -180,42 +183,6 @@ abstract class BaseSuiteMetrics {
         }
 
         return lines.join('\n');
-    }
-
-    /**
-     * Gets the standard deviation of the set of all test durations
-     *
-     * @param usePopulation Set to true for population standard deviation (divide by N),
-     *                      false for sample standard deviation (divide by N-1) (default: false)
-     * @returns The standard deviation of test durations in microseconds
-     * @throws Error If there are no tests in this metrics, or only one for a sample standard deviation
-     */
-    public getStandardDeviation(usePopulation: boolean = false): number {
-        const totalTests: number = this.getTotalTestCount();
-
-        if (totalTests === 0) {
-            throw new Error('Cannot calculate standard deviation: no tests available');
-        }
-
-        if (!usePopulation && totalTests < 2) {
-            throw new Error('Cannot calculate sample standard deviation: need at least 2 tests');
-        }
-
-        // Calculate mean
-        const allTests: Test[] = this.performanceCache.getTestsInOrder();
-        const durations: number[] = allTests.map((test: Test): number => test.duration);
-        const mean: number = durations.reduce((sum: number, duration: number): number => sum + duration, 0) / durations.length;
-
-        // Calculate variance
-        const sumSquaredDifferences: number = durations.reduce((sum: number, duration: number): number => {
-            const difference: number = duration - mean;
-            return sum + (difference * difference);
-        }, 0);
-
-        const divisor: number = usePopulation ? durations.length : durations.length - 1;
-        const variance: number = sumSquaredDifferences / divisor;
-
-        return Math.sqrt(variance);
     }
 
     /**
