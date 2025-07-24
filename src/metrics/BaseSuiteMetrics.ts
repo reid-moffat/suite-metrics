@@ -456,12 +456,7 @@ abstract class BaseSuiteMetrics {
      * Creates a deep copy of an array of test objects to prevent external modifications
      */
     private deepCopyTests(tests: Test[]): Test[] {
-        return tests.map((test: Test): Test => (
-            {
-                ...test,
-                path: [...test.path]
-            }
-        ));
+        return tests.map((test: Test): Test => this.deepCopyTest(test));
     }
 
     /**
