@@ -3,11 +3,11 @@ import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData } from "suite-
 
 suite("[Both] Singleton Pattern", function() {
 
-    let metrics: SuiteMetrics;
+    let suiteMetrics: SuiteMetrics;
     let concurrentMetrics: ConcurrentSuiteMetrics;
 
     setup(function() {
-        metrics = new SuiteMetrics();
+        suiteMetrics = new SuiteMetrics();
         concurrentMetrics = new ConcurrentSuiteMetrics();
     });
 
@@ -374,8 +374,8 @@ suite("[Both] Singleton Pattern", function() {
     suite("Instances are empty after reset", function() {
         test("SuiteMetrics", function() {
             // Simulate test completion
-            metrics.startTest(['suite1', 'test1']);
-            metrics.stopTest();
+            suiteMetrics.startTest(['suite1', 'test1']);
+            suiteMetrics.stopTest();
 
             // Get instance data after reset
             SuiteMetrics.resetInstance();
