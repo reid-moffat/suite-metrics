@@ -49,7 +49,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
                 throw new Error('Failed to acquire singleton lock: Singleton acquisition was cancelled');
             }
 
-            throw new Error(`Unknown exception getting singleton: ${error.message}`);
+            throw new Error(`Unexpected exception getting singleton: ${error.message}`);
         } finally {
             if (release) {
                 release();
@@ -74,7 +74,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
                 throw new Error('Singleton reset was cancelled');
             }
 
-            throw new Error(`Unknown exception resetting singleton: ${error.message}`);
+            throw new Error(`Unexpected exception resetting singleton: ${error.message}`);
         } finally {
             if (release) {
                 release();
@@ -83,45 +83,86 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     }
 
     /**
-     * Starts timing a new test. May be called when other tests are actively running
+     * Starts timing a new test. May be called when other tests are actively running (thread-safe)
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public startTest(path: string[]): void {
-        // Validate path and ensure test isn't already completed
-        const testExists: boolean = this.queries.testExists(path);
-        if (testExists) {
-            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
-        }
+    public async startTest(path: string[]): Promise<void> {
+        let release: (() => void) | null = null;
 
-        // Verify test isn't already running
-        const testKey: string = this.createTestKey(path);
-        if (this.activeTests.has(testKey)) {
-            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is already running`);
-        }
+        try {
+            release = await this.testMutex.acquire();
 
-        this.activeTests.set(testKey, microtime.now());
+            // Validate path and ensure test isn't already completed
+            const testExists: boolean = this.queries.testExists(path);
+            if (testExists) {
+                throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
+            }
+
+            // Verify test isn't already running
+            const testKey: string = this.createTestKey(path);
+            if (this.activeTests.has(testKey)) {
+                throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is already running`);
+            }
+
+            this.activeTests.set(testKey, microtime.now());
+        } catch (error: any) {
+            // Handle specific mutex errors
+            if (error === E_TIMEOUT) {
+                throw new Error(`Failed to acquire test mutex for starting test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+            }
+            if (error === E_CANCELED) {
+                throw new Error(`Test start operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);
+            }
+
+            throw new Error(`Error starting test: ${error.message}`);
+        } finally {
+            if (release) {
+                release();
+            }
+        }
     }
 
     /**
-     * Stops timing a specific test
+     * Stops timing a specific test (thread-safe)
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public stopTest(path: string[]): void {
+    public async stopTest(path: string[]): Promise<void> {
         const endTime: number = microtime.now();
-        BaseSuiteMetrics.validatePath(path, true);
-        const testKey: string = this.createTestKey(path);
+        let release: (() => void) | null = null;
 
-        // Verify test exists
-        const testStartTime: number | undefined = this.activeTests.get(testKey);
-        if (testStartTime === undefined) {
-            throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is not currently running. Call startTest() first to begin testing`);
+        try {
+            release = await this.testMutex.acquire();
+
+            BaseSuiteMetrics.validatePath(path, true);
+            const testKey: string = this.createTestKey(path);
+
+            // Verify test exists
+            const testStartTime: number | undefined = this.activeTests.get(testKey);
+            if (testStartTime === undefined) {
+                throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} is not currently running. Call startTest() first to begin testing`);
+            }
+
+            // Store test data and remove from active tests
+            this.suites.addTest(path, testStartTime, endTime);
+            this.activeTests.delete(testKey);
+        } catch (error: any) {
+            // Handle specific mutex errors
+            if (error === E_TIMEOUT) {
+                throw new Error(`Failed to acquire test mutex for stopping test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+            }
+            if (error === E_CANCELED) {
+                throw new Error(`Test stop operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);
+            }
+
+            // Re-throw business logic errors (test not running, etc.) and unexpected errors
+            throw Error(`Error stopping test: ${error.message}`);
+        } finally {
+            if (release) {
+                release();
+            }
         }
-
-        // Store test data and remove from active tests
-        this.suites.addTest(path, testStartTime, endTime);
-        this.activeTests.delete(testKey);
     }
 
 

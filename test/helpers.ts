@@ -1,4 +1,5 @@
 import microtime from "microtime";
+import { assert } from "chai";
 
 /**
  * Generates a random integer between min and max (both inclusive)
@@ -40,4 +41,20 @@ function sleepMicroseconds(microseconds: number): void {
     while (microtime.now() < endTime) { /* busy wait */ }
 }
 
-export { randomInt, sleep, sleepMicroseconds };
+/**
+ *
+ *
+ * @param func
+ * @param expectedError
+ * @param message
+ */
+async function assertThrowsAsync(func: () => Promise<void>, expectedError: string, message: string): Promise<void> {
+    try {
+        await func();
+        assert.fail("Expected function to throw an error, but it didn't");
+    } catch (error: any) {
+        assert.strictEqual(error.message, expectedError, message);
+    }
+}
+
+export { randomInt, sleep, sleepMicroseconds, assertThrowsAsync };

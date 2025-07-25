@@ -301,8 +301,8 @@ suite("[Both] Singleton Pattern", function() {
             suiteInstance.startTest(['suite-data', 'test1']);
             suiteInstance.stopTest();
 
-            concurrentInstance.startTest(['concurrent-data', 'test1']);
-            concurrentInstance.stopTest(['concurrent-data', 'test1']);
+            await concurrentInstance.startTest(['concurrent-data', 'test1']);
+            await concurrentInstance.stopTest(['concurrent-data', 'test1']);
 
             // Verify data exists in both
             assert.isTrue(suiteInstance.queries.testExists(['suite-data', 'test1']), "Test should exist in SuiteMetrics" +
@@ -428,12 +428,12 @@ suite("[Both] Singleton Pattern", function() {
             const instance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Create complex nested structure
-            instance.startTest(['level1', 'test1']);
-            instance.stopTest(['level1', 'test1']);
-            instance.startTest(['level1', 'level2', 'test2']);
-            instance.stopTest(['level1', 'level2', 'test2']);
-            instance.startTest(['level1', 'level2', 'level3', 'test3']);
-            instance.stopTest(['level1', 'level2', 'level3', 'test3']);
+            await instance.startTest(['level1', 'test1']);
+            await instance.stopTest(['level1', 'test1']);
+            await instance.startTest(['level1', 'level2', 'test2']);
+            await instance.stopTest(['level1', 'level2', 'test2']);
+            await instance.startTest(['level1', 'level2', 'level3', 'test3']);
+            await instance.stopTest(['level1', 'level2', 'level3', 'test3']);
 
             // Verify data exists
             assert.equal(instance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 3, "ConcurrentSuiteMetrics instance should have 3 tests before reset");
@@ -704,9 +704,9 @@ suite("[Both] Singleton Pattern", function() {
             const instance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Start multiple tests but don't stop them
-            instance.startTest(['concurrent-active', 'test1']);
-            instance.startTest(['concurrent-active', 'test2']);
-            instance.startTest(['concurrent-active', 'sub-suite', 'test3']);
+            await instance.startTest(['concurrent-active', 'test1']);
+            await instance.startTest(['concurrent-active', 'test2']);
+            await instance.startTest(['concurrent-active', 'sub-suite', 'test3']);
 
             // Reset while tests are active
             await ConcurrentSuiteMetrics.resetInstance();
@@ -714,10 +714,12 @@ suite("[Both] Singleton Pattern", function() {
 
             // New instance should be clean and allow starting tests
             assert.notEqual(newInstance, instance, "New ConcurrentSuiteMetrics instance should be different from old instance");
-            assert.doesNotThrow(() => {
-                newInstance.startTest(['new-concurrent', 'test1']);
-                newInstance.stopTest(['new-concurrent', 'test1']);
-            }, "New ConcurrentSuiteMetrics instance should allow starting tests without throwing");
+            await newInstance.startTest(['new-concurrent', 'test1']);
+            await newInstance.stopTest(['new-concurrent', 'test1']);
+
+            await newInstance.startTest(['concurrent-active', 'test1']);
+            await newInstance.startTest(['concurrent-active', 'test2']);
+            await newInstance.startTest(['concurrent-active', 'sub-suite', 'test3']);
 
             assert.isTrue(newInstance.queries.testExists(['new-concurrent', 'test1']), "New test should exist in new ConcurrentSuiteMetrics instance");
             assert.isFalse(newInstance.queries.testExists(['concurrent-active', 'test1']), "Active test from old instance should not exist in new ConcurrentSuiteMetrics instance");
