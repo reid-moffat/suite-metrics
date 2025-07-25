@@ -1,6 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import { Mutex, MutexInterface, withTimeout } from 'async-mutex';
+import { E_CANCELED, E_TIMEOUT, Mutex, withTimeout } from 'async-mutex';
 
 
 // Path segments joined with '::'
@@ -21,8 +21,8 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
 
     // Mutexes for the lazy singleton and for any specific instance
-    private static readonly instanceMutex: MutexInterface = withTimeout(new Mutex(), 100);
-    private readonly testMutex: MutexInterface = withTimeout(new Mutex(), 100);
+    private static readonly instanceMutex = withTimeout(new Mutex(), 100);
+    private readonly testMutex = withTimeout(new Mutex(), 100);
 
 
     /**
@@ -31,15 +31,29 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * @returns The globally available ConcurrentSuiteMetrics instance
      */
     public static async getInstance(): Promise<ConcurrentSuiteMetrics> {
-        await ConcurrentSuiteMetrics.instanceMutex.acquire();
+        let release: (() => void) | null = null;
+
         try {
+            release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
+
             if (ConcurrentSuiteMetrics._instance === null) {
                 ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
             }
-
             return ConcurrentSuiteMetrics._instance;
+        } catch (error: any) {
+            // Handle specific mutex errors
+            if (error === E_TIMEOUT) {
+                throw new Error('Failed to acquire singleton lock: Timeout after 100ms');
+            }
+            if (error === E_CANCELED) {
+                throw new Error('Failed to acquire singleton lock: Singleton acquisition was cancelled');
+            }
+
+            throw new Error(`Unknown exception getting singleton: ${error.message}`);
         } finally {
-            ConcurrentSuiteMetrics.instanceMutex.release();
+            if (release) {
+                release();
+            }
         }
     }
 
@@ -47,11 +61,24 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data (thread-safe)
      */
     public static async resetInstance(): Promise<void> {
-        await ConcurrentSuiteMetrics.instanceMutex.acquire();
+        let release: (() => void) | null = null;
+
         try {
+            release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
             ConcurrentSuiteMetrics._instance = null;
+        } catch (error: any) {
+            if (error === E_TIMEOUT) {
+                throw new Error('Failed to acquire singleton lock for reset: timeout after 100ms');
+            }
+            if (error === E_CANCELED) {
+                throw new Error('Singleton reset was cancelled');
+            }
+
+            throw new Error(`Unknown exception resetting singleton: ${error.message}`);
         } finally {
-            ConcurrentSuiteMetrics.instanceMutex.release();
+            if (release) {
+                release();
+            }
         }
     }
 
