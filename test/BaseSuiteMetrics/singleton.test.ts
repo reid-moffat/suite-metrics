@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData } from "suite-metrics";
+import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData, SuiteData, Test } from "suite-metrics";
 
 suite("[Both] Singleton Pattern", function() {
 
@@ -46,23 +46,23 @@ suite("[Both] Singleton Pattern", function() {
 
         test("Singleton consistency across different access patterns", function() {
             // Test various ways of accessing the singleton
-            const direct1 = SuiteMetrics.getInstance();
-            const direct2 = SuiteMetrics.getInstance();
+            const direct1: SuiteMetrics = SuiteMetrics.getInstance();
+            const direct2: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Access after operations
             direct1.startTest(['test-suite', 'test1']);
             direct1.stopTest();
-            const afterOp = SuiteMetrics.getInstance();
+            const afterOp: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Access in different execution contexts
-            const fromCallback = (() => SuiteMetrics.getInstance())();
-            const fromPromise = Promise.resolve().then(() => SuiteMetrics.getInstance());
+            const fromCallback: SuiteMetrics = ((): SuiteMetrics => SuiteMetrics.getInstance())();
+            const fromPromise: Promise<SuiteMetrics> = Promise.resolve().then((): SuiteMetrics => SuiteMetrics.getInstance());
 
             assert.equal(direct1, direct2, "Direct getInstance calls should return same instance");
             assert.equal(direct1, afterOp, "getInstance after operations should return same instance");
             assert.equal(direct1, fromCallback, "getInstance from callback should return same instance");
 
-            return fromPromise.then(promiseInstance => {
+            return fromPromise.then((promiseInstance: SuiteMetrics) => {
                 assert.equal(direct1, promiseInstance, "getInstance from promise should return same instance");
             });
         });
@@ -111,7 +111,7 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Reset creates completely fresh instance", function() {
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Add some data to the instance
             instance1.startTest(['reset-test', 'test1']);
@@ -121,7 +121,7 @@ suite("[Both] Singleton Pattern", function() {
 
             // Reset and get new instance
             SuiteMetrics.resetInstance();
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
             // New instance should be clean
             assert.isFalse(instance2.queries.testExists(['reset-test', 'test1']), "Test should not exist in new instance after reset");
@@ -130,8 +130,8 @@ suite("[Both] Singleton Pattern", function() {
 
         test("Reset preserves singleton behavior for new instance", function() {
             SuiteMetrics.resetInstance();
-            const instance1 = SuiteMetrics.getInstance();
-            const instance2 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
             assert.equal(instance1, instance2, "Multiple getInstance calls after reset should return same instance");
             assert.instanceOf(instance1, SuiteMetrics, "Instance after reset should be SuiteMetrics type");
@@ -172,24 +172,24 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Multiple consecutive resets", function() {
-            const originalInstance = SuiteMetrics.getInstance();
+            const originalInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Perform multiple resets
             SuiteMetrics.resetInstance();
             SuiteMetrics.resetInstance();
             SuiteMetrics.resetInstance();
 
-            const newInstance = SuiteMetrics.getInstance();
+            const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
             assert.notEqual(originalInstance, newInstance, "Instance after multiple consecutive resets should be different from original");
 
             // Verify singleton behavior still works
-            const sameInstance = SuiteMetrics.getInstance();
+            const sameInstance: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(newInstance, sameInstance, "getInstance calls after multiple resets should return same instance");
         });
 
         test("Reset with data persistence verification", function() {
             // Create instance with data
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
             instance1.startTest(['persistence-test', 'test1']);
             instance1.stopTest();
 
@@ -200,7 +200,7 @@ suite("[Both] Singleton Pattern", function() {
             SuiteMetrics.resetInstance();
             SuiteMetrics.resetInstance();
 
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(instance2.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 0, "Instance" +
                 " should have 0 tests after reset");
             assert.notEqual(instance1, instance2, "Instance after reset should be different object");
@@ -231,11 +231,11 @@ suite("[Both] Singleton Pattern", function() {
         test("Idempotency after reset with operations", function() {
             SuiteMetrics.resetInstance();
 
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
             instance1.startTest(['idempotency-test', 'test1']);
             instance1.stopTest();
 
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(instance1, instance2, "getInstance after operations should return same instance");
             assert.isTrue(instance2.queries.testExists(['idempotency-test', 'test1']), "Test should exist in same instance retrieved after operations");
         });
@@ -243,14 +243,14 @@ suite("[Both] Singleton Pattern", function() {
         test("Idempotency across multiple reset cycles", function() {
             // First cycle
             SuiteMetrics.resetInstance();
-            const cycle1_instance1 = SuiteMetrics.getInstance();
-            const cycle1_instance2 = SuiteMetrics.getInstance();
+            const cycle1_instance1: SuiteMetrics = SuiteMetrics.getInstance();
+            const cycle1_instance2: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(cycle1_instance1, cycle1_instance2, "Instances in first cycle should be the same");
 
             // Second cycle
             SuiteMetrics.resetInstance();
-            const cycle2_instance1 = SuiteMetrics.getInstance();
-            const cycle2_instance2 = SuiteMetrics.getInstance();
+            const cycle2_instance1: SuiteMetrics = SuiteMetrics.getInstance();
+            const cycle2_instance2: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(cycle2_instance1, cycle2_instance2, "Instances in second cycle should be the same");
 
             // Cycles should be different
@@ -294,8 +294,8 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Cross-class data isolation", async function() {
-            const suiteInstance = SuiteMetrics.getInstance();
-            const concurrentInstance = await ConcurrentSuiteMetrics.getInstance();
+            const suiteInstance: SuiteMetrics = SuiteMetrics.getInstance();
+            const concurrentInstance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Add data to both instances
             suiteInstance.startTest(['suite-data', 'test1']);
@@ -344,21 +344,21 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Alternating resets maintain independence", async function() {
-            const initialSuite = SuiteMetrics.getInstance();
+            const initialSuite: SuiteMetrics = SuiteMetrics.getInstance();
             const initialConcurrent: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Alternating resets
             SuiteMetrics.resetInstance();
-            const suite1 = SuiteMetrics.getInstance();
-            const concurrent1 = await ConcurrentSuiteMetrics.getInstance();
+            const suite1: SuiteMetrics = SuiteMetrics.getInstance();
+            const concurrent1: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             await ConcurrentSuiteMetrics.resetInstance();
-            const suite2 = SuiteMetrics.getInstance();
-            const concurrent2 = await ConcurrentSuiteMetrics.getInstance();
+            const suite2: SuiteMetrics = SuiteMetrics.getInstance();
+            const concurrent2: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             SuiteMetrics.resetInstance();
-            const suite3 = SuiteMetrics.getInstance();
-            const concurrent3 = await ConcurrentSuiteMetrics.getInstance();
+            const suite3: SuiteMetrics = SuiteMetrics.getInstance();
+            const concurrent3: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Verify independence
             assert.notEqual(initialSuite, suite1, "SuiteMetrics should change after first reset");
@@ -398,7 +398,7 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Complex data structure reset - SuiteMetrics", function() {
-            const instance = SuiteMetrics.getInstance();
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Create complex nested structure
             instance.startTest(['level1', 'test1']);
@@ -416,7 +416,7 @@ suite("[Both] Singleton Pattern", function() {
 
             // Reset and verify clean state
             SuiteMetrics.resetInstance();
-            const newInstance = SuiteMetrics.getInstance();
+            const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
             assert.equal(newInstance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 0, "New instance should have 0 tests after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1']), "Level1 suite should not exist after reset");
@@ -452,7 +452,7 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Reset clears all metrics and counters", function() {
-            const instance = SuiteMetrics.getInstance();
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Create multiple tests to increment counters
             instance.startTest(['counter-test', 'test1']);
@@ -463,9 +463,9 @@ suite("[Both] Singleton Pattern", function() {
             instance.stopTest();
 
             // Verify counters and data
-            const test1 = instance.queries.getTest(['counter-test', 'test1']);
-            const test2 = instance.queries.getTest(['counter-test', 'test2']);
-            const test3 = instance.queries.getTest(['counter-test', 'sub-suite', 'test3']);
+            const test1: Test = instance.queries.getTest(['counter-test', 'test1']);
+            const test2: Test = instance.queries.getTest(['counter-test', 'test2']);
+            const test3: Test = instance.queries.getTest(['counter-test', 'sub-suite', 'test3']);
 
             assert.equal(test1.testNumber, 1, "First test should have testNumber 1");
             assert.equal(test2.testNumber, 2, "Second test should have testNumber 2");
@@ -476,26 +476,26 @@ suite("[Both] Singleton Pattern", function() {
 
             // Reset and verify counters restart
             SuiteMetrics.resetInstance();
-            const newInstance = SuiteMetrics.getInstance();
+            const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
             newInstance.startTest(['new-counter-test', 'test1']);
             newInstance.stopTest();
 
-            const newTest = newInstance.queries.getTest(['new-counter-test', 'test1']);
+            const newTest: Test = newInstance.queries.getTest(['new-counter-test', 'test1']);
             assert.equal(newTest.testNumber, 1, "Test in new instance should start with testNumber 1");
             assert.equal(newTest.suiteTestNumber, 1, "Test in new instance should start with suiteTestNumber 1");
         });
 
         test("Reset clears timing data", function() {
-            const instance = SuiteMetrics.getInstance();
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Create test with timing data
             instance.startTest(['timing-test', 'test1']);
-            const start = Date.now();
+            const start: number = Date.now();
             while (Date.now() - start < 1) { /* busy wait */ }
             instance.stopTest();
 
-            const suiteData = instance.metrics.getSuiteMetrics(['timing-test']);
+            const suiteData: SuiteData = instance.metrics.getSuiteMetrics(['timing-test']);
             assert.isNumber(suiteData.testMetrics.totalTime, "Total time should be a number");
             assert.isAbove(suiteData.testMetrics.totalTime, 0, "Total time should be greater than 0");
             assert.isNumber(suiteData.testMetrics.averageTime, "Average time should be a number");
@@ -503,9 +503,9 @@ suite("[Both] Singleton Pattern", function() {
 
             // Reset and verify timing data is cleared
             SuiteMetrics.resetInstance();
-            const newInstance = SuiteMetrics.getInstance();
+            const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
-            const topLevelData = newInstance.metrics.getSuiteMetricsRecursive([]);
+            const topLevelData: RecursiveSuiteData = newInstance.metrics.getSuiteMetricsRecursive([]);
             assert.equal(topLevelData.totalTestMetrics.totalTime, 0, "Total time should be 0 after reset");
             assert.equal(topLevelData.totalTestMetrics.averageTime, 0, "Average time should be 0 after reset");
         });
@@ -516,7 +516,7 @@ suite("[Both] Singleton Pattern", function() {
             const initialInstance: SuiteMetrics = SuiteMetrics.getInstance();
             initialInstance.startTest(['suiteX', 'testY']);
             initialInstance.stopTest();
-            const afterOperationsInstance = SuiteMetrics.getInstance();
+            const afterOperationsInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
             assert.instanceOf(initialInstance, SuiteMetrics, "Initial SuiteMetrics instance should be correct type");
             assert.instanceOf(afterOperationsInstance, SuiteMetrics, "SuiteMetrics instance after operations should be correct type");
@@ -527,7 +527,7 @@ suite("[Both] Singleton Pattern", function() {
             const initialInstance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
             initialInstance.startTest(['suiteX', 'testY']);
             initialInstance.stopTest(['suiteX', 'testY']);
-            const afterOperationsInstance = await ConcurrentSuiteMetrics.getInstance();
+            const afterOperationsInstance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             assert.instanceOf(initialInstance, ConcurrentSuiteMetrics, "Initial ConcurrentSuiteMetrics instance should be correct type");
             assert.instanceOf(afterOperationsInstance, ConcurrentSuiteMetrics, "ConcurrentSuiteMetrics instance after operations should be correct type");
@@ -535,16 +535,16 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Instance consistency during complex operations", function() {
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Perform various operations
             instance1.startTest(['complex-ops', 'test1']);
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
             instance1.stopTest();
 
-            const instance3 = SuiteMetrics.getInstance();
-            const suiteData = instance3.metrics.getSuiteMetrics(['complex-ops']);
-            const instance4 = SuiteMetrics.getInstance();
+            const instance3: SuiteMetrics = SuiteMetrics.getInstance();
+            const suiteData: SuiteData = instance3.metrics.getSuiteMetrics(['complex-ops']);
+            const instance4: SuiteMetrics = SuiteMetrics.getInstance();
 
             // All should be the same instance
             assert.equal(instance1, instance2, "Instance should be same during test execution");
@@ -557,11 +557,11 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Instance consistency with error conditions", function() {
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Start a test
             instance1.startTest(['error-test', 'test1']);
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Try to start another test (should throw error)
             try {
@@ -571,11 +571,11 @@ suite("[Both] Singleton Pattern", function() {
                 // Expected error
             }
 
-            const instance3 = SuiteMetrics.getInstance();
+            const instance3: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Stop the original test
             instance3.stopTest();
-            const instance4 = SuiteMetrics.getInstance();
+            const instance4: SuiteMetrics = SuiteMetrics.getInstance();
 
             // All should be the same instance
             assert.equal(instance1, instance2, "Instance should be same when attempting concurrent test");
@@ -587,13 +587,13 @@ suite("[Both] Singleton Pattern", function() {
             const instance1: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
             // Start async operations
-            const promise1 = Promise.resolve().then(async () => {
+            const promise1: Promise<ConcurrentSuiteMetrics> = Promise.resolve().then(async () => {
                 const asyncInstance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
                 asyncInstance.startTest(['async-test', 'test1']);
                 return asyncInstance;
             });
 
-            const promise2 = Promise.resolve().then(() => {
+            const promise2: Promise<ConcurrentSuiteMetrics> = Promise.resolve().then(() => {
                 const asyncInstance = ConcurrentSuiteMetrics.getInstance();
                 return asyncInstance;
             });
@@ -609,31 +609,31 @@ suite("[Both] Singleton Pattern", function() {
 
     suite("Singleton state management edge cases", function() {
         test("Instance reference stability during operations", function() {
-            const instance = SuiteMetrics.getInstance();
-            const originalRef = instance;
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
+            const originalRef: SuiteMetrics = instance;
 
             // Perform many operations
             for (let i = 0; i < 10; i++) {
                 instance.startTest(['stability-test', `test${i}`]);
                 instance.stopTest();
 
-                const currentRef = SuiteMetrics.getInstance();
+                const currentRef: SuiteMetrics = SuiteMetrics.getInstance();
                 assert.equal(currentRef, originalRef, `Instance reference should be stable after operation ${i}`);
             }
         });
 
         test("Memory consistency after reset", function() {
             // Create instance with data
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
             instance1.startTest(['memory-test', 'test1']);
             instance1.stopTest();
 
-            const testData1 = instance1.queries.getTest(['memory-test', 'test1']);
+            const testData1: Test = instance1.queries.getTest(['memory-test', 'test1']);
             const firstTestNumber = testData1.testNumber;
 
             // Reset
             SuiteMetrics.resetInstance();
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Verify old reference doesn't affect new instance
             assert.notEqual(instance1, instance2, "Old and new instances should be different objects");
@@ -643,7 +643,7 @@ suite("[Both] Singleton Pattern", function() {
             instance2.startTest(['memory-test', 'test1']);
             instance2.stopTest();
 
-            const testData2 = instance2.queries.getTest(['memory-test', 'test1']);
+            const testData2: Test = instance2.queries.getTest(['memory-test', 'test1']);
 
             // Should be different test objects
             // Note: testNumber resets with new instance since testCounter is instance-level
@@ -667,8 +667,8 @@ suite("[Both] Singleton Pattern", function() {
             }
 
             // Verify all instances are identical within their class
-            const firstSuite = suiteInstances[0];
-            const firstConcurrent = concurrentInstances[0];
+            const firstSuite: SuiteMetrics = suiteInstances[0];
+            const firstConcurrent: ConcurrentSuiteMetrics = concurrentInstances[0];
 
             suiteInstances.forEach((instance, index) => {
                 assert.equal(instance, firstSuite, `SuiteMetrics instance ${index} should equal first instance`);
@@ -680,14 +680,14 @@ suite("[Both] Singleton Pattern", function() {
         });
 
         test("Reset behavior with active test state", function() {
-            const instance = SuiteMetrics.getInstance();
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Start a test but don't stop it
             instance.startTest(['active-test', 'test1']);
 
             // Reset while test is active
             SuiteMetrics.resetInstance();
-            const newInstance = SuiteMetrics.getInstance();
+            const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // New instance should be clean and allow starting tests
             assert.notEqual(newInstance, instance, "New instance should be different from old instance");
@@ -728,8 +728,8 @@ suite("[Both] Singleton Pattern", function() {
         test("Constructor is not directly accessible", function() {
             // This test verifies that the singleton pattern is properly implemented
             // by ensuring getInstance is the only way to get instances
-            const instance1 = SuiteMetrics.getInstance();
-            const instance2 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
 
             assert.equal(instance1, instance2, "Multiple getInstance calls should return same instance");
             assert.equal(instance1.constructor, SuiteMetrics, "Instance constructor should be SuiteMetrics");
@@ -737,18 +737,18 @@ suite("[Both] Singleton Pattern", function() {
 
         test("Static methods work correctly", function() {
             // Test that static methods are accessible and work
-            const instance1 = SuiteMetrics.getInstance();
+            const instance1: SuiteMetrics = SuiteMetrics.getInstance();
             assert.equal(typeof SuiteMetrics.getInstance, 'function', "getInstance should be a function");
             assert.equal(typeof SuiteMetrics.resetInstance, 'function', "resetInstance should be a function");
 
             // Test resetInstance static method
             SuiteMetrics.resetInstance();
-            const instance2 = SuiteMetrics.getInstance();
+            const instance2: SuiteMetrics = SuiteMetrics.getInstance();
             assert.notEqual(instance1, instance2, "Instance after resetInstance should be different");
         });
 
         test("Instance methods work on singleton", function() {
-            const instance = SuiteMetrics.getInstance();
+            const instance: SuiteMetrics = SuiteMetrics.getInstance();
 
             // Test that all expected methods exist and are functions
             assert.equal(typeof instance.startTest, 'function', "startTest should be a function");
@@ -774,11 +774,11 @@ suite("[Both] Singleton Pattern", function() {
             // Create multiple instances through reset cycles
             for (let i = 0; i < 5; i++) {
                 SuiteMetrics.resetInstance();
-                const instance = SuiteMetrics.getInstance();
+                const instance: SuiteMetrics = SuiteMetrics.getInstance();
                 instances.push(instance);
 
                 // Verify singleton behavior within each cycle
-                const sameInstance = SuiteMetrics.getInstance();
+                const sameInstance: SuiteMetrics = SuiteMetrics.getInstance();
                 assert.equal(instance, sameInstance, `Singleton behavior should be maintained in reset cycle ${i}`);
             }
 
