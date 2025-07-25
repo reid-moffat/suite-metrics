@@ -54,6 +54,7 @@
     "package.json"
   ],
   "dependencies": {
+    "async-mutex": "^0.5.0",
     "microtime": "^3.1.1"
   },
   "devDependencies": {

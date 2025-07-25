@@ -1,6 +1,7 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import Mutex from "../helpers/Mutex.ts";
+import { Mutex, MutexInterface, withTimeout } from 'async-mutex';
+
 
 // Path segments joined with '::'
 type TestKey = string;
@@ -20,8 +21,8 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
 
     // Mutexes for the lazy singleton and for any specific instance
-    private static readonly instanceMutex: Mutex = new Mutex();
-    private readonly testMutex: Mutex = new Mutex();
+    private static readonly instanceMutex: MutexInterface = withTimeout(new Mutex(), 100);
+    private readonly testMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
 
     /**
@@ -30,7 +31,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * @returns The globally available ConcurrentSuiteMetrics instance
      */
     public static async getInstance(): Promise<ConcurrentSuiteMetrics> {
-        await ConcurrentSuiteMetrics.instanceMutex.lock();
+        await ConcurrentSuiteMetrics.instanceMutex.acquire();
         try {
             if (ConcurrentSuiteMetrics._instance === null) {
                 ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
@@ -38,7 +39,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
             return ConcurrentSuiteMetrics._instance;
         } finally {
-            ConcurrentSuiteMetrics.instanceMutex.unlock();
+            ConcurrentSuiteMetrics.instanceMutex.release();
         }
     }
 
@@ -46,11 +47,11 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data (thread-safe)
      */
     public static async resetInstance(): Promise<void> {
-        await ConcurrentSuiteMetrics.instanceMutex.lock();
+        await ConcurrentSuiteMetrics.instanceMutex.acquire();
         try {
             ConcurrentSuiteMetrics._instance = null;
         } finally {
-            ConcurrentSuiteMetrics.instanceMutex.unlock();
+            ConcurrentSuiteMetrics.instanceMutex.release();
         }
     }
 
