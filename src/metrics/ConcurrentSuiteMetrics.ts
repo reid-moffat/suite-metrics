@@ -19,28 +19,39 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
 
-    // Mutexes for the lazy singleton and any instance
+    // Mutexes for the lazy singleton and for any specific instance
     private static readonly instanceMutex: Mutex = new Mutex();
     private readonly testMutex: Mutex = new Mutex();
 
 
     /**
-     * Gets the lazy singleton instance of ConcurrentSuiteMetrics
+     * Gets the lazy singleton instance of ConcurrentSuiteMetrics (thread-safe)
      *
      * @returns The globally available ConcurrentSuiteMetrics instance
      */
-    public static getInstance(): ConcurrentSuiteMetrics {
-        if (ConcurrentSuiteMetrics._instance === null) {
-            ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
+    public static async getInstance(): Promise<ConcurrentSuiteMetrics> {
+        await ConcurrentSuiteMetrics.instanceMutex.lock();
+        try {
+            if (ConcurrentSuiteMetrics._instance === null) {
+                ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
+            }
+
+            return ConcurrentSuiteMetrics._instance;
+        } finally {
+            ConcurrentSuiteMetrics.instanceMutex.unlock();
         }
-        return ConcurrentSuiteMetrics._instance;
     }
 
     /**
-     * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
+     * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data (thread-safe)
      */
-    public static resetInstance(): void {
-        ConcurrentSuiteMetrics._instance = null;
+    public static async resetInstance(): Promise<void> {
+        await ConcurrentSuiteMetrics.instanceMutex.lock();
+        try {
+            ConcurrentSuiteMetrics._instance = null;
+        } finally {
+            ConcurrentSuiteMetrics.instanceMutex.unlock();
+        }
     }
 
     /**
