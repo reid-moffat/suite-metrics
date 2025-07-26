@@ -13,28 +13,12 @@ type SuiteTestMetrics = {
 }
 
 /**
- * Returned data for a given suite's metrics
- *
- * Includes the suite's name, its parent and sub-suites, and metrics for the tests directly inside it
- */
-type SuiteData = {
-    /** Name of the suite */
-    readonly name: string;
-    /** Parent suites of this suite, ordered from top to bottom. Note: top-level suite is not included */
-    readonly parentSuites: string[];
-    /** All sub-suite names directly within this suite (non-recursive) */
-    readonly subSuites: string[];
-    /** Metrics for this suite's direct tests (not including sub-suites). Total # tests, total time, average time */
-    readonly testMetrics: SuiteTestMetrics;
-};
-
-/**
  * Returned data for a given suite's metrics, including tests in sub-suites
  *
  * Includes the suite's name, its parent and sub-suites, metrics for the tests directly inside it, sub-suite test
  * metrics, and overall test metrics
  */
-type RecursiveSuiteData = {
+type SuiteData = {
     /** Name of this suite */
     readonly name: string;
     /** Parent suites of this suite, ordered from top to bottom. Note: top-level suite is not included */
@@ -49,4 +33,4 @@ type RecursiveSuiteData = {
     readonly totalTestMetrics: SuiteTestMetrics;
 }
 
-export type { SuiteTestMetrics, SuiteData, RecursiveSuiteData };
+export type { SuiteTestMetrics, SuiteData };

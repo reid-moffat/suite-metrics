@@ -1,6 +1,6 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
-import { RecursiveSuiteData, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 
 /**
@@ -16,31 +16,12 @@ class Metrics {
     }
 
     /**
-     * Gets metrics for a specific suite
-     *
-     * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
-     * @returns An object with suite's name, parent/sub-suites, and test statistics
-     */
-    public getSuiteMetrics(path: string[]): SuiteData {
-        BaseSuiteMetrics.validatePath(path, false);
-        const suite: Suite = this.suites.navigateToSuite(path);
-        const testMetrics: SuiteTestMetrics = this.calculateDirectTestMetrics(suite);
-
-        return {
-            name: suite.name,
-            parentSuites: path.slice(0, -1),
-            subSuites: Array.from(suite.subSuites.keys()),
-            testMetrics
-        };
-    }
-
-    /**
      * Gets metrics for a given suite and its sub-suites
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
-    public getSuiteMetricsRecursive(path: string[]): RecursiveSuiteData {
+    public getSuiteMetrics(path: string[]): SuiteData {
         BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.suites.navigateToSuite(path);
 
