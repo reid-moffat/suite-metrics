@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { ConcurrentSuiteMetrics, RecursiveSuiteData, SuiteData, Test } from "suite-metrics";
+import SuiteMetrics, { ConcurrentSuiteMetrics, SuiteData, Test } from "suite-metrics";
 
 suite("[Both] Singleton Pattern", function() {
 
@@ -193,7 +193,7 @@ suite("[Both] Singleton Pattern", function() {
             instance1.startTest(['persistence-test', 'test1']);
             instance1.stopTest();
 
-            assert.equal(instance1.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 1, "Instance" +
+            assert.equal(instance1.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 1, "Instance" +
                 " should have 1 test before reset");
 
             // Reset multiple times
@@ -201,7 +201,7 @@ suite("[Both] Singleton Pattern", function() {
             SuiteMetrics.resetInstance();
 
             const instance2: SuiteMetrics = SuiteMetrics.getInstance();
-            assert.equal(instance2.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 0, "Instance" +
+            assert.equal(instance2.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 0, "Instance" +
                 " should have 0 tests after reset");
             assert.notEqual(instance1, instance2, "Instance after reset should be different object");
         });
@@ -379,7 +379,7 @@ suite("[Both] Singleton Pattern", function() {
 
             // Get instance data after reset
             SuiteMetrics.resetInstance();
-            const instanceData: RecursiveSuiteData = SuiteMetrics.getInstance().metrics.getSuiteMetricsRecursive([]);
+            const instanceData: SuiteData = SuiteMetrics.getInstance().metrics.getSuiteMetrics([]);
 
             assert.equal(instanceData.totalTestMetrics.numTests, 0, "Reset SuiteMetrics instance should have 0 tests");
         });
@@ -392,7 +392,7 @@ suite("[Both] Singleton Pattern", function() {
             // Get instance data before/after reset
             await ConcurrentSuiteMetrics.resetInstance();
             const instance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
-            const instanceData: RecursiveSuiteData = instance.metrics.getSuiteMetricsRecursive([]);
+            const instanceData: SuiteData = instance.metrics.getSuiteMetrics([]);
 
             assert.equal(instanceData.totalTestMetrics.numTests, 0, "Reset ConcurrentSuiteMetrics instance should have 0 tests");
         });
@@ -409,7 +409,7 @@ suite("[Both] Singleton Pattern", function() {
             instance.stopTest();
 
             // Verify data exists
-            assert.equal(instance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 3, "Instance should have 3 tests before reset");
+            assert.equal(instance.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 3, "Instance should have 3 tests before reset");
             assert.isTrue(instance.queries.suiteExists(['level1']), "Level1 suite should exist before reset");
             assert.isTrue(instance.queries.suiteExists(['level1', 'level2']), "Level1/level2 suite should exist before reset");
             assert.isTrue(instance.queries.suiteExists(['level1', 'level2', 'level3']), "Level1/level2/level3 suite should exist before reset");
@@ -418,7 +418,7 @@ suite("[Both] Singleton Pattern", function() {
             SuiteMetrics.resetInstance();
             const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
-            assert.equal(newInstance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 0, "New instance should have 0 tests after reset");
+            assert.equal(newInstance.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 0, "New instance should have 0 tests after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1']), "Level1 suite should not exist after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1', 'level2']), "Level1/level2 suite should not exist after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1', 'level2', 'level3']), "Level1/level2/level3 suite should not exist after reset");
@@ -436,7 +436,7 @@ suite("[Both] Singleton Pattern", function() {
             await instance.stopTest(['level1', 'level2', 'level3', 'test3']);
 
             // Verify data exists
-            assert.equal(instance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 3, "ConcurrentSuiteMetrics instance should have 3 tests before reset");
+            assert.equal(instance.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 3, "ConcurrentSuiteMetrics instance should have 3 tests before reset");
             assert.isTrue(instance.queries.suiteExists(['level1']), "Level1 suite should exist in ConcurrentSuiteMetrics before reset");
             assert.isTrue(instance.queries.suiteExists(['level1', 'level2']), "Level1/level2 suite should exist in ConcurrentSuiteMetrics before reset");
             assert.isTrue(instance.queries.suiteExists(['level1', 'level2', 'level3']), "Level1/level2/level3 suite should exist in ConcurrentSuiteMetrics before reset");
@@ -445,7 +445,7 @@ suite("[Both] Singleton Pattern", function() {
             await ConcurrentSuiteMetrics.resetInstance();
             const newInstance: ConcurrentSuiteMetrics = await ConcurrentSuiteMetrics.getInstance();
 
-            assert.equal(newInstance.metrics.getSuiteMetricsRecursive([]).totalTestMetrics.numTests, 0, "New ConcurrentSuiteMetrics instance should have 0 tests after reset");
+            assert.equal(newInstance.metrics.getSuiteMetrics([]).totalTestMetrics.numTests, 0, "New ConcurrentSuiteMetrics instance should have 0 tests after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1']), "Level1 suite should not exist in ConcurrentSuiteMetrics after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1', 'level2']), "Level1/level2 suite should not exist in ConcurrentSuiteMetrics after reset");
             assert.isFalse(newInstance.queries.suiteExists(['level1', 'level2', 'level3']), "Level1/level2/level3 suite should not exist in ConcurrentSuiteMetrics after reset");
@@ -496,16 +496,16 @@ suite("[Both] Singleton Pattern", function() {
             instance.stopTest();
 
             const suiteData: SuiteData = instance.metrics.getSuiteMetrics(['timing-test']);
-            assert.isNumber(suiteData.testMetrics.totalTime, "Total time should be a number");
-            assert.isAbove(suiteData.testMetrics.totalTime, 0, "Total time should be greater than 0");
-            assert.isNumber(suiteData.testMetrics.averageTime, "Average time should be a number");
-            assert.isAbove(suiteData.testMetrics.averageTime, 0, "Average time should be greater than 0");
+            assert.isNumber(suiteData.totalTestMetrics.totalTime, "Total time should be a number");
+            assert.isAbove(suiteData.totalTestMetrics.totalTime, 0, "Total time should be greater than 0");
+            assert.isNumber(suiteData.totalTestMetrics.averageTime, "Average time should be a number");
+            assert.isAbove(suiteData.totalTestMetrics.averageTime, 0, "Average time should be greater than 0");
 
             // Reset and verify timing data is cleared
             SuiteMetrics.resetInstance();
             const newInstance: SuiteMetrics = SuiteMetrics.getInstance();
 
-            const topLevelData: RecursiveSuiteData = newInstance.metrics.getSuiteMetricsRecursive([]);
+            const topLevelData: SuiteData = newInstance.metrics.getSuiteMetrics([]);
             assert.equal(topLevelData.totalTestMetrics.totalTime, 0, "Total time should be 0 after reset");
             assert.equal(topLevelData.totalTestMetrics.averageTime, 0, "Average time should be 0 after reset");
         });
@@ -552,7 +552,7 @@ suite("[Both] Singleton Pattern", function() {
             assert.equal(instance3, instance4, "Instance should be same after data retrieval");
 
             // Verify operations worked on the same instance
-            assert.equal(suiteData.testMetrics.numTests, 1, "Suite should have 1 test after operations");
+            assert.equal(suiteData.totalTestMetrics.numTests, 1, "Suite should have 1 test after operations");
             assert.isTrue(instance4.queries.testExists(['complex-ops', 'test1']), "Test should exist in final instance");
         });
 
@@ -759,7 +759,6 @@ suite("[Both] Singleton Pattern", function() {
             assert.equal(typeof instance.queries.suiteExists, 'function', "suiteExists should be a function");
             assert.equal(typeof instance.queries.getTest, 'function', "getTest should be a function");
             assert.equal(typeof instance.metrics.getSuiteMetrics, 'function', "getSuiteMetrics should be a function");
-            assert.equal(typeof instance.metrics.getSuiteMetricsRecursive, 'function', "getSuiteMetricsRecursive should be a function");
             assert.equal(typeof instance.metrics.printAllSuiteMetrics, 'function', "printAllSuiteMetrics should be a function");
         });
 

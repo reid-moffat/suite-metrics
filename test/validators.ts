@@ -1,52 +1,8 @@
 import { expect } from 'chai';
-import { SuiteData, RecursiveSuiteData } from "suite-metrics";
+import { SuiteData } from "suite-metrics";
 
 // Required data to validate (total & average time differ each run)
 type SuiteDataValidate = {
-    name: string;
-    parentSuites: string[] | null;
-    childSuites: string[] | null;
-    testMetrics: {
-        numTests: number;
-    }
-};
-
-/**
- * Validates suite data
- *
- * @param data Suite data returned from the metrics
- * @param expected Expected suite data (note: total and average time are left out since these vary each time)
- */
-const validateSuiteData = (data: SuiteData, expected: SuiteDataValidate) => {
-
-    console.log(`Validating suite metrics:\nResult: ${JSON.stringify(data, null, 4)}\nExpected: ${JSON.stringify(expected, null, 4)}`);
-
-    expect(data).to.be.an('object');
-    expect(data).to.have.all.keys(['name', 'parentSuites', 'childSuites', 'testMetrics']);
-    console.log(`\n✅ Structure validated`);
-
-    expect(data.name).to.be.a('string');
-    expect(data.name).to.equal(expected.name);
-    expect(data.parentSuites).to.deep.equal(expected.parentSuites);
-    expect(data.subSuites).to.deep.equal(expected.childSuites);
-    console.log(`✅ Metadata validated`);
-
-    expect(data.testMetrics).to.have.all.keys(['numTests', 'totalTime', 'averageTime']);
-    expect(data.testMetrics.numTests).to.equal(expected.testMetrics.numTests);
-
-    if (expected.testMetrics.numTests === 0) {
-        expect(data.testMetrics.totalTime).to.be.null;
-        expect(data.testMetrics.averageTime).to.be.null;
-    } else {
-        expect(data.testMetrics.totalTime).to.be.a('number').and.be.above(0).and.satisfy((num: number) => Number.isInteger(num));
-        expect(data.testMetrics.averageTime).to.be.a('number').and.be.above(0).and.satisfy((num: number) => Number.isInteger(num)); // @ts-ignore
-        expect(data.testMetrics.averageTime).to.equal(data.testMetrics.totalTime / data.testMetrics.numTests);
-    }
-    console.log(`✅ Test metrics validated\n`);
-}
-
-// Required data to validate (total & average time differ each run)
-type RecursiveSuiteDataValidate = {
     name: string;
     parentSuites: string[] | null;
     childSuites: string[] | null;
@@ -67,7 +23,7 @@ type RecursiveSuiteDataValidate = {
  * @param data Suite data returned from the metrics
  * @param expected Expected suite data (note: total and average time are left out since these vary each time)
  */
-const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: RecursiveSuiteDataValidate) => {
+const validateSuiteData = (data: SuiteData, expected: SuiteDataValidate) => {
 
     console.log(`Validating recursive suite metrics:\nResult: ${JSON.stringify(data, null, 4)}\nExpected: ${JSON.stringify(expected, null, 4)}`);
 
@@ -118,4 +74,4 @@ const validateRecursiveSuiteData = (data: RecursiveSuiteData, expected: Recursiv
     console.log(`✅ Total test metrics validated\n`);
 }
 
-export { validateSuiteData, SuiteDataValidate, validateRecursiveSuiteData, RecursiveSuiteDataValidate };
+export { validateSuiteData, SuiteDataValidate };
