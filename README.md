@@ -4,14 +4,14 @@
 [![npm](https://img.shields.io/npm/dt/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
 [![npm](https://img.shields.io/npm/l/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
 
-Easily keep track of metrics for many nested test suites
+Easily track and aggregate test timing metrics for many nested test suites
 
 Features:
 - **Precision Tracking**: Measure test execution time down to microseconds
 - **Flexible Nesting**: Organize tests in any number of nested suites with any structure
-- **Comprehensive Metrics**: Collect data for top-level suites, sub-suites, and individual tests
-- **Simple Interface**: Easily integrate into your testing workflow with only a few lines of code
-- **Concurrency Support**: Allows for tracking of multiple concurrent tests
+- **Comprehensive Metrics**: Get aggregate test data, find outliers, and perform statistical tests
+- **Easy Interface**: Simple methods calls provided with clear documentation
+- **Concurrency Support**: Allows for tracking of multiple concurrent tests safely
 
 ## 📦 Installation
 
@@ -29,10 +29,10 @@ yarn add suite-metrics -D
 
 ### Setup
 
-If you do not need concurrent tracking, use SuiteMetrics:
+If you are not running tests concurrently, use SuiteMetrics:
 
 ```typescript
-import SuiteMetrics, { ConcurrentSuiteMetrics } from 'suite-metrics';
+import SuiteMetrics from 'suite-metrics';
 
 // Use as a lazy singleton for easy access across multiple files
 const metricsSingleton = SuiteMetrics.getInstance();
@@ -46,7 +46,8 @@ For running concurrent tests, ConcurrentSuiteMetrics is required:
 ```typescript
 import { ConcurrentSuiteMetrics } from 'suite-metrics';
 
-const concurrentSingleton = await ConcurrentSuiteMetrics.getInstance();
+// Singleton and start/stop test methods are async for thread-safe queues
+const concurrentMetricsSingleton = await ConcurrentSuiteMetrics.getInstance();
 // or
 const concurrentMetrics = new ConcurrentSuiteMetrics();
 ```
@@ -55,6 +56,8 @@ const concurrentMetrics = new ConcurrentSuiteMetrics();
 stopTest(), and a bit more overhead with the mutex locks. It is recommended to only use it when required for simplicity*
 
 ### Tracking Tests
+
+Standard SuiteMetrics is simple:
 
 ```typescript
 // Start tracking a test (directly before test logic for best accuracy)
@@ -66,17 +69,134 @@ metrics.startTest(["Suite Name", "Sub-suite name", "Test Name"]);
 metrics.stopTest();
 ```
 
+Concurrent metrics can run multiple at the same time:
+
 ```typescript
-await concurrentMetrics.startTest(["Suite Name", "Test Name 1"]);
-// Start a promise...
-await concurrentMetrics.startTest(["Suite Name", "Test Name 2"]);
+const promises = [
+    (async () => {
+        await concurrentMetrics.startTest(["Suite Name", "Test Name 1"]);
+        // Test logic...
+        await concurrentMetrics.stopTest(["Suite Name", "Test Name 1"]);
+    })(),
+    (async () => {
+        await concurrentMetrics.startTest(["Suite Name", "Test Name 2"]);
+        // Test logic...
+        await concurrentMetrics.stopTest(["Suite Name", "Test Name 2"]);
+    })(),
+    (async () => {
+        await concurrentMetrics.startTest(["Suite Name", "Test Name 3"]);
+        // Test logic...
+        await concurrentMetrics.stopTest(["Suite Name", "Test Name 3"]);
+    })()
+];
 
-await concurrentMetrics.startTest(["Suite Name", "Test Name 3"]);
-
-concurrentMetrics.stopTest();
+await Promise.all(promises);
 ```
 
-### Getting Metrics
+### Getting Test Data
+
+Both `SuiteMetrics` and `ConcurrentSuiteMetrics` have extensive methods in composite classes:
+
+- **BaseSuiteMetrics**: Base class with simple methods like `getTotalTestCount()` and `getAverageTestDuration()`
+- **queries**: Query for Suites and Tests, such as `getTest()` and `suiteExists()`
+- **metrics**: Gets aggregate metrics for single or multiple suites
+- **performance**: Gets the fastest or slowest test(s) in order
+- **statistics**: Helpers for Z-scores and standard deviation
+
+> ⚠️ Important ⚠️: If you are using `ConcurrentSuiteMetrics`, these methods are NOT thread-safe. Do not call while 
+> concurrently running tests.
+
+#### BaseSuiteMetrics
+
+```typescript
+metrics.validatePath(["Suite 1", "Test 1"], true); // -> valid
+metrics.validatePath([], false); // -> invalid (error)
+
+metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
+
+metrics.getTotalTestCount(); // # of completed tests in this metrics instance
+
+metrics.getAverageTestDuration(); // Average test duration for all tests (microseconds)
+
+metrics.getTestsInOrder(); // Copy of all tests in order they were completed
+```
+
+#### queries
+
+```typescript
+// Simple summary of all suites and tests - # test/suites, total/avg time
+console.log(metrics.printAllSuiteMetrics());
+
+// Detailed metrics for a specific test
+metrics.getTestMetrics(["Suite Name", "Test Name"]);
+
+// Detailed metrics for a specific suite and its direct tests
+metrics.getSuiteMetrics(["Suite Name"]);
+
+// Detailed metrics for a specific suite and all sub-suites & sub-tests
+metrics.getSuiteMetricsRecursive(["Suite Name"]);
+
+// Helpers
+if (metrics.suiteExists(["Suite Name"])) {
+    // ...
+}
+
+if (metrics.testExists(["Suite Name", "Test Name"])) {
+    // ...
+}
+```
+
+#### BaseSuiteMetrics
+
+```typescript
+// Simple summary of all suites and tests - # test/suites, total/avg time
+console.log(metrics.printAllSuiteMetrics());
+
+// Detailed metrics for a specific test
+metrics.getTestMetrics(["Suite Name", "Test Name"]);
+
+// Detailed metrics for a specific suite and its direct tests
+metrics.getSuiteMetrics(["Suite Name"]);
+
+// Detailed metrics for a specific suite and all sub-suites & sub-tests
+metrics.getSuiteMetricsRecursive(["Suite Name"]);
+
+// Helpers
+if (metrics.suiteExists(["Suite Name"])) {
+    // ...
+}
+
+if (metrics.testExists(["Suite Name", "Test Name"])) {
+    // ...
+}
+```
+
+#### BaseSuiteMetrics
+
+```typescript
+// Simple summary of all suites and tests - # test/suites, total/avg time
+console.log(metrics.printAllSuiteMetrics());
+
+// Detailed metrics for a specific test
+metrics.getTestMetrics(["Suite Name", "Test Name"]);
+
+// Detailed metrics for a specific suite and its direct tests
+metrics.getSuiteMetrics(["Suite Name"]);
+
+// Detailed metrics for a specific suite and all sub-suites & sub-tests
+metrics.getSuiteMetricsRecursive(["Suite Name"]);
+
+// Helpers
+if (metrics.suiteExists(["Suite Name"])) {
+    // ...
+}
+
+if (metrics.testExists(["Suite Name", "Test Name"])) {
+    // ...
+}
+```
+
+#### BaseSuiteMetrics
 
 ```typescript
 // Simple summary of all suites and tests - # test/suites, total/avg time
