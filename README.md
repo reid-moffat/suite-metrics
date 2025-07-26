@@ -11,8 +11,7 @@ Features:
 - **Flexible Nesting**: Organize tests in any number of nested suites with any structure
 - **Comprehensive Metrics**: Collect data for top-level suites, sub-suites, and individual tests
 - **Simple Interface**: Easily integrate into your testing workflow with only a few lines of code
-
-[comment]: <> (**Concurrency Support**: Allows for tracking of multiple concurrent tests)
+- **Concurrency Support**: Allows for tracking of multiple concurrent tests
 
 ## 📦 Installation
 
@@ -47,10 +46,13 @@ For running concurrent tests, ConcurrentSuiteMetrics is required:
 ```typescript
 import { ConcurrentSuiteMetrics } from 'suite-metrics';
 
-const concurrentSingleton = ConcurrentSuiteMetrics.getInstance();
+const concurrentSingleton = await ConcurrentSuiteMetrics.getInstance();
 // or
 const concurrentMetrics = new ConcurrentSuiteMetrics();
 ```
+
+*Note: ConcurrentSuiteMetrics does work fine for sequential tests; however, it requires async calls, a parameter for 
+stopTest(), and a bit more overhead with the mutex locks. It is recommended to only use it when required for simplicity*
 
 ### Tracking Tests
 
@@ -99,29 +101,30 @@ if (metrics.testExists(["Suite Name", "Test Name"])) {
 }
 ```
 
-## ⏱️ Time complexity
+## ⏱️ Performance & Time Complexity
 
-This package uses lazy loading and caching to make as many calls as possible `O(1)`
+### Overview
+This package uses **lazy loading** and **caching** to optimize performance, making most operations `O(1)` constant time.
 
-Non-constant operations:
+### Non-Constant Operations
 
-- `ConcurrentSuiteMetrics` methods use locks for its methods, making it `O(k)` where `k` is the number of waiting 
-  operations. This is process is quite fast, though, 100 concurrent tests starting or stopping should take a few 
-  milliseconds max
-- Getting or adding Suites/Tests is `O(k)` where `k` is the depth of the Suite/Test. This is minimal in most cases
-- Any operation that involves returning `k` Suites or Tests is `O(k)` as these values require a deep copy to prevent 
-  leaking references
-- Methods in `performance` require a cache rebuild (`O(n * log(n))`) when called after test(s) are added. Otherwise, 
-  it is `O(k)` where `k` is the number of tests to return
-- Methods in `statistics` (except `interpretZScore()`) require a standard deviation cache rebuild (`O(n)`) when called 
-  after test(s) are added. Otherwise, it is `O(1)` (or `O(n)` for `getAllTestsWithZScores`)
-- `toJSON()` and `printAllSuiteMetrics()` are `O(n)`
+| Operation | Complexity | Notes                                                                                         |
+|-----------|------------|-----------------------------------------------------------------------------------------------|
+| **ConcurrentSuiteMetrics methods** | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests)  |
+| **Getting/Adding Suites/Tests** | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                         |
+| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks               |
+| **Performance methods** | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)        |
+| **Statistics methods** | `O(n)` → `O(1)` | Cache rebuild when tests added, then constant time (except `getAllTestsWithZScores` which is `O(n)`) |
+| **JSON export & printing** | `O(n)` | `toJSON()` and `printAllSuiteMetrics()` require a full traverse                               |
 
-Overall, the performance overhead is very minimal in most cases. However, there are some cases to avoid:
+> **Note**: `interpretZScore()` is always `O(1)` and doesn't require cache rebuilds.
 
-- Run all tests first, then get metrics. This ensures cached expensive operations only need to be run once, 
-  independent of the number of tests or metric calls (run 100k tests, thousands of performance calls -> only one sort 
-  required)
-- Don't use excessively deep suites. Anything you manually create should be fine, but avoid 100s/1000s of generated 
-  suites in a deep chain. Thousands of shallow tests or suites is a relatively flat structure is fine though
-- Avoid repeated calls to methods that return large amounts of tests (100,000+)
+### ⚡ Performance Best Practices
+
+- **Test execution**: Run all tests before gathering metrics to ensure cache rebuilds only run once
+- **Suite depth**: Keep suite hierarchies reasonable (avoid 100s of deeply nested suites)
+- **Bulk operations**: Minimize repeated calls to methods returning large datasets (10,000+ tests)
+
+### Real-World Performance
+In typical scenarios, performance overhead is **negligible** due to efficient caching. For large cases (~10,000+ tests),
+following the recommended patterns above to reduce overhead.
