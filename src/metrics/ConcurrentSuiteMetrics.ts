@@ -11,6 +11,10 @@ type StartTime = number;
 
 /**
  * Provides metrics for tests and test suites, with the ability to track multiple test simultaneously
+ *
+ * Note: This class is thread-safe when working with its singleton and starting/stopping tests, however, querying
+ * test data with other methods (getTest(), toJSON(), etc) is not thread-safe. Do not mix test running with getting
+ * metrics concurrently
  */
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
