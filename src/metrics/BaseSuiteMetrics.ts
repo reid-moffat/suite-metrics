@@ -58,12 +58,12 @@ abstract class BaseSuiteMetrics {
     /**
      * Converts a suite or test path to a readable string
      *
-     * Note: This does not validate the path. Call validatePath to do so
-     *
      * @param path Path to the desired suite or test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      * @returns Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
+     * @throws Error If the provided path is invalid (BaseSuiteMetrics.validatePath() is called)
      */
     public static pathToString(path: string[]): string {
+        BaseSuiteMetrics.validatePath(path, false);
         return `[${path.join(", ")}]`;
     }
 
