@@ -292,7 +292,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const suiteMetrics: SuiteData = concurrentMetrics.metrics.getSuiteMetrics(suitePath);
             assert.exists(suiteMetrics, "Suite metrics should exist");
             assert.strictEqual(suiteMetrics.name, "Sample Suite", "Suite should have correct name");
-            assert.strictEqual(suiteMetrics.testMetrics.numTests, 2, "Suite should have 2 tests");
+            assert.strictEqual(suiteMetrics.totalTestMetrics.numTests, 2, "Suite should have 2 tests");
         });
 
         test("Get recursive suite metrics", async function() {
@@ -307,7 +307,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             sleep(15);
             await concurrentMetrics.stopTest([...basePath, "Sub Suite", "Nested Test"]);
 
-            const recursiveMetrics = concurrentMetrics.metrics.getSuiteMetricsRecursive(basePath);
+            const recursiveMetrics = concurrentMetrics.metrics.getSuiteMetrics(basePath);
             assert.exists(recursiveMetrics, "Recursive metrics should exist");
             assert.strictEqual(recursiveMetrics.name, "Recursive Suite", "Recursive suite should have correct name");
         });
@@ -418,9 +418,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             // Verify metrics work correctly
             const suite1Data = metrics.metrics.getSuiteMetrics(["ConcurrentSuite1"]);
-            assert.strictEqual(suite1Data.testMetrics.numTests, 3, "ConcurrentSuite1 should have 3 tests");
-            assert.isNumber(suite1Data.testMetrics.totalTime, "Suite should have numeric total time");
-            assert.isAbove(suite1Data.testMetrics.totalTime!, 0, "Suite total time should be positive");
+            assert.strictEqual(suite1Data.totalTestMetrics.numTests, 3, "ConcurrentSuite1 should have 3 tests");
+            assert.isNumber(suite1Data.totalTestMetrics.totalTime, "Suite should have numeric total time");
+            assert.isAbove(suite1Data.totalTestMetrics.totalTime!, 0, "Suite total time should be positive");
         });
 
         test("Work with complex test data helper for concurrent metrics", function() {
@@ -438,12 +438,12 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             // Test metrics at different levels
             const authData = metrics.metrics.getSuiteMetrics(["Authentication"]);
-            assert.strictEqual(authData.testMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
+            assert.strictEqual(authData.totalTestMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
             assert.isArray(authData.subSuites, "Authentication suite should have child suites array");
             assert.includeMembers(authData.subSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
 
             const apiUsersData = metrics.metrics.getSuiteMetrics(["API", "Users"]);
-            assert.strictEqual(apiUsersData.testMetrics.numTests, 4, "API>Users suite should have 4 tests");
+            assert.strictEqual(apiUsersData.totalTestMetrics.numTests, 4, "API>Users suite should have 4 tests");
             assert.deepEqual(apiUsersData.subSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
         });
 
@@ -464,9 +464,9 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.suiteExists(["Suite15"]), "Suite15 should exist in large dataset");
 
             const suite8Data = metrics.metrics.getSuiteMetrics(["Suite8"]);
-            assert.strictEqual(suite8Data.testMetrics.numTests, 20, "Suite8 should have 20 tests");
-            assert.isNumber(suite8Data.testMetrics.totalTime, "Suite8 should have numeric total time");
-            assert.isAtLeast(suite8Data.testMetrics.totalTime!, 0, "Suite8 total time should be non-negative");
+            assert.strictEqual(suite8Data.totalTestMetrics.numTests, 20, "Suite8 should have 20 tests");
+            assert.isNumber(suite8Data.totalTestMetrics.totalTime, "Suite8 should have numeric total time");
+            assert.isAtLeast(suite8Data.totalTestMetrics.totalTime!, 0, "Suite8 total time should be non-negative");
 
             // Verify top-level structure
             const topLevelData = metrics.metrics.getSuiteMetrics([]);

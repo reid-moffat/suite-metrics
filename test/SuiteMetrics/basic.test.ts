@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { RecursiveSuiteData, SuiteData } from "suite-metrics";
+import SuiteMetrics, { SuiteData } from "suite-metrics";
 
 suite("[SuiteMetrics] Basic tests", function() {
 
@@ -27,7 +27,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         test("Empty suite name for top-level operations", function() {
             assert.doesNotThrow(() => metrics.queries.suiteExists([]), 'suiteExists should allow empty array for top-level');
             assert.doesNotThrow(() => metrics.metrics.getSuiteMetrics([]), 'getSuiteMetrics should allow empty array for top-level');
-            assert.doesNotThrow(() => metrics.metrics.getSuiteMetricsRecursive([]), 'getSuiteMetricsRecursive should allow empty array for top-level');
+            assert.doesNotThrow(() => metrics.metrics.getSuiteMetrics([]), 'getSuiteMetricsRecursive should allow empty array for top-level');
         });
     });
 
@@ -72,11 +72,11 @@ suite("[SuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.testExists(["MultiTestSuite", "Test3"]), 'Test3 should exist');
 
             const suiteData = metrics.metrics.getSuiteMetrics(["MultiTestSuite"]);
-            assert.strictEqual(suiteData.testMetrics.numTests, 3, 'Suite should have 3 tests');
-            assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');
-            assert.isAtLeast(suiteData.testMetrics.totalTime!, 0, 'Suite total time should be non-negative');
-            assert.isNumber(suiteData.testMetrics.averageTime, 'Suite should have numeric average time');
-            assert.strictEqual(suiteData.testMetrics.averageTime!, suiteData.testMetrics.totalTime! / 3, 'Average time should equal total divided by count');
+            assert.strictEqual(suiteData.totalTestMetrics.numTests, 3, 'Suite should have 3 tests');
+            assert.isNumber(suiteData.totalTestMetrics.totalTime, 'Suite should have numeric total time');
+            assert.isAtLeast(suiteData.totalTestMetrics.totalTime, 0, 'Suite total time should be non-negative');
+            assert.isNumber(suiteData.totalTestMetrics.averageTime, 'Suite should have numeric average time');
+            assert.strictEqual(suiteData.totalTestMetrics.averageTime!, suiteData.totalTestMetrics.totalTime! / 3, 'Average time should equal total divided by count');
         });
 
         test("Multiple suites at same level", function() {
@@ -93,7 +93,7 @@ suite("[SuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.suiteExists(["Suite2"]), 'Suite2 should exist');
             assert.isTrue(metrics.queries.suiteExists(["Suite3"]), 'Suite3 should exist');
 
-            const topLevelData = metrics.metrics.getSuiteMetricsRecursive([]);
+            const topLevelData = metrics.metrics.getSuiteMetrics([]);
             assert.strictEqual(topLevelData.subTestMetrics.numTests, 3, 'Top level should have 3 sub-tests');
             assert.isArray(topLevelData.subSuites, 'Top level should have child suites array');
             assert.includeMembers(topLevelData.subSuites!, ["Suite1", "Suite2", "Suite3"], 'Top level should include all created suites');
@@ -134,7 +134,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         });
 
         test("Correctly report direct vs recursive metrics", function() {
-            const topSuiteData = metrics.metrics.getSuiteMetricsRecursive(["TopSuite"]);
+            const topSuiteData = metrics.metrics.getSuiteMetrics(["TopSuite"]);
 
             assert.strictEqual(topSuiteData.directTestMetrics.numTests, 2, 'Top suite should have 2 direct tests'); // DirectTest1, DirectTest2
             assert.strictEqual(topSuiteData.subTestMetrics.numTests, 4, 'Top suite should have 4 sub-tests'); // SubTest1, DeepTest1, SubTest2, SubTest3
@@ -144,7 +144,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         });
 
         test("Nested suite metrics correctly", function() {
-            const subSuite1Data = metrics.metrics.getSuiteMetricsRecursive(["TopSuite", "SubSuite1"]);
+            const subSuite1Data = metrics.metrics.getSuiteMetrics(["TopSuite", "SubSuite1"]);
 
             assert.strictEqual(subSuite1Data.directTestMetrics.numTests, 1, 'SubSuite1 should have 1 direct test'); // SubTest1
             assert.strictEqual(subSuite1Data.subTestMetrics.numTests, 1, 'SubSuite1 should have 1 sub-test'); // DeepTest1
@@ -157,7 +157,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         test("Deep nesting correctly", function() {
             const deepSuiteData = metrics.metrics.getSuiteMetrics(["TopSuite", "SubSuite1", "SubSubSuite"]);
 
-            assert.strictEqual(deepSuiteData.testMetrics.numTests, 1, 'Deep suite should have 1 test');
+            assert.strictEqual(deepSuiteData.totalTestMetrics.numTests, 1, 'Deep suite should have 1 test');
             assert.isArray(deepSuiteData.parentSuites, 'Deep suite should have parent suites array');
             assert.deepEqual(deepSuiteData.parentSuites!, ["TopSuite", "SubSuite1"], 'Deep suite should have correct parent suites');
             assert.deepEqual(deepSuiteData.subSuites, [], 'Deep suite should have no child suites');
@@ -226,10 +226,10 @@ suite("[SuiteMetrics] Basic tests", function() {
             const slowTest = metrics.queries.getTest(["TimingSuite", "SlowTest"]);
 
             assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
-            assert.isNumber(suiteData.testMetrics.totalTime, 'Suite should have numeric total time');
-            assert.strictEqual(suiteData.testMetrics.totalTime!, fastTest.duration + slowTest.duration, 'Suite total time should equal sum of test durations');
-            assert.isNumber(suiteData.testMetrics.averageTime, 'Suite should have numeric average time');
-            assert.strictEqual(suiteData.testMetrics.averageTime!, (fastTest.duration + slowTest.duration) / 2, 'Suite average time should equal total divided by count');
+            assert.isNumber(suiteData.totalTestMetrics.totalTime, 'Suite should have numeric total time');
+            assert.strictEqual(suiteData.totalTestMetrics.totalTime!, fastTest.duration + slowTest.duration, 'Suite total time should equal sum of test durations');
+            assert.isNumber(suiteData.totalTestMetrics.averageTime, 'Suite should have numeric average time');
+            assert.strictEqual(suiteData.totalTestMetrics.averageTime!, (fastTest.duration + slowTest.duration) / 2, 'Suite average time should equal total divided by count');
         });
     });
 
@@ -260,9 +260,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const parentData = metrics.metrics.getSuiteMetrics(["ParentSuite"]);
-            assert.strictEqual(parentData.testMetrics.numTests, 0, 'Parent suite should have no direct tests');
-            assert.strictEqual(parentData.testMetrics.totalTime, 0, 'Parent suite should have zero total time');
-            assert.strictEqual(parentData.testMetrics.averageTime, 0, 'Parent suite should have zero average time');
+            assert.strictEqual(parentData.totalTestMetrics.numTests, 0, 'Parent suite should have no direct tests');
+            assert.strictEqual(parentData.totalTestMetrics.totalTime, 0, 'Parent suite should have zero total time');
+            assert.strictEqual(parentData.totalTestMetrics.averageTime, 0, 'Parent suite should have zero average time');
             assert.deepEqual(parentData.subSuites, ["SubSuite"], 'Parent suite should have SubSuite as child');
         });
 
@@ -273,7 +273,7 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["Suite2", "Test2"]);
             metrics.stopTest();
 
-            const topLevelData = metrics.metrics.getSuiteMetricsRecursive([]);
+            const topLevelData = metrics.metrics.getSuiteMetrics([]);
             assert.strictEqual(topLevelData.name, "<Top-Level suite>", 'Top level should have correct name');
             assert.deepEqual(topLevelData.parentSuites, [], 'Top level should have no parent suites');
             assert.strictEqual(topLevelData.directTestMetrics.numTests, 0, 'Top level should have no direct tests');
@@ -287,10 +287,10 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const emptyData: SuiteData = metrics.metrics.getSuiteMetrics(["EmptySuite"]);
-            assert.strictEqual(emptyData.testMetrics.totalTime, 0, 'Empty suite should have zero total time');
-            assert.strictEqual(emptyData.testMetrics.averageTime, 0, 'Empty suite should have zero average time');
+            assert.strictEqual(emptyData.totalTestMetrics.totalTime, 0, 'Empty suite should have zero total time');
+            assert.strictEqual(emptyData.totalTestMetrics.averageTime, 0, 'Empty suite should have zero average time');
 
-            const recursiveData: RecursiveSuiteData = metrics.metrics.getSuiteMetricsRecursive(["EmptySuite"]);
+            const recursiveData: SuiteData = metrics.metrics.getSuiteMetrics(["EmptySuite"]);
             assert.strictEqual(recursiveData.directTestMetrics.totalTime, 0, 'Empty suite should have zero direct total time');
             assert.strictEqual(recursiveData.directTestMetrics.averageTime, 0, 'Empty suite should have zero direct average time');
             assert.isNumber(recursiveData.subTestMetrics.totalTime, 'Empty suite should have numeric sub-test total time');
@@ -338,7 +338,7 @@ suite("[SuiteMetrics] Basic tests", function() {
             assert.isTrue(metrics.queries.testExists(["StateSuite", "Test2"]), 'Test2 should exist after creation');
 
             const suiteData = metrics.metrics.getSuiteMetrics(["StateSuite"]);
-            assert.strictEqual(suiteData.testMetrics.numTests, 2, 'Suite should have 2 tests after adding both');
+            assert.strictEqual(suiteData.totalTestMetrics.numTests, 2, 'Suite should have 2 tests after adding both');
         });
 
         test("Reset correctly", function() {
@@ -386,8 +386,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["Consistency", "SubSuite", "Test3"]);
             metrics.stopTest();
 
-            const topSuite = metrics.metrics.getSuiteMetricsRecursive(["Consistency"]);
-            const subSuite = metrics.metrics.getSuiteMetricsRecursive(["Consistency", "SubSuite"]);
+            const topSuite = metrics.metrics.getSuiteMetrics(["Consistency"]);
+            const subSuite = metrics.metrics.getSuiteMetrics(["Consistency", "SubSuite"]);
 
             // Verify consistency
             assert.strictEqual(topSuite.directTestMetrics.numTests, 1, 'Top suite should have 1 direct test');
