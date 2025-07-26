@@ -85,6 +85,9 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     /**
      * Starts timing a new test. May be called when other tests are actively running (thread-safe)
      *
+     * This method gets the test start time directly before returning, after waiting in queue. More concurrent
+     * tests do not affect test timing accuracy.
+     *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public async startTest(path: string[]): Promise<void> {
@@ -125,6 +128,9 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Stops timing a specific test (thread-safe)
+     *
+     * This method gets the test end time immediately, before waiting in queue. More concurrent tests do not affect
+     * test timing accuracy
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
