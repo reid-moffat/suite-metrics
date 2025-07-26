@@ -124,29 +124,38 @@ metrics.getTestsInOrder(); // Copy of all tests in order they were completed
 #### queries
 
 ```typescript
-// Simple summary of all suites and tests - # test/suites, total/avg time
-console.log(metrics.printAllSuiteMetrics());
-
-// Detailed metrics for a specific test
-metrics.getTestMetrics(["Suite Name", "Test Name"]);
-
-// Detailed metrics for a specific suite and its direct tests
-metrics.getSuiteMetrics(["Suite Name"]);
-
-// Detailed metrics for a specific suite and all sub-suites & sub-tests
-metrics.getSuiteMetricsRecursive(["Suite Name"]);
-
-// Helpers
-if (metrics.suiteExists(["Suite Name"])) {
+// Check if a suite or test exists
+if (metrics.queries.suiteExists(["Suite Name"])) {
     // ...
 }
 
-if (metrics.testExists(["Suite Name", "Test Name"])) {
+if (metrics.queries.testExists(["Suite Name", "Test Name"])) {
     // ...
 }
+
+
+// Gets a full Suite or Test object
+metrics.queries.getSuite(["Suite 1", "Sub-suite"]); // -> suite's name, tests, sub-suites, and aggregate data
+
+metrics.queries.getTest(["Suite 1", "Sub-suite", "Test 1"]); // -> test's name, timestamps, and metadata
+
+
+// Get child suite/test names
+metrics.queries.getSuiteNames(["Suite 1"]); // -> all suite names directly in this suite
+
+metrics.queries.getTestNames(["Suite 2"]); // -> all test names directly in this suite
 ```
 
-#### BaseSuiteMetrics
+#### metrics
+
+```typescript
+// Detailed metrics for a specific suite and its direct tests
+metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
+
+console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summary of all tests
+```
+
+#### performance
 
 ```typescript
 // Simple summary of all suites and tests - # test/suites, total/avg time
@@ -171,32 +180,7 @@ if (metrics.testExists(["Suite Name", "Test Name"])) {
 }
 ```
 
-#### BaseSuiteMetrics
-
-```typescript
-// Simple summary of all suites and tests - # test/suites, total/avg time
-console.log(metrics.printAllSuiteMetrics());
-
-// Detailed metrics for a specific test
-metrics.getTestMetrics(["Suite Name", "Test Name"]);
-
-// Detailed metrics for a specific suite and its direct tests
-metrics.getSuiteMetrics(["Suite Name"]);
-
-// Detailed metrics for a specific suite and all sub-suites & sub-tests
-metrics.getSuiteMetricsRecursive(["Suite Name"]);
-
-// Helpers
-if (metrics.suiteExists(["Suite Name"])) {
-    // ...
-}
-
-if (metrics.testExists(["Suite Name", "Test Name"])) {
-    // ...
-}
-```
-
-#### BaseSuiteMetrics
+#### statistics
 
 ```typescript
 // Simple summary of all suites and tests - # test/suites, total/avg time
