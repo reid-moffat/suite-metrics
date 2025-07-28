@@ -150,9 +150,11 @@ metrics.queries.getTestNames(["Suite 2"]); // -> all test names directly in this
 #### metrics
 
 ```typescript
-metrics.getTotalTestCount(); // # of completed tests in this metrics instance
+metrics.metrics.getTotalTestCount(); // -> number of (completed) tests in this metrics instance
 
-metrics.getAverageTestDuration(); // Average test duration for all tests (microseconds)
+metrics.metrics.getAverageTestDuration(); // -> average test duration for all tests (microseconds)
+
+metrics.metrics.getMedianTestDuration(); // -> median duration for all tests (microseconds)
 
 metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
 

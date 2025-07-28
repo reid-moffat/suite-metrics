@@ -39,6 +39,21 @@ class Metrics {
     }
 
     /**
+     * Gets the median duration of all tests in this instance
+     *
+     * @returns The median test completion duration, in microseconds. May be a decimal (x.5) when an even number of
+     *          tests are present
+     * @throws Error if there are no completed tests in this instance
+     */
+    public getMedianTestDuration(): number {
+        if (this.getTotalTestCount() === 0) {
+            throw new Error(`There are no completed tests in this instance`);
+        }
+
+        return -1;
+    }
+
+    /**
      * Gets metrics for a given suite and its sub-suites
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
