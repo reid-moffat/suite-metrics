@@ -50,7 +50,15 @@ class Metrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        return -1;
+        const sortedTests: Test[] = this.suites.getAllTestsByDuration();
+        const mid: number = Math.floor(sortedTests.length / 2);
+
+        if (sortedTests.length % 2 === 1) {
+            return sortedTests[mid].duration; // Odd length -> middle element is the median
+        }
+
+        // Even length: median is the average of the two middle elements
+        return (sortedTests[mid - 1].duration + sortedTests[mid].duration) / 2;
     }
 
     /**
