@@ -3,6 +3,7 @@
 [![npm](https://img.shields.io/npm/v/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
 [![npm](https://img.shields.io/npm/dt/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
 [![npm](https://img.shields.io/npm/l/suite-metrics)](https://www.npmjs.com/package/suite-metrics)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?logo=buy-me-a-coffee)](https://buymeacoffee.com/reidmoffat)
 
 Easily track and aggregate test timing metrics for many nested test suites
 
@@ -218,3 +219,7 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 ### Real-World Performance
 In typical scenarios, performance overhead is **negligible** due to efficient caching. For large cases (~10,000+ tests),
 following the recommended patterns above to reduce overhead.
+
+---
+
+☕ [Buy me a coffee](https://buymeacoffee.com/reidmoffat) if this package helped you!
