@@ -438,12 +438,12 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
             // Test metrics at different levels
             const authData = metrics.metrics.getSuiteMetrics(["Authentication"]);
-            assert.strictEqual(authData.totalTestMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
+            assert.strictEqual(authData.directTestMetrics.numTests, 3, "Authentication suite should have 3 direct tests"); // Direct tests only
             assert.isArray(authData.subSuites, "Authentication suite should have child suites array");
             assert.includeMembers(authData.subSuites!, ["OAuth", "TwoFactor"], "Authentication suite should include OAuth and TwoFactor child suites");
 
             const apiUsersData = metrics.metrics.getSuiteMetrics(["API", "Users"]);
-            assert.strictEqual(apiUsersData.totalTestMetrics.numTests, 4, "API>Users suite should have 4 tests");
+            assert.strictEqual(apiUsersData.directTestMetrics.numTests, 4, "API>Users suite should have 4 tests");
             assert.deepEqual(apiUsersData.subSuites, ["Validation"], "API>Users suite should have Validation as only child suite");
         });
 

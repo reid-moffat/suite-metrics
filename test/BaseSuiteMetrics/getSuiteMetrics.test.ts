@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics from "suite-metrics";
+import SuiteMetrics, { SuiteData } from "suite-metrics";
 import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
 import { _MockSuiteMetrics } from "../generators/mocks.js";
 import { sleep } from "../helpers.js";
@@ -90,9 +90,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             assert.isArray(topLevelData.subSuites, 'Top level suite should have child suites array');
             assert.includeMembers(topLevelData.subSuites!, ["Suite1", "Suite2"], 'Top level suite should include created child suites');
             assert.isObject(topLevelData.totalTestMetrics, 'Top level suite should have test metrics object');
-            assert.strictEqual(topLevelData.totalTestMetrics.numTests, 0, 'Top level suite should have no direct tests');
-            assert.equal(topLevelData.totalTestMetrics.totalTime, 0, 'Top level suite should have null total time when no direct tests');
-            assert.equal(topLevelData.totalTestMetrics.averageTime, 0, 'Top level suite should have null average time when no direct tests');
+            assert.strictEqual(topLevelData.directTestMetrics.numTests, 0, 'Top level suite should have no direct tests');
+            assert.equal(topLevelData.directTestMetrics.totalTime, 0, 'Top level suite should have null total time when no direct tests');
+            assert.equal(topLevelData.directTestMetrics.averageTime, 0, 'Top level suite should have null average time when no direct tests');
         });
 
         test("Complete suite data for single-level suite", function() {
@@ -197,11 +197,11 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ParentSuite", "SubSuite", "Test1"]);
             metrics.stopTest();
 
-            const parentData = metrics.metrics.getSuiteMetrics(["ParentSuite"]);
+            const parentData: SuiteData = metrics.metrics.getSuiteMetrics(["ParentSuite"]);
 
-            assert.strictEqual(parentData.totalTestMetrics.numTests, 0, 'Parent suite with no direct tests should have zero test count');
-            assert.equal(parentData.totalTestMetrics.totalTime, 0, 'Parent suite with no direct tests should have null total time');
-            assert.equal(parentData.totalTestMetrics.averageTime, 0, 'Parent suite with no direct tests should have null average time');
+            assert.strictEqual(parentData.directTestMetrics.numTests, 0, 'Parent suite with no direct tests should have zero test count');
+            assert.equal(parentData.directTestMetrics.totalTime, 0, 'Parent suite with no direct tests should have null total time');
+            assert.equal(parentData.directTestMetrics.averageTime, 0, 'Parent suite with no direct tests should have null average time');
             assert.deepEqual(parentData.subSuites, ["SubSuite"], 'Parent suite should have child suite');
         });
 
@@ -223,7 +223,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const subSuiteData = metrics.metrics.getSuiteMetrics(["MainSuite", "SubSuite"]);
 
             // Main suite should only count direct tests
-            assert.strictEqual(mainSuiteData.totalTestMetrics.numTests, 2, 'Main suite should only count direct tests');
+            assert.strictEqual(mainSuiteData.directTestMetrics.numTests, 2, 'Main suite should only count direct tests');
             assert.deepEqual(mainSuiteData.subSuites, ["SubSuite"], 'Main suite should have sub suite as child');
 
             // Sub suite should count its direct tests
@@ -283,7 +283,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             const mixedData = metrics.metrics.getSuiteMetrics(["MixedSuite"]);
 
-            assert.strictEqual(mixedData.totalTestMetrics.numTests, 1, 'Mixed suite should count only direct test');
+            assert.strictEqual(mixedData.directTestMetrics.numTests, 1, 'Mixed suite should count only direct test');
             assert.deepEqual(mixedData.subSuites, ["ChildSuite"], 'Mixed suite should have child suite');
             assert.deepEqual(mixedData.parentSuites, [], 'Mixed suite should have no parent suites');
         });
@@ -316,13 +316,13 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["Suite1", "SubSuite", "DuplicateName"]);
             metrics.stopTest();
 
-            const suite1Data = metrics.metrics.getSuiteMetrics(["Suite1"]);
-            const suite2Data = metrics.metrics.getSuiteMetrics(["Suite2"]);
-            const subSuiteData = metrics.metrics.getSuiteMetrics(["Suite1", "SubSuite"]);
+            const suite1Data: SuiteData = metrics.metrics.getSuiteMetrics(["Suite1"]);
+            const suite2Data: SuiteData = metrics.metrics.getSuiteMetrics(["Suite2"]);
+            const subSuiteData: SuiteData = metrics.metrics.getSuiteMetrics(["Suite1", "SubSuite"]);
 
-            assert.strictEqual(suite1Data.totalTestMetrics.numTests, 1, 'Suite1 should have one direct test');
-            assert.strictEqual(suite2Data.totalTestMetrics.numTests, 1, 'Suite2 should have one direct test');
-            assert.strictEqual(subSuiteData.totalTestMetrics.numTests, 1, 'SubSuite should have one direct test');
+            assert.strictEqual(suite1Data.directTestMetrics.numTests, 1, 'Suite1 should have one direct test');
+            assert.strictEqual(suite2Data.directTestMetrics.numTests, 1, 'Suite2 should have one direct test');
+            assert.strictEqual(subSuiteData.directTestMetrics.numTests, 1, 'SubSuite should have one direct test');
 
             assert.deepEqual(suite1Data.subSuites, ["SubSuite"], 'Suite1 should have SubSuite as child');
             assert.deepEqual(suite2Data.subSuites, [], 'Suite2 should have no child suites');
@@ -340,23 +340,23 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             // Test various levels
-            const level1Data = metrics.metrics.getSuiteMetrics(["Level1"]);
-            const level5Data = metrics.metrics.getSuiteMetrics(deepPath.slice(0, 5));
-            const level10Data = metrics.metrics.getSuiteMetrics(deepPath.slice(0, 10));
+            const level1Data: SuiteData = metrics.metrics.getSuiteMetrics(["Level1"]);
+            const level5Data: SuiteData = metrics.metrics.getSuiteMetrics(deepPath.slice(0, 5));
+            const level10Data: SuiteData = metrics.metrics.getSuiteMetrics(deepPath.slice(0, 10));
 
             assert.deepEqual(level1Data.parentSuites, [], 'Level1 should have no parent suites');
             assert.deepEqual(level1Data.subSuites, ["Level2"], 'Level1 should have Level2 as child');
-            assert.strictEqual(level1Data.totalTestMetrics.numTests, 0, 'Level1 should have no direct tests');
+            assert.strictEqual(level1Data.directTestMetrics.numTests, 0, 'Level1 should have no direct tests');
 
             assert.isArray(level5Data.parentSuites, 'Level5 should have parent suites array');
             assert.deepEqual(level5Data.parentSuites!, ["Level1", "Level2", "Level3", "Level4"], 'Level5 should have correct parent suites');
             assert.deepEqual(level5Data.subSuites, ["Level6"], 'Level5 should have Level6 as child');
-            assert.strictEqual(level5Data.totalTestMetrics.numTests, 0, 'Level5 should have no direct tests');
+            assert.strictEqual(level5Data.directTestMetrics.numTests, 0, 'Level5 should have no direct tests');
 
             assert.isArray(level10Data.parentSuites, 'Level10 should have parent suites array');
-            assert.deepEqual(level10Data.parentSuites!, deepPath.slice(0, 9), 'Level10 should have correct parent suites');
+            assert.deepEqual(level10Data.parentSuites, deepPath.slice(0, 9), 'Level10 should have correct parent suites');
             assert.deepEqual(level10Data.subSuites, [], 'Level10 should have no sub-suites');
-            assert.strictEqual(level10Data.totalTestMetrics.numTests, 1, 'Level10 should have one direct test');
+            assert.strictEqual(level10Data.directTestMetrics.numTests, 1, 'Level10 should have one direct test');
         });
 
         test("Consistency across multiple operations", function() {
@@ -364,7 +364,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ConsistencySuite", "Test1"]);
             metrics.stopTest();
 
-            const initialData = metrics.metrics.getSuiteMetrics(["ConsistencySuite"]);
+            const initialData: SuiteData = metrics.metrics.getSuiteMetrics(["ConsistencySuite"]);
 
             // Add more tests and suites
             metrics.startTest(["ConsistencySuite", "Test2"]);
@@ -373,10 +373,11 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ConsistencySuite", "SubSuite", "Test3"]);
             metrics.stopTest();
 
-            const updatedData = metrics.metrics.getSuiteMetrics(["ConsistencySuite"]);
+            const updatedData: SuiteData = metrics.metrics.getSuiteMetrics(["ConsistencySuite"]);
 
             // Verify the suite data updated correctly
-            assert.strictEqual(updatedData.totalTestMetrics.numTests, 2, 'Consistency suite should have two direct tests after updates');
+            assert.strictEqual(updatedData.directTestMetrics.numTests, 2, 'Consistency suite should have two direct tests after' +
+                ' updates');
             assert.deepEqual(updatedData.subSuites, ["SubSuite"], 'Consistency suite should have SubSuite as child after updates');
             assert.isAtLeast(updatedData.totalTestMetrics.totalTime!, initialData.totalTestMetrics.totalTime!, 'Total time should increase after adding more tests');
         });
@@ -443,9 +444,9 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const aData = metrics.metrics.getSuiteMetrics(["A"]);
             const topData = metrics.metrics.getSuiteMetrics([]);
 
-            assert.strictEqual(zData.totalTestMetrics.numTests, 1, 'Z suite should have one direct test');
+            assert.strictEqual(zData.directTestMetrics.numTests, 1, 'Z suite should have one direct test');
             assert.deepEqual(zData.subSuites, ["Y"], 'Z suite should have Y as child');
-            assert.strictEqual(aData.totalTestMetrics.numTests, 0, 'A suite should have no direct tests');
+            assert.strictEqual(aData.directTestMetrics.numTests, 0, 'A suite should have no direct tests');
             assert.deepEqual(aData.subSuites, ["B"], 'A suite should have B as child');
             assert.isArray(topData.subSuites, 'Top level should have child suites array');
             assert.includeMembers(topData.subSuites!, ["Z", "A"], 'Top level should include both Z and A suites');
@@ -457,15 +458,15 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["ImmutableSuite", "Test1"]);
             metrics.stopTest();
 
-            const suiteData1 = metrics.metrics.getSuiteMetrics(["ImmutableSuite"]);
-            const suiteData2 = metrics.metrics.getSuiteMetrics(["ImmutableSuite"]);
+            const suiteData1: SuiteData = metrics.metrics.getSuiteMetrics(["ImmutableSuite"]);
+            const suiteData2: SuiteData = metrics.metrics.getSuiteMetrics(["ImmutableSuite"]);
 
             assert.deepEqual(suiteData1, suiteData2, 'Multiple calls should return equal objects');
             assert.notEqual(suiteData1, suiteData2, 'Multiple calls should return different object references');
 
             // Verify modifying returned object doesn't affect internal state
             // @ts-ignore - Testing immutability
-            suiteData1.testMetrics.numTests = 999;
+            suiteData1.totalTestMetrics.numTests = 999;
             const suiteData3 = metrics.metrics.getSuiteMetrics(["ImmutableSuite"]);
             assert.notEqual(suiteData3.totalTestMetrics.numTests, 999, 'Modifying returned object should not affect internal state');
             assert.deepEqual(suiteData3, suiteData2, 'Internal state should remain unchanged after modification');
@@ -475,11 +476,11 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.startTest(["CompleteSuite", "Test1"]);
             metrics.stopTest();
 
-            const suiteData = metrics.metrics.getSuiteMetrics(["CompleteSuite"]);
+            const suiteData: SuiteData = metrics.metrics.getSuiteMetrics(["CompleteSuite"]);
 
             // Verify all properties from SuiteData type are present
             assert.hasAllKeys(suiteData, [
-                'name', 'parentSuites', 'subSuites', 'testMetrics'
+                'name', 'parentSuites', 'subSuites', 'directTestMetrics', 'subTestMetrics', 'totalTestMetrics'
             ], 'Suite data should have all required properties');
 
             // Verify property types
@@ -600,9 +601,10 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
             const parentData = metrics.metrics.getSuiteMetrics(["ParentSuite"]);
 
-            assert.strictEqual(parentData.totalTestMetrics.numTests, 0, 'Parent suite with many children should have no direct tests');
+            assert.strictEqual(parentData.directTestMetrics.numTests, 0, 'Parent suite with many children should have no direct' +
+                ' tests');
             assert.isArray(parentData.subSuites, 'Parent suite should have child suites array');
-            assert.lengthOf(parentData.subSuites!, numsubSuites, 'Parent suite should have correct number of child suites');
+            assert.lengthOf(parentData.subSuites, numsubSuites, 'Parent suite should have correct number of child suites');
 
             // Verify all child suites are present
             for (let i = 0; i < numsubSuites; i++) {
@@ -640,7 +642,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
                     assert.strictEqual(levelData.totalTestMetrics.numTests, 1, `Level${i} should have one test`);
                 } else {
                     assert.deepEqual(levelData.subSuites, [`Level${i + 1}`], `Level${i} should have next level as child`);
-                    assert.strictEqual(levelData.totalTestMetrics.numTests, 0, `Level${i} should have no direct tests`);
+                    assert.strictEqual(levelData.directTestMetrics.numTests, 0, `Level${i} should have no direct tests`);
                 }
             }
         });

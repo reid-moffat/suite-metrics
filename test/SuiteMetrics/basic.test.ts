@@ -260,9 +260,9 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const parentData = metrics.metrics.getSuiteMetrics(["ParentSuite"]);
-            assert.strictEqual(parentData.totalTestMetrics.numTests, 0, 'Parent suite should have no direct tests');
-            assert.strictEqual(parentData.totalTestMetrics.totalTime, 0, 'Parent suite should have zero total time');
-            assert.strictEqual(parentData.totalTestMetrics.averageTime, 0, 'Parent suite should have zero average time');
+            assert.strictEqual(parentData.directTestMetrics.numTests, 0, 'Parent suite should have no direct tests');
+            assert.strictEqual(parentData.directTestMetrics.totalTime, 0, 'Parent suite should have zero total time');
+            assert.strictEqual(parentData.directTestMetrics.averageTime, 0, 'Parent suite should have zero average time');
             assert.deepEqual(parentData.subSuites, ["SubSuite"], 'Parent suite should have SubSuite as child');
         });
 
@@ -287,8 +287,8 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.stopTest();
 
             const emptyData: SuiteData = metrics.metrics.getSuiteMetrics(["EmptySuite"]);
-            assert.strictEqual(emptyData.totalTestMetrics.totalTime, 0, 'Empty suite should have zero total time');
-            assert.strictEqual(emptyData.totalTestMetrics.averageTime, 0, 'Empty suite should have zero average time');
+            assert.strictEqual(emptyData.directTestMetrics.totalTime, 0, 'Empty suite should have zero total time');
+            assert.strictEqual(emptyData.directTestMetrics.averageTime, 0, 'Empty suite should have zero average time');
 
             const recursiveData: SuiteData = metrics.metrics.getSuiteMetrics(["EmptySuite"]);
             assert.strictEqual(recursiveData.directTestMetrics.totalTime, 0, 'Empty suite should have zero direct total time');
