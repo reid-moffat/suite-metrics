@@ -149,7 +149,7 @@ metrics.getTotalTestCount(); // # of completed tests in this metrics instance
 
 metrics.getAverageTestDuration(); // Average test duration for all tests (microseconds)
 
-// metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
+metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
 
 console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summary of all tests
 ```
@@ -157,7 +157,17 @@ console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summar
 #### performance
 
 ```typescript
+metrics.performance.getSlowestTest(); // -> slowest test overall
 
+metrics.performance.getKSlowestTests(); // -> the k slowests tests overall, in order
+
+metrics.performance.getAllTestsSlowestFirst(); // -> all tests, slowest first
+
+metrics.performance.getFastestTest(); // -> fastest test voerall
+
+metrics.performance.getKFastestTests(); // -> the k fastest tests overall, in order
+
+metrics.performance.getAllTestsFastestFirst(); // -> all tests, slowest first
 ```
 
 #### statistics
