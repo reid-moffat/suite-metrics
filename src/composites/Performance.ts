@@ -10,9 +10,6 @@ class Performance {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    // All tests for a given metrics sorted from slowest to fastest (requires rebuild for each test addition)
-    private cache: Test[] = [];
-
     public constructor(suites: Suites) {
         this.suites = suites;
     }
@@ -28,8 +25,8 @@ class Performance {
             throw new Error(`There are no tests in this cache, could not get the slowest test`);
         }
 
-        this.ensureSortedCache();
-        const slowestTest: Test = this.cache[0];
+        const tests: Test[] = this.suites.getAllTestsByDuration();
+        const slowestTest: Test = tests[0];
 
         return Utils.deepCopyTest(slowestTest);
     }
@@ -50,9 +47,9 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        this.ensureSortedCache();
+        const tests: Test[] = this.suites.getAllTestsByDuration();
         const endIndex: number = Math.min(k, this.suites.getNumTests());
-        const slowestTests: Test[] = this.cache.slice(0, endIndex);
+        const slowestTests: Test[] = tests.slice(0, endIndex);
 
         return Utils.deepCopyTests(slowestTests);
     }
@@ -63,8 +60,8 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        this.ensureSortedCache();
-        return Utils.deepCopyTests(this.cache);
+        const tests: Test[] = this.suites.getAllTestsByDuration();
+        return Utils.deepCopyTests(tests);
     }
 
     /**
@@ -78,8 +75,8 @@ class Performance {
             throw new Error(`There are no tests in this cache, could not get the fastest test`);
         }
 
-        this.ensureSortedCache();
-        const fastestTest: Test = this.cache[this.suites.getNumTests() - 1];
+        const tests: Test[] = this.suites.getAllTestsByDuration();
+        const fastestTest: Test = tests[this.suites.getNumTests() - 1];
 
         return Utils.deepCopyTest(fastestTest);
     }
@@ -100,9 +97,9 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        this.ensureSortedCache();
+        const tests: Test[] = this.suites.getAllTestsByDuration();
         const startIndex: number = Math.max(0, this.suites.getNumTests() - k);
-        const fastestTests: Test[] = this.cache.slice(startIndex).reverse();
+        const fastestTests: Test[] = tests.slice(startIndex).reverse();
 
         return Utils.deepCopyTests(fastestTests);
     }
@@ -113,21 +110,8 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        this.ensureSortedCache();
-        return Utils.deepCopyTests(this.cache).reverse();
-    }
-
-
-    /**
-     * Rebuilds the sorted cache if invalid
-     */
-    private ensureSortedCache(): void {
-        const sortedCacheValid: boolean = this.cache.length !== this.suites.getNumTests();
-
-        if (!sortedCacheValid) {
-            // Sort by duration in descending order (slowest goes first)
-            this.cache = [...this.suites.getAllTestsInOrder()].sort((a: Test, b: Test): number => b.duration - a.duration);
-        }
+        const tests: Test[] = this.suites.getAllTestsByDuration();
+        return Utils.deepCopyTests(tests).reverse();
     }
 }
 

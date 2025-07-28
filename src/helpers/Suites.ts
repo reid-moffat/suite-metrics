@@ -21,7 +21,13 @@ class Suites {
     };
 
     // All tests in order of insertion
-    private readonly testsInOrder: Test[] = [];
+    private readonly testsInInsertionOrder: Test[] = [];
+
+    // All tests for a given metrics sorted from slowest to fastest
+    private testsByDuration: Test[] = [];
+
+    // If the sorted list above is valid
+    private orderedTestsValid: boolean = false;
 
 
     /**
@@ -42,7 +48,7 @@ class Suites {
      * Gets the total number of tests in this metrics instance
      */
     public getNumTests(): number {
-        return this.testsInOrder.length;
+        return this.testsInInsertionOrder.length;
     }
 
     /**
@@ -74,12 +80,15 @@ class Suites {
             path: testPath
         };
 
+        // Invalidate sorted cache
+        this.orderedTestsValid = false;
+
         // Adds test to its parent suite and updates stats counter
         suite.tests.set(test.name, test);
         this.updateSubTestCounters(test.path, test.duration);
 
         // Adds to the list of all suites in order
-        this.testsInOrder.push(test);
+        this.testsInInsertionOrder.push(test);
     }
 
     /**
@@ -124,7 +133,22 @@ class Suites {
      * Returns an array with all tests in this metrics instance, in the order they were inserted in
      */
     public getAllTestsInOrder(): Test[] {
-        return this.testsInOrder;
+        return this.testsInInsertionOrder;
+    }
+
+    /**
+     * Gets all tests by their completion duration
+     *
+     * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
+     */
+    public getAllTestsByDuration(): Test[] {
+        if (!this.orderedTestsValid) {
+            // Sort by duration in descending order (slowest goes first)
+            this.testsByDuration = [...this.getAllTestsInOrder()].sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.orderedTestsValid = true;
+        }
+
+        return this.testsByDuration;
     }
 
 
