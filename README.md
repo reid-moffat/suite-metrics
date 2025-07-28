@@ -159,13 +159,13 @@ console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summar
 ```typescript
 metrics.performance.getSlowestTest(); // -> slowest test overall
 
-metrics.performance.getKSlowestTests(); // -> the k slowests tests overall, in order
+metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, in order
 
 metrics.performance.getAllTestsSlowestFirst(); // -> all tests, slowest first
 
 metrics.performance.getFastestTest(); // -> fastest test voerall
 
-metrics.performance.getKFastestTests(); // -> the k fastest tests overall, in order
+metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, in order
 
 metrics.performance.getAllTestsFastestFirst(); // -> all tests, slowest first
 ```
@@ -173,7 +173,18 @@ metrics.performance.getAllTestsFastestFirst(); // -> all tests, slowest first
 #### statistics
 
 ```typescript
+metrics.statistics.getStandardDeviation(); // -> standard deviation for all test times combined
 
+metrics.statistics.getTestZScore(/* <test object> */); // -> Z-score for the test (e.g. 0.7)
+
+metrics.statistics.getAllTestsWithZScores(); // -> every test with their Z-score
+
+metrics.statistics.interpretZScore(2); // -> human-readable z score interpretation (e.g. below)
+result = {
+    interpretation: 'Unusual performance',
+    severity: 'unusual',
+    description: 'Test is unusually slow'
+}
 ```
 
 ## ⏱️ Performance & Time Complexity
