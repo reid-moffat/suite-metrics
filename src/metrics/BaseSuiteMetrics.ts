@@ -78,6 +78,15 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
+     * Exports all the data in this metrics instance as-is (deep copied to prevent reference leakage)
+     *
+     * @returns The top-level suite
+     */
+    public getAllData(): Suite {
+        return Utils.deepCopySuite(this.suites.getTopLevelSuite());
+    }
+
+    /**
      * Stringifies all data in this metrics instance into JSON
      *
      * @param includeTopLevel true to include the top-level suite as the top level object

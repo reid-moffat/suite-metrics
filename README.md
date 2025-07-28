@@ -115,6 +115,10 @@ metrics.validatePath([], false); // -> invalid (error)
 metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
 
 metrics.getTestsInOrder(); // Copy of all tests in order they were completed
+
+metrics.getAllData(); // -> all data in this metrics as-is (deeply copied)
+
+metrics.toJSON(); // -> all data in this metrics, serialized to JSON
 ```
 
 #### queries
@@ -194,14 +198,14 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 
 ### Non-Constant Operations
 
-| Operation | Complexity | Notes                                                                                         |
-|-----------|------------|-----------------------------------------------------------------------------------------------|
-| **ConcurrentSuiteMetrics methods** | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests)  |
-| **Getting/Adding Suites/Tests** | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                         |
-| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks               |
-| **Performance methods** | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)        |
-| **Statistics methods** | `O(n)` → `O(1)` | Cache rebuild when tests added, then constant time (except `getAllTestsWithZScores` which is `O(n)`) |
-| **JSON export & printing** | `O(n)` | `toJSON()` and `printAllSuiteMetrics()` require a full traverse                               |
+| Operation                           | Complexity | Notes                                                                                             |
+|-------------------------------------|------------|---------------------------------------------------------------------------------------------------|
+| **ConcurrentSuiteMetrics methods**  | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests)      |
+| **Getting/Adding Suites/Tests**     | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                             |
+| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks                   |
+| **Performance methods**             | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests) |
+| **Statistics methods**              | `O(n)` → `O(1)` | Cache rebuild when tests added, then constant time (except `getAllTestsWithZScores` which is `O(n)`) |
+| **Data exporting**                  | `O(n)` | Methods `toJSON()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse          |
 
 > **Note**: `interpretZScore()` is always `O(1)` and doesn't require cache rebuilds.
 
