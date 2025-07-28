@@ -48,7 +48,7 @@ function sleepMicroseconds(microseconds: number): void {
  * @param expectedError
  * @param message
  */
-async function assertThrowsAsync(func: () => Promise<void>, expectedError: string, message: string): Promise<void> {
+async function assertThrowsAsync(func: () => Promise<any>, expectedError: string, message: string): Promise<void> {
     try {
         await func();
         assert.fail("Expected function to throw an error, but it didn't");

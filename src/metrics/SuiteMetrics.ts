@@ -1,5 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
+import { Test } from "../types/structures.ts";
 
 // Metadata for the currently running test
 type TestMetadata = { testPath: string[]; startTime: number; };
@@ -60,7 +61,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
     /**
      * Stops timing the currently active test, storing the test information
      */
-    public stopTest(): void {
+    public stopTest(): Test {
         const endTime: number = microtime.now();
 
         if (this.activeTest === null) {
@@ -68,9 +69,11 @@ class SuiteMetrics extends BaseSuiteMetrics {
         }
 
         const { testPath, startTime }: TestMetadata = this.activeTest;
-        this.suites.addTest(testPath, startTime, endTime);
+        const test: Test = this.suites.addTest(testPath, startTime, endTime);
 
         this.activeTest = null;
+
+        return test;
     }
 }
 

@@ -59,13 +59,14 @@ class Suites {
     }
 
     /**
-     * Stores a completed test's data in this metrics instance
+     * Stores and returns a completed test's data in this metrics instance
      *
      * @param testPath Path to this test
      * @param startTime Time the test was started at
      * @param endTime Time the test was completed at
+     * @returns The created Test object
      */
-    public addTest(testPath: string[], startTime: number, endTime: number): void {
+    public addTest(testPath: string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
         const testName: string = testPath[testPath.length - 1];
         const testDuration: number = endTime - startTime;
@@ -89,6 +90,8 @@ class Suites {
 
         // Adds to the list of all suites in order
         this.testsInInsertionOrder.push(test);
+
+        return test;
     }
 
     /**

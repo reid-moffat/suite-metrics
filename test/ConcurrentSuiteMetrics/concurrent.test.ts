@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ConcurrentSuiteMetrics, SuiteData } from "suite-metrics";
+import { ConcurrentSuiteMetrics, SuiteData, Test } from "suite-metrics";
 import { createPresetData, createSimpleTestData, PRESET_TYPE } from "../generators/testDataHelpers.ts";
 import { assertThrowsAsync, sleep } from "../helpers.ts";
 
@@ -164,7 +164,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
         });
 
         test("Stopping test that wasn't started", async function() {
-            const test = (): Promise<void> => concurrentMetrics.stopTest(["Error Handling", "Non-existent test"]);
+            const test = (): Promise<Test> => concurrentMetrics.stopTest(["Error Handling", "Non-existent test"]);
             const expectedError: string = "Error stopping test: Test [Error Handling, Non-existent test] is not currently running. Call startTest() first to begin testing";
 
             await assertThrowsAsync(test, expectedError, "Stopping a non-existent test should fail");

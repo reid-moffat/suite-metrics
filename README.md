@@ -67,7 +67,7 @@ metrics.startTest(["Suite Name", "Sub-suite name", "Test Name"]);
 // Execute your test logic here...
 
 // Call directly after test logic completes to stop tracking
-metrics.stopTest();
+const test = metrics.stopTest();
 ```
 
 Concurrent metrics can run multiple at the same time:
@@ -77,7 +77,7 @@ const promises = [
     (async () => {
         await concurrentMetrics.startTest(["Suite Name", "Test Name 1"]);
         // Test logic...
-        await concurrentMetrics.stopTest(["Suite Name", "Test Name 1"]);
+        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 1"]);
     })(),
     (async () => {
         await concurrentMetrics.startTest(["Suite Name", "Test Name 2"]);

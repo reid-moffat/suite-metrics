@@ -1,6 +1,7 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 import { E_CANCELED, E_TIMEOUT, Mutex, withTimeout } from 'async-mutex';
+import { Test } from "../types/structures.ts";
 
 
 // Path segments joined with '::'
@@ -138,7 +139,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async stopTest(path: string[]): Promise<void> {
+    public async stopTest(path: string[]): Promise<Test> {
         const endTime: number = microtime.now();
         let release: (() => void) | null = null;
 
@@ -155,8 +156,10 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             }
 
             // Store test data and remove from active tests
-            this.suites.addTest(path, testStartTime, endTime);
+            const test: Test = this.suites.addTest(path, testStartTime, endTime);
             this.activeTests.delete(testKey);
+
+            return test;
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
