@@ -16,6 +16,29 @@ class Metrics {
     }
 
     /**
+     * Gets the total number of completed tests across all suites
+     *
+     * @returns The total number of completed tests in this metrics instance
+     */
+    public getTotalTestCount(): number {
+        return this.suites.getNumTests();
+    }
+
+    /**
+     * Gets the average completion duration for all tests in this metrics instance
+     *
+     * @returns The average test completion duration, rounded to the nearest microsecond
+     * @throws Error if there are no completed tests in this instance
+     */
+    public getAverageTestDuration(): number {
+        if (this.getTotalTestCount() === 0) {
+            throw new Error(`There are no completed tests in this instance`);
+        }
+
+        return this.suites.getAverageTestDuration();
+    }
+
+    /**
      * Gets metrics for a given suite and its sub-suites
      *
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed

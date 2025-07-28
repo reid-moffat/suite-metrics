@@ -114,10 +114,6 @@ metrics.validatePath([], false); // -> invalid (error)
 
 metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
 
-metrics.getTotalTestCount(); // # of completed tests in this metrics instance
-
-metrics.getAverageTestDuration(); // Average test duration for all tests (microseconds)
-
 metrics.getTestsInOrder(); // Copy of all tests in order they were completed
 ```
 
@@ -149,8 +145,11 @@ metrics.queries.getTestNames(["Suite 2"]); // -> all test names directly in this
 #### metrics
 
 ```typescript
-// Detailed metrics for a specific suite and its direct tests
-metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
+metrics.getTotalTestCount(); // # of completed tests in this metrics instance
+
+metrics.getAverageTestDuration(); // Average test duration for all tests (microseconds)
+
+// metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
 
 console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summary of all tests
 ```
@@ -158,51 +157,13 @@ console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summar
 #### performance
 
 ```typescript
-// Simple summary of all suites and tests - # test/suites, total/avg time
-console.log(metrics.printAllSuiteMetrics());
 
-// Detailed metrics for a specific test
-metrics.getTestMetrics(["Suite Name", "Test Name"]);
-
-// Detailed metrics for a specific suite and its direct tests
-metrics.getSuiteMetrics(["Suite Name"]);
-
-// Detailed metrics for a specific suite and all sub-suites & sub-tests
-metrics.getSuiteMetricsRecursive(["Suite Name"]);
-
-// Helpers
-if (metrics.suiteExists(["Suite Name"])) {
-    // ...
-}
-
-if (metrics.testExists(["Suite Name", "Test Name"])) {
-    // ...
-}
 ```
 
 #### statistics
 
 ```typescript
-// Simple summary of all suites and tests - # test/suites, total/avg time
-console.log(metrics.printAllSuiteMetrics());
 
-// Detailed metrics for a specific test
-metrics.getTestMetrics(["Suite Name", "Test Name"]);
-
-// Detailed metrics for a specific suite and its direct tests
-metrics.getSuiteMetrics(["Suite Name"]);
-
-// Detailed metrics for a specific suite and all sub-suites & sub-tests
-metrics.getSuiteMetricsRecursive(["Suite Name"]);
-
-// Helpers
-if (metrics.suiteExists(["Suite Name"])) {
-    // ...
-}
-
-if (metrics.testExists(["Suite Name", "Test Name"])) {
-    // ...
-}
 ```
 
 ## ⏱️ Performance & Time Complexity

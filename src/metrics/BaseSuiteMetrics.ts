@@ -68,29 +68,6 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets the total number of completed tests across all suites
-     *
-     * @returns The total number of completed tests in this metrics instance
-     */
-    public getTotalTestCount(): number {
-        return this.suites.getNumTests();
-    }
-
-    /**
-     * Gets the average completion duration for all tests in this metrics instance
-     *
-     * @returns The average test completion duration, rounded to the nearest microsecond
-     * @throws Error if there are no completed tests in this instance
-     */
-    public getAverageTestDuration(): number {
-        if (this.getTotalTestCount() === 0) {
-            throw new Error(`There are no completed tests in this instance`);
-        }
-
-        return this.suites.getAverageTestDuration();
-    }
-
-    /**
      * Gets all tests in order
      *
      * @returns An array of all tests in this metrics instance, sorted by time of completion (first test completion
