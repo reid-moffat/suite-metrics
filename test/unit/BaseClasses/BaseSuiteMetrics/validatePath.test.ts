@@ -22,36 +22,132 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
     suite("Invalid input types", function() {
 
-        allInputTypes.filter((val) => !Array.isArray(val)).forEach((input: any) => {
-            const stringified: string = valueToHumanReadableString(input);
+        suite("Suite", function() {
+            allInputTypes.filter((val) => !Array.isArray(val)).forEach((input: any) => {
+                const stringified: string = valueToHumanReadableString(input);
 
-            return test(stringified, function() {
+                return test(stringified, function() {
+                    assertThrowsWithMessage(
+                        createValidatePathTest(input, false),
+                        "Suite/test path must be an array",
+                        `Should reject '${stringified}' input`
+                    );
+                });
+            });
+        });
+
+        suite("Test", function() {
+            allInputTypes.filter((val) => !Array.isArray(val)).forEach((input: any) => {
+                const stringified: string = valueToHumanReadableString(input);
+
+                return test(stringified, function() {
+                    assertThrowsWithMessage(
+                        createValidatePathTest(input, true),
+                        "Suite/test path must be an array",
+                        `Should reject '${stringified}' input`
+                    );
+                });
+            });
+        });
+    });
+
+    suite("Invalid input array", function() {
+
+        suite("Suite", function() {
+            test("Number array", function() {
                 assertThrowsWithMessage(
-                    createValidatePathTest(input, false),
-                    "Suite/test path must be an array",
-                    `Should reject '${stringified}' input`
+                    createValidatePathTest([123], false),
+                    "Suite/test path element at index 0 must be a 'string', got 'number'",
+                    "Should reject empty array when isTest=true"
+                );
+            });
+
+            test("Empty string in array", function() {
+                assertThrowsWithMessage(
+                    createValidatePathTest([""], false),
+                    "Suite/test path element at index 0 cannot be empty",
+                    "Should reject empty array when isTest=true"
+                );
+            });
+
+            test("Multi empty strings in array", function() {
+                assertThrowsWithMessage(
+                    createValidatePathTest(["", ""], false),
+                    "Suite/test path element at index 0 cannot be empty",
+                    "Should reject empty array when isTest=true"
+                );
+            });
+        });
+
+        suite("Test", function() {
+            test("Empty array", function() {
+                assertThrowsWithMessage(
+                    createValidatePathTest([], true),
+                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
+                    "Should reject empty array when isTest=true"
+                );
+            });
+
+            test("Single element array", function() {
+                assertThrowsWithMessage(
+                    createValidatePathTest(["OnlyOneSuite"], true),
+                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
+                    "Should reject single element array when isTest=true"
                 );
             });
         });
     });
 
-    suite("Invalid path length/elements", function() {
-        test("Reject empty array for test", function() {
-            assertThrowsWithMessage(
-                createValidatePathTest([], true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                "Should reject empty array when isTest=true"
+    suite("Valid inputs - suite", function() {
+        test("Accept empty array for suite (top-level suite)", function() {
+            assertDoesNotThrow(
+                createValidatePathTest([], false),
+                "Should accept empty array (top-level suite) when isTest=false"
             );
         });
 
-        test("Reject single element array for test", function() {
-            assertThrowsWithMessage(
-                createValidatePathTest(["OnlyOneSuite"], true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                "Should reject single element array when isTest=true"
+        test("Accept one element array for suite", function() {
+            assertDoesNotThrow(
+                createValidatePathTest(["Suite"], false),
+                "Should accept one element array when isTest=false"
             );
         });
 
+        test("Accept multi-element suite", function () {
+            assertDoesNotThrow(
+                createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false),
+                "Should accept multi-one element array when isTest=false"
+            );
+        });
+
+        test("Accept long suite", function () {
+            const suite: string[] = [];
+            const length = 100;
+            for (let i = 0; i < length; ++i) {
+                suite.push(`Suite ${i}`);
+            }
+
+            assertDoesNotThrow(
+                createValidatePathTest(suite, false),
+                "Should accept long array when isTest=false"
+            );
+        });
+
+        test("Accept VERY long suite", function () {
+            const suite: string[] = [];
+            const length = 100_000;
+            for (let i = 0; i < length; ++i) {
+                suite.push(`Suite ${i}`);
+            }
+
+            assertDoesNotThrow(
+                createValidatePathTest(suite, false),
+                "Should accept very long array when isTest=false"
+            );
+        });
+    });
+
+    suite("Valid inputs - test", function (){
         test("Accept two element array for test", function() {
             assertDoesNotThrow(
                 createValidatePathTest(["Suite", "Test"], true),
@@ -65,27 +161,32 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 "Should accept multi-element array when isTest=true"
             );
         });
-    });
 
-    suite("Path Length Validation for Suites", function() {
-        test("Accept empty array for suite", function() {
+        test("Accept long suite", function () {
+            const test: string[] = [];
+            const length = 100;
+            for (let i = 0; i < length; ++i) {
+                test.push(`Suite ${i}`);
+            }
+            test.push("Test name");
+
             assertDoesNotThrow(
-                createValidatePathTest([], false),
-                "Should accept empty array when isTest=false (top-level suite)"
+                createValidatePathTest(test, true),
+                "Should accept long array when isTest=true"
             );
         });
 
-        test("Accept single element array for suite", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite"], false),
-                "Should accept single element array when isTest=false"
-            );
-        });
+        test("Accept VERY long suite", function () {
+            const test: string[] = [];
+            const length = 100_000;
+            for (let i = 0; i < length; ++i) {
+                test.push(`Suite ${i}`);
+            }
+            test.push("Test name");
 
-        test("Accept multi-element array for suite", function() {
             assertDoesNotThrow(
-                createValidatePathTest(["Suite", "SubSuite", "SubSubSuite"], false),
-                "Should accept multi-element array when isTest=false"
+                createValidatePathTest(test, true),
+                "Should accept very long array when isTest=true"
             );
         });
     });
