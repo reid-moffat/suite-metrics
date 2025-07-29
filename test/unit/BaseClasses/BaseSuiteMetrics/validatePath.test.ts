@@ -92,112 +92,151 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         });
 
         suite("Test", function() {
-            test("Empty array", function() {
-                assertThrows(
-                    createValidatePathTest([], true),
-                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
-                );
-            });
+            const testCases: { input: any[], expectedError: string }[] = [
+                {
+                    input: [],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: ["OnlyOneSuite"],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: [123],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: [""],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: ["", ""],
+                    expectedError: "Test path element at index 0 cannot be empty"
+                },
+                {
+                    input: [" "],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: [" ", " "],
+                    expectedError: "Test path element at index 0 cannot be whitespace-only"
+                },
+                {
+                    input: [" ".repeat(100_000)],
+                    expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
+                },
+                {
+                    input: [" ".repeat(100_000), " ".repeat(100_000)],
+                    expectedError: "Test path element at index 0 cannot be whitespace-only"
+                }
+            ];
 
-            test("Single element array", function() {
-                assertThrows(
-                    createValidatePathTest(["OnlyOneSuite"], true),
-                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
-                );
+            testCases.forEach(({ input, expectedError }) => {
+                const testName: string = valueToHumanReadableString(input);
+
+                test(testName, function() {
+                    assertThrows(
+                        createValidatePathTest(input, true),
+                        expectedError
+                    );
+                });
             });
         });
     });
 
-    suite("Valid inputs - suite", function() {
-        test("Accept empty array for suite (top-level suite)", function() {
-            assertDoesNotThrow(
-                createValidatePathTest([], false),
-                "Should accept empty array (top-level suite) when isTest=false"
-            );
+    suite("Valid inputs", function() {
+
+        suite("Suite", function() {
+            test("Accept empty array for suite (top-level suite)", function() {
+                assertDoesNotThrow(
+                    createValidatePathTest([], false),
+                    "Should accept empty array (top-level suite) when isTest=false"
+                );
+            });
+
+            test("Accept one element array for suite", function() {
+                assertDoesNotThrow(
+                    createValidatePathTest(["Suite"], false),
+                    "Should accept one element array when isTest=false"
+                );
+            });
+
+            test("Accept multi-element suite", function () {
+                assertDoesNotThrow(
+                    createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false),
+                    "Should accept multi-one element array when isTest=false"
+                );
+            });
+
+            test("Accept long suite", function () {
+                const suite: string[] = [];
+                const length = 100;
+                for (let i = 0; i < length; ++i) {
+                    suite.push(`Suite ${i}`);
+                }
+
+                assertDoesNotThrow(
+                    createValidatePathTest(suite, false),
+                    "Should accept long array when isTest=false"
+                );
+            });
+
+            test("Accept VERY long suite", function () {
+                const suite: string[] = [];
+                const length = 100_000;
+                for (let i = 0; i < length; ++i) {
+                    suite.push(`Suite ${i}`);
+                }
+
+                assertDoesNotThrow(
+                    createValidatePathTest(suite, false),
+                    "Should accept very long array when isTest=false"
+                );
+            });
         });
 
-        test("Accept one element array for suite", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite"], false),
-                "Should accept one element array when isTest=false"
-            );
-        });
+        suite("Test", function() {
+            test("Accept two element array for test", function() {
+                assertDoesNotThrow(
+                    createValidatePathTest(["Suite", "Test"], true),
+                    "Should accept two element array when isTest=true"
+                );
+            });
 
-        test("Accept multi-element suite", function () {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false),
-                "Should accept multi-one element array when isTest=false"
-            );
-        });
+            test("Accept multi-element array for test", function() {
+                assertDoesNotThrow(
+                    createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true),
+                    "Should accept multi-element array when isTest=true"
+                );
+            });
 
-        test("Accept long suite", function () {
-            const suite: string[] = [];
-            const length = 100;
-            for (let i = 0; i < length; ++i) {
-                suite.push(`Suite ${i}`);
-            }
+            test("Accept long suite", function () {
+                const test: string[] = [];
+                const length = 100;
+                for (let i = 0; i < length; ++i) {
+                    test.push(`Suite ${i}`);
+                }
+                test.push("Test name");
 
-            assertDoesNotThrow(
-                createValidatePathTest(suite, false),
-                "Should accept long array when isTest=false"
-            );
-        });
+                assertDoesNotThrow(
+                    createValidatePathTest(test, true),
+                    "Should accept long array when isTest=true"
+                );
+            });
 
-        test("Accept VERY long suite", function () {
-            const suite: string[] = [];
-            const length = 100_000;
-            for (let i = 0; i < length; ++i) {
-                suite.push(`Suite ${i}`);
-            }
+            test("Accept VERY long suite", function () {
+                const test: string[] = [];
+                const length = 100_000;
+                for (let i = 0; i < length; ++i) {
+                    test.push(`Suite ${i}`);
+                }
+                test.push("Test name");
 
-            assertDoesNotThrow(
-                createValidatePathTest(suite, false),
-                "Should accept very long array when isTest=false"
-            );
-        });
-    });
-
-    suite("Valid inputs - test", function (){
-        test("Accept two element array for test", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite", "Test"], true),
-                "Should accept two element array when isTest=true"
-            );
-        });
-
-        test("Accept multi-element array for test", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true),
-                "Should accept multi-element array when isTest=true"
-            );
-        });
-
-        test("Accept long suite", function () {
-            const test: string[] = [];
-            const length = 100;
-            for (let i = 0; i < length; ++i) {
-                test.push(`Suite ${i}`);
-            }
-            test.push("Test name");
-
-            assertDoesNotThrow(
-                createValidatePathTest(test, true),
-                "Should accept long array when isTest=true"
-            );
-        });
-
-        test("Accept VERY long suite", function () {
-            const test: string[] = [];
-            const length = 100_000;
-            for (let i = 0; i < length; ++i) {
-                test.push(`Suite ${i}`);
-            }
-            test.push("Test name");
-
-            assertDoesNotThrow(
-                createValidatePathTest(test, true),
-                "Should accept very long array when isTest=true"
-            );
+                assertDoesNotThrow(
+                    createValidatePathTest(test, true),
+                    "Should accept very long array when isTest=true"
+                );
+            });
         });
     });
 
