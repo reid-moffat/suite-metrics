@@ -76,6 +76,55 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 {
                     input: [" ".repeat(100_000), " ".repeat(100_000)],
                     expectedError: "Suite path element at index 0 cannot be whitespace-only"
+                },
+
+                {
+                    input: ["Suite 1", true],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'boolean'"
+                },
+                {
+                    input: ["Suite 1", false, "Suite name"],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'boolean'"
+                },
+                {
+                    input: ["Suite 1", null],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", undefined],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'undefined'"
+                },
+                {
+                    input: [undefined, "Suite 1"],
+                    expectedError: "Suite path element at index 0 must be a 'string', got 'undefined'"
+                },
+                {
+                    input: ["Suite 1", [123]],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", 221],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'number'"
+                },
+                {
+                    input: ["Suite 1", {}],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", []],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite", { name: "Suite 1" }],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite", () => "suite name"],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'function'"
+                },
+                {
+                    input: ["Suite", 12, "suite name #1"],
+                    expectedError: "Suite path element at index 1 must be a 'string', got 'number'"
                 }
             ];
 
@@ -101,6 +150,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     input: ["OnlyOneSuite"],
                     expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
                 },
+
                 {
                     input: [123],
                     expectedError: "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)"
@@ -128,6 +178,55 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 {
                     input: [" ".repeat(100_000), " ".repeat(100_000)],
                     expectedError: "Test path element at index 0 cannot be whitespace-only"
+                },
+
+                {
+                    input: ["Suite 1", true],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'boolean'"
+                },
+                {
+                    input: ["Suite 1", false, "Test name"],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'boolean'"
+                },
+                {
+                    input: ["Suite 1", null],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", undefined],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'undefined'"
+                },
+                {
+                    input: [undefined, "Suite 1"],
+                    expectedError: "Test path element at index 0 must be a 'string', got 'undefined'"
+                },
+                {
+                    input: ["Suite 1", [123]],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", 221],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'number'"
+                },
+                {
+                    input: ["Suite 1", {}],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite 1", []],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite", { name: "test 1" }],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'object'"
+                },
+                {
+                    input: ["Suite", () => "test name"],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'function'"
+                },
+                {
+                    input: ["Suite", 12, "Test name 1"],
+                    expectedError: "Test path element at index 1 must be a 'string', got 'number'"
                 }
             ];
 
@@ -237,80 +336,6 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     "Should accept very long array when isTest=true"
                 );
             });
-        });
-    });
-
-    suite("Element Type Validation", function() {
-        test("Reject number element at index 0", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest([123], false),
-                "Suite path element at index 0 must be a 'string', got 'number'"
-            );
-        });
-
-        test("Reject number element at index 1", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", 456], false),
-                "Suite path element at index 1 must be a 'string', got 'number'"
-            );
-        });
-
-        test("Reject number element in middle of path", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", "SubSuite", 789, "Test"], true),
-                "Test path element at index 2 must be a 'string', got 'number'"
-            );
-        });
-
-        test("Reject boolean element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", true], false),
-                "Suite path element at index 1 must be a 'string', got 'boolean'"
-            );
-        });
-
-        test("Reject null element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", null], false),
-                "Suite path element at index 1 must be a 'string', got 'object'"
-            );
-        });
-
-        test("Reject undefined element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", undefined], false),
-                "Suite path element at index 1 must be a 'string', got 'undefined'"
-            );
-        });
-
-        test("Reject object element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", { name: "test" }], false),
-                "Suite path element at index 1 must be a 'string', got 'object'"
-            );
-        });
-
-        test("Reject array element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", ["SubArray"]], false),
-                "Suite path element at index 1 must be a 'string', got 'object'"
-            );
-        });
-
-        test("Reject function element", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["Suite", () => "test"], false),
-                "Suite path element at index 1 must be a 'string', got 'function'"
-            );
         });
     });
 
