@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import SuiteMetrics from "suite-metrics";
-import { sleep } from "../../helpers.ts";
+import { sleep } from "../../helpers/helpers.ts";
 
 suite("[BaseSuiteMetrics] getTest", function() {
 

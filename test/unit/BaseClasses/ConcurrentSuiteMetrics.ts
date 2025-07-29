@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { ConcurrentSuiteMetrics, SuiteData, Test } from "suite-metrics";
 import { createPresetData, createSimpleTestData, PRESET_TYPE } from "../../generators/testDataHelpers.ts";
-import { assertThrowsAsync, sleep } from "../../helpers.ts";
+import { assertThrowsAsync, sleep } from "../../helpers/helpers.ts";
 
 suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 

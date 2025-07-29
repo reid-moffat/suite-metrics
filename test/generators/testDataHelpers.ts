@@ -1,5 +1,5 @@
 import { TestDataOptions, SuiteStructure, DEFAULT_OPTIONS } from "./options.ts";
-import { randomInt } from "../helpers.ts";
+import { randomInt } from "../helpers/helpers.ts";
 import { realisticStructure, edgeCaseStructure } from "./presets.ts";
 import { _MockConcurrentSuiteMetrics, _MockSuiteMetrics } from "./mocks.js";
 

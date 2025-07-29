@@ -1,6 +1,6 @@
 import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics } from "suite-metrics";
 import microtime from "microtime";
-import { randomInt } from "../helpers.ts";
+import { randomInt } from "../helpers/helpers.ts";
 
 // Set the initial time 1 hour ago for a semi-realistic start time
 const hourInMicrosec = 60 * 60 * 1000 * 1000;
