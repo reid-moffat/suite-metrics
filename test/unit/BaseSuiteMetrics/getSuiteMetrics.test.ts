@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import SuiteMetrics, { SuiteData } from "suite-metrics";
-import { createSimpleTestData, createNestedTestData } from "../generators/testDataHelpers.ts";
-import { _MockSuiteMetrics } from "../generators/mocks.js";
-import { sleep } from "../helpers.js";
+import { createSimpleTestData, createNestedTestData } from "../../generators/testDataHelpers.ts";
+import { _MockSuiteMetrics } from "../../generators/mocks.js";
+import { sleep } from "../../helpers.js";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
