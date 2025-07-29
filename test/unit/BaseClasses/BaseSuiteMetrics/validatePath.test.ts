@@ -8,8 +8,8 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         assert.throws(fn, expectedMessage);
     }
 
-    function assertDoesNotThrow(fn: () => void, description: string): void {
-        assert.doesNotThrow(fn, description);
+    function assertDoesNotThrow(fn: () => void): void {
+        assert.doesNotThrow(fn);
     }
 
     function createValidatePathTest(path: any, isTest: boolean): () => void {
@@ -279,24 +279,15 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
         suite("Suite", function() {
             test("Accept empty array for suite (top-level suite)", function() {
-                assertDoesNotThrow(
-                    createValidatePathTest([], false),
-                    "Should accept empty array (top-level suite) when isTest=false"
-                );
+                assertDoesNotThrow(createValidatePathTest([], false));
             });
 
             test("Accept one element array for suite", function() {
-                assertDoesNotThrow(
-                    createValidatePathTest(["Suite"], false),
-                    "Should accept one element array when isTest=false"
-                );
+                assertDoesNotThrow(createValidatePathTest(["Suite"], false));
             });
 
             test("Accept multi-element suite", function () {
-                assertDoesNotThrow(
-                    createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false),
-                    "Should accept multi-one element array when isTest=false"
-                );
+                assertDoesNotThrow(createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false));
             });
 
             test("Accept long suite", function () {
@@ -306,10 +297,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     suite.push(`Suite ${i}`);
                 }
 
-                assertDoesNotThrow(
-                    createValidatePathTest(suite, false),
-                    "Should accept long array when isTest=false"
-                );
+                assertDoesNotThrow(createValidatePathTest(suite, false));
             });
 
             test("Accept VERY long suite", function () {
@@ -319,26 +307,25 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     suite.push(`Suite ${i}`);
                 }
 
-                assertDoesNotThrow(
-                    createValidatePathTest(suite, false),
-                    "Should accept very long array when isTest=false"
-                );
+                assertDoesNotThrow(createValidatePathTest(suite, false));
+            });
+
+            test("Accept one element array for suite", function() {
+                assertDoesNotThrow(createValidatePathTest(["Suite"], false));
+            });
+
+            test("Accept emojis", function() {
+                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], false));
             });
         });
 
         suite("Test", function() {
             test("Accept two element array for test", function() {
-                assertDoesNotThrow(
-                    createValidatePathTest(["Suite", "Test"], true),
-                    "Should accept two element array when isTest=true"
-                );
+                assertDoesNotThrow(createValidatePathTest(["Suite", "Test"], true));
             });
 
             test("Accept multi-element array for test", function() {
-                assertDoesNotThrow(
-                    createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true),
-                    "Should accept multi-element array when isTest=true"
-                );
+                assertDoesNotThrow(createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true));
             });
 
             test("Accept long suite", function () {
@@ -349,10 +336,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 }
                 test.push("Test name");
 
-                assertDoesNotThrow(
-                    createValidatePathTest(test, true),
-                    "Should accept long array when isTest=true"
-                );
+                assertDoesNotThrow(createValidatePathTest(test, true));
             });
 
             test("Accept VERY long suite", function () {
@@ -363,87 +347,39 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 }
                 test.push("Test name");
 
-                assertDoesNotThrow(
-                    createValidatePathTest(test, true),
-                    "Should accept very long array when isTest=true"
-                );
+                assertDoesNotThrow(createValidatePathTest(test, true));
             });
         });
     });
 
     suite("Valid Path Cases", function() {
-        test("Accept valid single suite", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["ValidSuite"], false),
-                "Should accept valid single suite name"
-            );
-        });
-
-        test("Accept valid nested suite path", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite", "SubSuite", "SubSubSuite"], false),
-                "Should accept valid nested suite path"
-            );
-        });
-
-        test("Accept valid test path", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite", "TestName"], true),
-                "Should accept valid test path"
-            );
-        });
-
-        test("Accept valid deeply nested test path", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "TestName"], true),
-                "Should accept valid deeply nested test path"
-            );
-        });
 
         test("Accept strings with leading/trailing spaces (but not whitespace-only)", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["  Suite  ", "  TestName  "], true),
-                "Should accept strings with leading/trailing spaces"
-            );
+            assertDoesNotThrow(createValidatePathTest(["  Suite  ", "  TestName  "], true));
         });
 
         test("Accept strings with numbers as content", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite123", "Test456"], true),
-                "Should accept strings containing numbers"
-            );
+            assertDoesNotThrow(createValidatePathTest(["Suite123", "Test456"], true));
         });
 
         test("Accept strings with special characters", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite-Name_1", "Test@Name#2"], true),
-                "Should accept strings with special characters"
-            );
+            assertDoesNotThrow(createValidatePathTest(["Suite-Name_1", "Test@Name#2"], true));
         });
 
         test("Accept strings with unicode characters", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["Suite🚀", "Test✅"], true),
-                "Should accept strings with unicode characters"
-            );
+            assertDoesNotThrow(createValidatePathTest(["Suite🚀", "Test✅"], true));
         });
     });
 
     suite("Edge Cases and Boundary Conditions", function() {
         test("Accept very long path", function() {
             const longPath = Array(100_000).fill(0).map((_, i) => `Level${i}`);
-            assertDoesNotThrow(
-                createValidatePathTest(longPath, false),
-                "Should accept very long valid path"
-            );
+            assertDoesNotThrow(createValidatePathTest(longPath, false));
         });
 
         test("Accept very long test path", function() {
             const longPath = Array(100_000).fill(0).map((_, i) => `Level${i}`);
-            assertDoesNotThrow(
-                createValidatePathTest(longPath, true),
-                "Should accept very long valid test path"
-            );
+            assertDoesNotThrow(createValidatePathTest(longPath, true));
         });
 
         test("Reject exactly one character empty string", function() {
@@ -454,17 +390,11 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         });
 
         test("Accept exactly one character valid string", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["S", "T"], true),
-                "Should accept single character strings"
-            );
+            assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
         });
 
         test("Test with exactly minimum required elements for test", function() {
-            assertDoesNotThrow(
-                createValidatePathTest(["S", "T"], true),
-                "Should accept exactly two elements for test"
-            );
+            assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
         });
 
         test("Mixed valid and invalid scenarios - first element invalid", function() {
@@ -496,10 +426,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         test("Same path validates differently based on isTest flag", function() {
             const singleElementPath = ["OnlySuite"];
 
-            assertDoesNotThrow(
-                createValidatePathTest(singleElementPath, false),
-                "Should accept single element as suite"
-            );
+            assertDoesNotThrow(createValidatePathTest(singleElementPath, false));
 
             assertThrows(
                 createValidatePathTest(singleElementPath, true),
@@ -510,10 +437,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         test("Empty path validates differently based on isTest flag", function() {
             const emptyPath: string[] = [];
 
-            assertDoesNotThrow(
-                createValidatePathTest(emptyPath, false),
-                "Should accept empty path as suite (top-level)"
-            );
+            assertDoesNotThrow(createValidatePathTest(emptyPath, false));
 
             assertThrows(
                 createValidatePathTest(emptyPath, true),
@@ -524,15 +448,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         test("Two element path should be valid for both flags", function() {
             const twoElementPath = ["Suite", "Item"];
 
-            assertDoesNotThrow(
-                createValidatePathTest(twoElementPath, false),
-                "Should accept two elements as suite path"
-            );
+            assertDoesNotThrow(createValidatePathTest(twoElementPath, false));
 
-            assertDoesNotThrow(
-                createValidatePathTest(twoElementPath, true),
-                "Should accept two elements as test path"
-            );
+            assertDoesNotThrow(createValidatePathTest(twoElementPath, true));
         });
     });
 
