@@ -11,7 +11,7 @@ class Metrics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    constructor(suites: Suites) {
+    public constructor(suites: Suites) {
         this.suites = suites;
     }
 

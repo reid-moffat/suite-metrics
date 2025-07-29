@@ -16,7 +16,7 @@ class Statistics {
     // Number of tests present when the stDev was calculated (used to verify if recalculation is required)
     private stdDevTests: number = 0;
 
-    constructor(suites: Suites) {
+    public constructor(suites: Suites) {
         this.suites = suites;
     }
 
