@@ -7,6 +7,8 @@ const allInputTypes: any[] = [
     true,
     false,
     "",
+    " ",
+    " ".repeat(10_000),
     "not an array",
     -1,
     0,
