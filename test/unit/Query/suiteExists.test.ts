@@ -14,28 +14,28 @@ suite("[BaseSuiteMetrics] suiteExists", function() {
         suite("Input Validation", function() {
             test("Non-array path", function() {
                 // @ts-ignore - Testing runtime validation
-                assert.throws(() => metrics.queries.suiteExists("not an array"), 'Suite/test path must be an array', 'Non-array path should throw validation error');
+                assert.throws(() => metrics.queries.suiteExists("not an array"), 'Suite path must be an array', 'Non-array path should throw validation error');
             });
 
             test("Non-string elements", function() {
                 // @ts-ignore - Testing runtime validation
-                assert.throws(() => metrics.queries.suiteExists([123, "suite"]), "Suite/test path element at index 0 must be a 'string', got 'number'");
+                assert.throws(() => metrics.queries.suiteExists([123, "suite"]), "Suite path element at index 0 must be a 'string', got 'number'");
                 // @ts-ignore - Testing runtime validation
-                assert.throws(() => metrics.queries.suiteExists(["suite", null]), 'Suite/test path element at index 1 must' +
+                assert.throws(() => metrics.queries.suiteExists(["suite", null]), 'Suite path element at index 1 must' +
                     ' be a \'string\', got \'object\'', 'Array with null element should throw validation error');
                 // @ts-ignore - Testing runtime validation
-                assert.throws(() => metrics.queries.suiteExists(["suite", undefined]), 'Suite/test path element at index 1' +
+                assert.throws(() => metrics.queries.suiteExists(["suite", undefined]), 'Suite path element at index 1' +
                     ' must be a \'string\', got \'undefined\'', 'Array with undefined element should throw validation' +
                     ' error');
                 // @ts-ignore - Testing runtime validation
-                assert.throws(() => metrics.queries.suiteExists([{}, "suite"]), 'Suite/test path element at index 0 must be' +
+                assert.throws(() => metrics.queries.suiteExists([{}, "suite"]), 'Suite path element at index 0 must be' +
                     ' a \'string\', got \'object\'', 'Array with object element should throw validation error');
             });
 
             test("Empty string elements", function() {
-                assert.throws(() => metrics.queries.suiteExists([""]), 'Suite/test path element at index 0 cannot be empty', 'Array with single empty string should throw validation error');
-                assert.throws(() => metrics.queries.suiteExists(["suite", ""]), 'Suite/test path element at index 1 cannot be empty', 'Array with empty string at end should throw validation error');
-                assert.throws(() => metrics.queries.suiteExists(["", "suite"]), 'Suite/test path element at index 0 cannot be empty', 'Array with empty string at start should throw validation error');
+                assert.throws(() => metrics.queries.suiteExists([""]), 'Suite path element at index 0 cannot be empty', 'Array with single empty string should throw validation error');
+                assert.throws(() => metrics.queries.suiteExists(["suite", ""]), 'Suite path element at index 1 cannot be empty', 'Array with empty string at end should throw validation error');
+                assert.throws(() => metrics.queries.suiteExists(["", "suite"]), 'Suite path element at index 0 cannot be empty', 'Array with empty string at start should throw validation error');
             });
 
             test("Allows empty array (top-level suite)", function() {

@@ -29,8 +29,9 @@ abstract class BaseSuiteMetrics {
      */
     public static validatePath(path: string[], isTest: boolean): void {
 
+        const type: string = isTest ? "Test" : "Suite";
         if (!Array.isArray(path)) {
-            throw new Error('Suite/test path must be an array');
+            throw new Error(`${type} path must be an array`);
         }
 
         if (isTest && path.length <= 1) {
@@ -42,15 +43,15 @@ abstract class BaseSuiteMetrics {
             const segment: any = path[i];
 
             if (typeof segment !== "string") {
-                throw new Error(`Suite/test path element at index ${i} must be a 'string', got '${typeof segment}'`);
+                throw new Error(`${type} path element at index ${i} must be a 'string', got '${typeof segment}'`);
             }
 
             if (segment.length === 0) {
-                throw new Error(`Suite/test path element at index ${i} cannot be empty`);
+                throw new Error(`${type} path element at index ${i} cannot be empty`);
             }
 
             if (segment.trim().length === 0) {
-                throw new Error(`Suite/test path element at index ${i} cannot be whitespace-only`);
+                throw new Error(`${type} path element at index ${i} cannot be whitespace-only`);
             }
         }
     }

@@ -150,7 +150,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
         test("Invalid test names - non-string elements", async function() {
             // @ts-ignore - intentionally passing invalid types for testing
             const test = (): Promise<void> => concurrentMetrics.startTest(["ValidSuite", 123, "TestName"]);
-            const expectedError: string = "Error starting test: Suite/test path element at index 1 must be a 'string', got 'number'";
+            const expectedError: string = "Error starting test: Test path element at index 1 must be a 'string', got 'number'";
 
             await assertThrowsAsync(test, expectedError, "Providing a non-string in the path should fail");
         });
@@ -158,7 +158,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
         test("Invalid test names - non-array input", async function() {
             // @ts-ignore - intentionally passing invalid types for testing
             const test = (): Promise<void> => concurrentMetrics.startTest("NotAnArray");
-            const expectedError: string = "Error starting test: Suite/test path must be an array";
+            const expectedError: string = "Error starting test: Test path must be an array";
 
             await assertThrowsAsync(test, expectedError, "Providing a non-array input to startTest should fail");
         });

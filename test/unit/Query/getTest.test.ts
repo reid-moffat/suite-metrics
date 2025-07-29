@@ -13,7 +13,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest("not an array"), "Suite/test path must be an array");
+            assert.throws(() => metrics.queries.getTest("not an array"), "Test path must be an array");
         });
 
         test("Empty path", function() {
@@ -21,19 +21,19 @@ suite("[BaseSuiteMetrics] getTest", function() {
         });
 
         test("Path with empty strings", function() {
-            assert.throws(() => metrics.queries.getTest(["suite", ""]), "Suite/test path element at index 1 cannot be empty");
+            assert.throws(() => metrics.queries.getTest(["suite", ""]), "Test path element at index 1 cannot be empty");
         });
 
         test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", 123]), "Suite/test path element at index 1 must be a 'string', got 'number'");
+            assert.throws(() => metrics.queries.getTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'");
         });
 
         test("Path with null/undefined elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", null]), "Suite/test path element at index 1 must be a 'string', got 'object'");
+            assert.throws(() => metrics.queries.getTest(["suite", null]), "Test path element at index 1 must be a 'string', got 'object'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", undefined]), "Suite/test path element at index 1 must be a 'string', got 'undefined'");
+            assert.throws(() => metrics.queries.getTest(["suite", undefined]), "Test path element at index 1 must be a 'string', got 'undefined'");
         });
     });
 
@@ -261,7 +261,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
             assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');
 
             // Verify modifying returned object doesn't affect internal state
-            // @ts-ignore - Testing immutability
+            // @ts-ignore
             testMetrics1.duration = 999999;
             const testMetrics3 = metrics.queries.getTest(["ImmutableSuite", "ImmutableTest"]);
             assert.notEqual(testMetrics3.duration, 999999, 'Modifying returned object should not affect internal state');

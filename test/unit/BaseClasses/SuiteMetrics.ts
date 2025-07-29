@@ -12,7 +12,7 @@ suite("[SuiteMetrics] Basic tests", function() {
     suite("Input Validation", function() {
         test("Non-array names", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest("not an array"), "Suite/test path must be an array", 'Should throw error when test name is not an array');
+            assert.throws(() => metrics.startTest("not an array"), "Test path must be an array", 'Should throw error when test name is not an array');
         });
 
         test("Empty test name", function() {
@@ -21,7 +21,7 @@ suite("[SuiteMetrics] Basic tests", function() {
 
         test("Non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest(["suite", 123]), "Suite/test path element at index 1 must be a 'string', got 'number'", 'Should throw error when test name contains non-string element');
+            assert.throws(() => metrics.startTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'", 'Should throw error when test name contains non-string element');
         });
 
         test("Empty suite name for top-level operations", function() {
