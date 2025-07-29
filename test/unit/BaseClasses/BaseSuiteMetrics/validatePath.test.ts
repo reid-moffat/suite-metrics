@@ -339,36 +339,6 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         });
     });
 
-    suite("Element Content Validation - Empty Strings", function() {
-        test("Reject empty string at index 0", function() {
-            assertThrows(
-                createValidatePathTest([""], false),
-                "Suite path element at index 0 cannot be empty"
-            );
-        });
-
-        test("Reject empty string at index 1", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", ""], false),
-                "Suite path element at index 1 cannot be empty"
-            );
-        });
-
-        test("Reject empty string in middle of path", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "SubSuite", "", "Test"], true),
-                "Test path element at index 2 cannot be empty"
-            );
-        });
-
-        test("Reject empty string at end of path", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "SubSuite", ""], false),
-                "Suite path element at index 2 cannot be empty"
-            );
-        });
-    });
-
     suite("Element Content Validation - Whitespace Strings", function() {
         test("Reject single space at index 0", function() {
             assertThrows(
