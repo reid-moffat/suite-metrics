@@ -16,10 +16,6 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         return () => BaseSuiteMetrics.validatePath(path, isTest);
     }
 
-    function createPathWithInvalidElement(validPrefix: string[], invalidElement: any, validSuffix: string[] = []): any[] {
-        return [...validPrefix, invalidElement, ...validSuffix];
-    }
-
     suite("Invalid input types", function() {
 
         suite("Suite", function() {
