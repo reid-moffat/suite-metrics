@@ -310,12 +310,25 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 assertDoesNotThrow(createValidatePathTest(suite, false));
             });
 
-            test("Accept one element array for suite", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite"], false));
+            test("Accept whitespaces (but not empty)", function() {
+                assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " Suite       2              "], false));
+            });
+
+            test("Accept lots of whitespaces (but not empty)", function() {
+                const spaces: string = "".repeat(100_000);
+                assertDoesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}Suite${spaces}7${spaces}`], false));
+            });
+
+            test("Accept escape characters", function() {
+                assertDoesNotThrow(createValidatePathTest(["Suite \n 1 \t", "Suite \r\r\r 222 \t\t\n"], false));
+            });
+
+            test("Accept special characters", function() {
+                assertDoesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) "], false));
             });
 
             test("Accept emojis", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], false));
+                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Suite 2 ✅"], false));
             });
         });
 
@@ -349,25 +362,27 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
                 assertDoesNotThrow(createValidatePathTest(test, true));
             });
-        });
-    });
 
-    suite("Valid Path Cases", function() {
+            test("Accept whitespaces (but not empty)", function() {
+                assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " test       2              "], true));
+            });
 
-        test("Accept strings with leading/trailing spaces (but not whitespace-only)", function() {
-            assertDoesNotThrow(createValidatePathTest(["  Suite  ", "  TestName  "], true));
-        });
+            test("Accept lots of whitespaces (but not empty)", function() {
+                const spaces: string = "".repeat(100_000);
+                assertDoesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}test${spaces}7${spaces}`], true));
+            });
 
-        test("Accept strings with numbers as content", function() {
-            assertDoesNotThrow(createValidatePathTest(["Suite123", "Test456"], true));
-        });
+            test("Accept escape characters", function() {
+                assertDoesNotThrow(createValidatePathTest(["Suite \n 1 \t", "test \r\r\r 222 \t\t\n"], true));
+            });
 
-        test("Accept strings with special characters", function() {
-            assertDoesNotThrow(createValidatePathTest(["Suite-Name_1", "Test@Name#2"], true));
-        });
+            test("Accept special characters", function() {
+                assertDoesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) ", "te%%%#st"], true));
+            });
 
-        test("Accept strings with unicode characters", function() {
-            assertDoesNotThrow(createValidatePathTest(["Suite🚀", "Test✅"], true));
+            test("Accept emojis", function() {
+                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], true));
+            });
         });
     });
 
