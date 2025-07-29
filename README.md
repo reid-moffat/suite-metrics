@@ -82,12 +82,12 @@ const promises = [
     (async () => {
         await concurrentMetrics.startTest(["Suite Name", "Test Name 2"]);
         // Test logic...
-        await concurrentMetrics.stopTest(["Suite Name", "Test Name 2"]);
+        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 2"]);
     })(),
     (async () => {
         await concurrentMetrics.startTest(["Suite Name", "Test Name 3"]);
         // Test logic...
-        await concurrentMetrics.stopTest(["Suite Name", "Test Name 3"]);
+        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 3"]);
     })()
 ];
 
