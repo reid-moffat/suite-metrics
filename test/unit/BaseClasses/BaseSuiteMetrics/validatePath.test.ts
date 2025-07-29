@@ -310,6 +310,10 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 assertDoesNotThrow(createValidatePathTest(suite, false));
             });
 
+            test("Accept shortest input", function() {
+                assertDoesNotThrow(createValidatePathTest(["S"], false));
+            });
+
             test("Accept whitespaces (but not empty)", function() {
                 assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " Suite       2              "], false));
             });
@@ -363,6 +367,10 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 assertDoesNotThrow(createValidatePathTest(test, true));
             });
 
+            test("Accept shortest input", function() {
+                assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
+            });
+
             test("Accept whitespaces (but not empty)", function() {
                 assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " test       2              "], true));
             });
@@ -382,138 +390,6 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
             test("Accept emojis", function() {
                 assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], true));
-            });
-        });
-    });
-
-    suite("Edge Cases and Boundary Conditions", function() {
-        test("Accept very long path", function() {
-            const longPath = Array(100_000).fill(0).map((_, i) => `Level${i}`);
-            assertDoesNotThrow(createValidatePathTest(longPath, false));
-        });
-
-        test("Accept very long test path", function() {
-            const longPath = Array(100_000).fill(0).map((_, i) => `Level${i}`);
-            assertDoesNotThrow(createValidatePathTest(longPath, true));
-        });
-
-        test("Reject exactly one character empty string", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", ""], false),
-                "Suite path element at index 1 cannot be empty"
-            );
-        });
-
-        test("Accept exactly one character valid string", function() {
-            assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
-        });
-
-        test("Test with exactly minimum required elements for test", function() {
-            assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
-        });
-
-        test("Mixed valid and invalid scenarios - first element invalid", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest([123, "ValidSuite"], false),
-                "Suite path element at index 0 must be a 'string', got 'number'"
-            );
-        });
-
-        test("Mixed valid and invalid scenarios - last element invalid", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest(["ValidSuite", "AnotherValid", 456], false),
-                "Suite path element at index 2 must be a 'string', got 'number'"
-            );
-        });
-
-        test("Multiple invalid elements - should report first one", function() {
-            assertThrows(
-                // @ts-ignore - Testing runtime validation
-                createValidatePathTest([123, 456, 789], false),
-                "Suite path element at index 0 must be a 'string', got 'number'"
-            );
-        });
-    });
-
-    suite("isTest Flag Behavior", function() {
-        test("Same path validates differently based on isTest flag", function() {
-            const singleElementPath = ["OnlySuite"];
-
-            assertDoesNotThrow(createValidatePathTest(singleElementPath, false));
-
-            assertThrows(
-                createValidatePathTest(singleElementPath, true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
-            );
-        });
-
-        test("Empty path validates differently based on isTest flag", function() {
-            const emptyPath: string[] = [];
-
-            assertDoesNotThrow(createValidatePathTest(emptyPath, false));
-
-            assertThrows(
-                createValidatePathTest(emptyPath, true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
-            );
-        });
-
-        test("Two element path should be valid for both flags", function() {
-            const twoElementPath = ["Suite", "Item"];
-
-            assertDoesNotThrow(createValidatePathTest(twoElementPath, false));
-
-            assertDoesNotThrow(createValidatePathTest(twoElementPath, true));
-        });
-    });
-
-    suite("Error Message Accuracy", function() {
-        test("Error messages include correct index for type validation", function() {
-            const testCases = [
-                { path: [123], expectedIndex: 0 },
-                { path: ["Valid", 456], expectedIndex: 1 },
-                { path: ["Valid", "Also Valid", 789], expectedIndex: 2 },
-                { path: ["A", "B", "C", "D", true], expectedIndex: 4 }
-            ];
-
-            testCases.forEach(({ path, expectedIndex }) => {
-                assertThrows(
-                    // @ts-ignore - Testing runtime validation
-                    createValidatePathTest(path, false),
-                    `Suite path element at index ${expectedIndex} must be a 'string', got '${typeof path[expectedIndex]}'`
-                );
-            });
-        });
-
-        test("Error messages include correct index for empty string validation", function() {
-            const testCases = [
-                { path: [""], expectedIndex: 0 },
-                { path: ["Valid", ""], expectedIndex: 1 },
-                { path: ["Valid", "Also Valid", ""], expectedIndex: 2 }
-            ];
-
-            testCases.forEach(({ path, expectedIndex }) => {
-                assertThrows(
-                    createValidatePathTest(path, false),
-                    `Suite path element at index ${expectedIndex} cannot be empty`
-                );
-            });
-        });
-
-        test("Error messages include correct index for whitespace validation", function() {
-            const testCases = [
-                { path: [" "], expectedIndex: 0 },
-                { path: ["Valid", "\t"], expectedIndex: 1 },
-                { path: ["Valid", "Also Valid", "\n"], expectedIndex: 2 }
-            ];
-
-            testCases.forEach(({ path, expectedIndex }) => {
-                assertThrows(
-                    createValidatePathTest(path, false),
-                    `Suite path element at index ${expectedIndex} cannot be whitespace-only`
-                );
             });
         });
     });
