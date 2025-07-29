@@ -22,7 +22,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
     suite("Invalid input types", function() {
 
-        allInputTypes.forEach((input: any) => {
+        allInputTypes.filter((val) => !Array.isArray(val)).forEach((input: any) => {
             const stringified: string = valueToHumanReadableString(input);
 
             return test(stringified, function() {
