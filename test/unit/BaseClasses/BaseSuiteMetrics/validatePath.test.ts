@@ -125,6 +125,22 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 {
                     input: ["Suite", 12, "suite name #1"],
                     expectedError: "Suite path element at index 1 must be a 'string', got 'number'"
+                },
+                {
+                    input: ["Suite", "\r", "Test name 1"],
+                    expectedError: "Suite path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\t", "Test name 1"],
+                    expectedError: "Suite path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\n", "Test name 1"],
+                    expectedError: "Suite path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\r\n\t", "Test name 1"],
+                    expectedError: "Suite path element at index 1 cannot be whitespace-only"
                 }
             ];
 
@@ -227,6 +243,22 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 {
                     input: ["Suite", 12, "Test name 1"],
                     expectedError: "Test path element at index 1 must be a 'string', got 'number'"
+                },
+                {
+                    input: ["Suite", "\r", "Test name 1"],
+                    expectedError: "Test path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\t", "Test name 1"],
+                    expectedError: "Test path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\n", "Test name 1"],
+                    expectedError: "Test path element at index 1 cannot be whitespace-only"
+                },
+                {
+                    input: ["Suite", "\r\n\t", "Test name 1"],
+                    expectedError: "Test path element at index 1 cannot be whitespace-only"
                 }
             ];
 
@@ -336,57 +368,6 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     "Should accept very long array when isTest=true"
                 );
             });
-        });
-    });
-
-    suite("Element Content Validation - Whitespace Strings", function() {
-        test("Reject single space at index 0", function() {
-            assertThrows(
-                createValidatePathTest([" "], false),
-                "Suite path element at index 0 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject multiple spaces", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "   "], false),
-                "Suite path element at index 1 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject tab character", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "\t"], false),
-                "Suite path element at index 1 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject newline character", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "\n"], false),
-                "Suite path element at index 1 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject carriage return", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", "\r"], false),
-                "Suite path element at index 1 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject mixed whitespace", function() {
-            assertThrows(
-                createValidatePathTest(["Suite", " \t\n\r "], false),
-                "Suite path element at index 1 cannot be whitespace-only"
-            );
-        });
-
-        test("Reject whitespace in middle of long path", function() {
-            assertThrows(
-                createValidatePathTest(["A", "B", "C", " \t ", "E"], false),
-                "Suite path element at index 3 cannot be whitespace-only"
-            );
         });
     });
 

@@ -13,6 +13,7 @@ const allInputTypes: any[] = [
     "\n",
     "\r",
     "\t",
+    " \t\n\r ",
     -1,
     0,
     1,
