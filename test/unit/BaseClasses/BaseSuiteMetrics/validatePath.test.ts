@@ -48,25 +48,46 @@ suite("[BaseSuiteMetrics] validatePath", function() {
     suite("Invalid input array", function() {
 
         suite("Suite", function() {
-            test("Number array", function() {
-                assertThrows(
-                    createValidatePathTest([123], false),
-                    "Suite/test path element at index 0 must be a 'string', got 'number'"
-                );
-            });
+            const testCases = [
+                {
+                    input: [123],
+                    expectedError: "Suite/test path element at index 0 must be a 'string', got 'number'"
+                },
+                {
+                    input: [""],
+                    expectedError: "Suite/test path element at index 0 cannot be empty"
+                },
+                {
+                    input: ["", ""],
+                    expectedError: "Suite/test path element at index 0 cannot be empty"
+                },
+                {
+                    input: [" "],
+                    expectedError: "Suite/test path element at index 0 cannot be whitespace-only"
+                },
+                {
+                    input: [" ", " "],
+                    expectedError: "Suite/test path element at index 0 cannot be whitespace-only"
+                },
+                {
+                    input: [" ".repeat(100_000)],
+                    expectedError: "Suite/test path element at index 0 cannot be whitespace-only"
+                },
+                {
+                    input: [" ".repeat(100_000), " ".repeat(100_000)],
+                    expectedError: "Suite/test path element at index 0 cannot be whitespace-only"
+                }
+            ];
 
-            test("Empty string in array", function() {
-                assertThrows(
-                    createValidatePathTest([""], false),
-                    "Suite/test path element at index 0 cannot be empty"
-                );
-            });
+            testCases.forEach(({ input, expectedError }) => {
+                const testName: string = valueToHumanReadableString(input);
 
-            test("Multi empty strings in array", function() {
-                assertThrows(
-                    createValidatePathTest(["", ""], false),
-                    "Suite/test path element at index 0 cannot be empty"
-                );
+                test(testName, function() {
+                    assertThrows(
+                        createValidatePathTest(input, false),
+                        expectedError
+                    );
+                });
             });
         });
 
