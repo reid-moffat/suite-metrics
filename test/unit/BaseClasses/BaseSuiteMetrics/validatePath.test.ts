@@ -4,8 +4,8 @@ import { allInputTypes, valueToHumanReadableString } from "../../../helpers/data
 
 suite("[BaseSuiteMetrics] validatePath", function() {
 
-    function assertThrowsWithMessage(fn: () => void, expectedMessage: string, description: string): void {
-        assert.throws(fn, expectedMessage, description);
+    function assertThrows(fn: () => void, expectedMessage: string): void {
+        assert.throws(fn, expectedMessage);
     }
 
     function assertDoesNotThrow(fn: () => void, description: string): void {
@@ -27,10 +27,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 const stringified: string = valueToHumanReadableString(input);
 
                 return test(stringified, function() {
-                    assertThrowsWithMessage(
+                    assertThrows(
                         createValidatePathTest(input, false),
-                        "Suite/test path must be an array",
-                        `Should reject '${stringified}' input`
+                        "Suite/test path must be an array"
                     );
                 });
             });
@@ -41,10 +40,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 const stringified: string = valueToHumanReadableString(input);
 
                 return test(stringified, function() {
-                    assertThrowsWithMessage(
+                    assertThrows(
                         createValidatePathTest(input, true),
-                        "Suite/test path must be an array",
-                        `Should reject '${stringified}' input`
+                        "Suite/test path must be an array"
                     );
                 });
             });
@@ -55,44 +53,39 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
         suite("Suite", function() {
             test("Number array", function() {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest([123], false),
-                    "Suite/test path element at index 0 must be a 'string', got 'number'",
-                    "Should reject empty array when isTest=true"
+                    "Suite/test path element at index 0 must be a 'string', got 'number'"
                 );
             });
 
             test("Empty string in array", function() {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest([""], false),
-                    "Suite/test path element at index 0 cannot be empty",
-                    "Should reject empty array when isTest=true"
+                    "Suite/test path element at index 0 cannot be empty"
                 );
             });
 
             test("Multi empty strings in array", function() {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest(["", ""], false),
-                    "Suite/test path element at index 0 cannot be empty",
-                    "Should reject empty array when isTest=true"
+                    "Suite/test path element at index 0 cannot be empty"
                 );
             });
         });
 
         suite("Test", function() {
             test("Empty array", function() {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest([], true),
-                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                    "Should reject empty array when isTest=true"
+                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
                 );
             });
 
             test("Single element array", function() {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest(["OnlyOneSuite"], true),
-                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                    "Should reject single element array when isTest=true"
+                    'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
                 );
             });
         });
@@ -193,175 +186,155 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
     suite("Element Type Validation", function() {
         test("Reject number element at index 0", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest([123], false),
-                "Suite/test path element at index 0 must be a 'string', got 'number'",
-                "Should reject number at first position"
+                "Suite/test path element at index 0 must be a 'string', got 'number'"
             );
         });
 
         test("Reject number element at index 1", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", 456], false),
-                "Suite/test path element at index 1 must be a 'string', got 'number'",
-                "Should reject number at second position"
+                "Suite/test path element at index 1 must be a 'string', got 'number'"
             );
         });
 
         test("Reject number element in middle of path", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", "SubSuite", 789, "Test"], true),
-                "Suite/test path element at index 2 must be a 'string', got 'number'",
-                "Should reject number in middle position"
+                "Suite/test path element at index 2 must be a 'string', got 'number'"
             );
         });
 
         test("Reject boolean element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", true], false),
-                "Suite/test path element at index 1 must be a 'string', got 'boolean'",
-                "Should reject boolean element"
+                "Suite/test path element at index 1 must be a 'string', got 'boolean'"
             );
         });
 
         test("Reject null element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", null], false),
-                "Suite/test path element at index 1 must be a 'string', got 'object'",
-                "Should reject null element"
+                "Suite/test path element at index 1 must be a 'string', got 'object'"
             );
         });
 
         test("Reject undefined element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", undefined], false),
-                "Suite/test path element at index 1 must be a 'string', got 'undefined'",
-                "Should reject undefined element"
+                "Suite/test path element at index 1 must be a 'string', got 'undefined'"
             );
         });
 
         test("Reject object element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", { name: "test" }], false),
-                "Suite/test path element at index 1 must be a 'string', got 'object'",
-                "Should reject object element"
+                "Suite/test path element at index 1 must be a 'string', got 'object'"
             );
         });
 
         test("Reject array element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", ["SubArray"]], false),
-                "Suite/test path element at index 1 must be a 'string', got 'object'",
-                "Should reject array element"
+                "Suite/test path element at index 1 must be a 'string', got 'object'"
             );
         });
 
         test("Reject function element", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["Suite", () => "test"], false),
-                "Suite/test path element at index 1 must be a 'string', got 'function'",
-                "Should reject function element"
+                "Suite/test path element at index 1 must be a 'string', got 'function'"
             );
         });
     });
 
     suite("Element Content Validation - Empty Strings", function() {
         test("Reject empty string at index 0", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest([""], false),
-                "Suite/test path element at index 0 cannot be empty",
-                "Should reject empty string at first position"
+                "Suite/test path element at index 0 cannot be empty"
             );
         });
 
         test("Reject empty string at index 1", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", ""], false),
-                "Suite/test path element at index 1 cannot be empty",
-                "Should reject empty string at second position"
+                "Suite/test path element at index 1 cannot be empty"
             );
         });
 
         test("Reject empty string in middle of path", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "SubSuite", "", "Test"], true),
-                "Suite/test path element at index 2 cannot be empty",
-                "Should reject empty string in middle position"
+                "Suite/test path element at index 2 cannot be empty"
             );
         });
 
         test("Reject empty string at end of path", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "SubSuite", ""], false),
-                "Suite/test path element at index 2 cannot be empty",
-                "Should reject empty string at end of path"
+                "Suite/test path element at index 2 cannot be empty"
             );
         });
     });
 
     suite("Element Content Validation - Whitespace Strings", function() {
         test("Reject single space at index 0", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest([" "], false),
-                "Suite/test path element at index 0 cannot be whitespace-only",
-                "Should reject single space at first position"
+                "Suite/test path element at index 0 cannot be whitespace-only"
             );
         });
 
         test("Reject multiple spaces", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "   "], false),
-                "Suite/test path element at index 1 cannot be whitespace-only",
-                "Should reject multiple spaces"
+                "Suite/test path element at index 1 cannot be whitespace-only"
             );
         });
 
         test("Reject tab character", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "\t"], false),
-                "Suite/test path element at index 1 cannot be whitespace-only",
-                "Should reject tab character"
+                "Suite/test path element at index 1 cannot be whitespace-only"
             );
         });
 
         test("Reject newline character", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "\n"], false),
-                "Suite/test path element at index 1 cannot be whitespace-only",
-                "Should reject newline character"
+                "Suite/test path element at index 1 cannot be whitespace-only"
             );
         });
 
         test("Reject carriage return", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", "\r"], false),
-                "Suite/test path element at index 1 cannot be whitespace-only",
-                "Should reject carriage return"
+                "Suite/test path element at index 1 cannot be whitespace-only"
             );
         });
 
         test("Reject mixed whitespace", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", " \t\n\r "], false),
-                "Suite/test path element at index 1 cannot be whitespace-only",
-                "Should reject mixed whitespace characters"
+                "Suite/test path element at index 1 cannot be whitespace-only"
             );
         });
 
         test("Reject whitespace in middle of long path", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["A", "B", "C", " \t ", "E"], false),
-                "Suite/test path element at index 3 cannot be whitespace-only",
-                "Should reject whitespace in middle of long path"
+                "Suite/test path element at index 3 cannot be whitespace-only"
             );
         });
     });
@@ -442,10 +415,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         });
 
         test("Reject exactly one character empty string", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(["Suite", ""], false),
-                "Suite/test path element at index 1 cannot be empty",
-                "Should reject exactly one character empty string"
+                "Suite/test path element at index 1 cannot be empty"
             );
         });
 
@@ -464,29 +436,26 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         });
 
         test("Mixed valid and invalid scenarios - first element invalid", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest([123, "ValidSuite"], false),
-                "Suite/test path element at index 0 must be a 'string', got 'number'",
-                "Should report first invalid element"
+                "Suite/test path element at index 0 must be a 'string', got 'number'"
             );
         });
 
         test("Mixed valid and invalid scenarios - last element invalid", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest(["ValidSuite", "AnotherValid", 456], false),
-                "Suite/test path element at index 2 must be a 'string', got 'number'",
-                "Should report last invalid element"
+                "Suite/test path element at index 2 must be a 'string', got 'number'"
             );
         });
 
         test("Multiple invalid elements - should report first one", function() {
-            assertThrowsWithMessage(
+            assertThrows(
                 // @ts-ignore - Testing runtime validation
                 createValidatePathTest([123, 456, 789], false),
-                "Suite/test path element at index 0 must be a 'string', got 'number'",
-                "Should report first invalid element when multiple are invalid"
+                "Suite/test path element at index 0 must be a 'string', got 'number'"
             );
         });
     });
@@ -500,10 +469,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 "Should accept single element as suite"
             );
 
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(singleElementPath, true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                "Should reject single element as test"
+                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
             );
         });
 
@@ -515,10 +483,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 "Should accept empty path as suite (top-level)"
             );
 
-            assertThrowsWithMessage(
+            assertThrows(
                 createValidatePathTest(emptyPath, true),
-                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)',
-                "Should reject empty path as test"
+                'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)'
             );
         });
 
@@ -547,11 +514,10 @@ suite("[BaseSuiteMetrics] validatePath", function() {
             ];
 
             testCases.forEach(({ path, expectedIndex }) => {
-                assertThrowsWithMessage(
+                assertThrows(
                     // @ts-ignore - Testing runtime validation
                     createValidatePathTest(path, false),
-                    `Suite/test path element at index ${expectedIndex} must be a 'string', got '${typeof path[expectedIndex]}'`,
-                    `Should report correct index ${expectedIndex} for type error`
+                    `Suite/test path element at index ${expectedIndex} must be a 'string', got '${typeof path[expectedIndex]}'`
                 );
             });
         });
@@ -564,10 +530,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
             ];
 
             testCases.forEach(({ path, expectedIndex }) => {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest(path, false),
-                    `Suite/test path element at index ${expectedIndex} cannot be empty`,
-                    `Should report correct index ${expectedIndex} for empty string error`
+                    `Suite/test path element at index ${expectedIndex} cannot be empty`
                 );
             });
         });
@@ -580,10 +545,9 @@ suite("[BaseSuiteMetrics] validatePath", function() {
             ];
 
             testCases.forEach(({ path, expectedIndex }) => {
-                assertThrowsWithMessage(
+                assertThrows(
                     createValidatePathTest(path, false),
-                    `Suite/test path element at index ${expectedIndex} cannot be whitespace-only`,
-                    `Should report correct index ${expectedIndex} for whitespace error`
+                    `Suite/test path element at index ${expectedIndex} cannot be whitespace-only`
                 );
             });
         });
