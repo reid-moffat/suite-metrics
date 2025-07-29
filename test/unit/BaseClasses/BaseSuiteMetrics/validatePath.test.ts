@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import { BaseSuiteMetrics } from "suite-metrics";
+import { allInputTypes, valueToHumanReadableString } from "../../../helpers/data.ts";
 
 suite("[BaseSuiteMetrics] validatePath", function() {
 
@@ -19,63 +20,22 @@ suite("[BaseSuiteMetrics] validatePath", function() {
         return [...validPrefix, invalidElement, ...validSuffix];
     }
 
-    suite("Input Type Validation", function() {
-        test("Reject non-array inputs - null", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest(null, false),
-                "Suite/test path must be an array",
-                "Should reject null input"
-            );
-        });
+    suite("Invalid input types", function() {
 
-        test("Reject non-array inputs - undefined", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest(undefined, false),
-                "Suite/test path must be an array",
-                "Should reject undefined input"
-            );
-        });
+        allInputTypes.forEach((input: any) => {
+            const stringified: string = valueToHumanReadableString(input);
 
-        test("Reject non-array inputs - string", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest("not an array", false),
-                "Suite/test path must be an array",
-                "Should reject string input"
-            );
-        });
-
-        test("Reject non-array inputs - number", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest(123, false),
-                "Suite/test path must be an array",
-                "Should reject number input"
-            );
-        });
-
-        test("Reject non-array inputs - object", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest({ path: ["suite"] }, false),
-                "Suite/test path must be an array",
-                "Should reject object input"
-            );
-        });
-
-        test("Reject non-array inputs - function", function() {
-            // @ts-ignore - Testing runtime validation
-            assertThrowsWithMessage(
-                createValidatePathTest(() => ["suite"], false),
-                "Suite/test path must be an array",
-                "Should reject function input"
-            );
+            return test(stringified, function() {
+                assertThrowsWithMessage(
+                    createValidatePathTest(input, false),
+                    "Suite/test path must be an array",
+                    `Should reject '${stringified}' input`
+                );
+            });
         });
     });
 
-    suite("Path Length Validation for Tests", function() {
+    suite("Invalid path length/elements", function() {
         test("Reject empty array for test", function() {
             assertThrowsWithMessage(
                 createValidatePathTest([], true),
