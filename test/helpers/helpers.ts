@@ -67,10 +67,10 @@ function assertThrows(func: () => any, expectedMessage: string, message?: string
  * @param expectedMessage Expected error message the function should throw
  * @param message Message to display if this assertion fails
  */
-async function assertThrowsAsync(func: () => Promise<any>, expectedMessage: string, message: string): Promise<void> {
+async function assertThrowsAsync(func: () => Promise<any>, expectedMessage: string, message?: string): Promise<void> {
     try {
         await func();
-        assert.fail("Expected function to throw an error");
+        assert.fail(message ?? "Expected function to throw an error");
     } catch (error: any) {
         assert.strictEqual(error.message, expectedMessage, message);
     }
