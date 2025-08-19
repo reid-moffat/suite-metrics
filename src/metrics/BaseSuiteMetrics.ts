@@ -14,9 +14,13 @@ abstract class BaseSuiteMetrics {
 
     protected readonly suites: Suites = new Suites();
 
+    /** Queries for Tests, Suites, and their data */
     public readonly queries: Queries = new Queries(this.suites);
+    /** Aggregate metrics such as test averages and total counts */
     public readonly metrics: Metrics = new Metrics(this.suites);
+    /** Gets fastest and slowest test(s) */
     public readonly performance: Performance = new Performance(this.suites);
+    /** Statistical methods around Z-scores */
     public readonly statistics: Statistics = new Statistics(this.suites);
 
     /**

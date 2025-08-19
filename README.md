@@ -42,7 +42,7 @@ const metricsSingleton = SuiteMetrics.getInstance();
 const metrics = new SuiteMetrics();
 ```
 
-For running concurrent tests, ConcurrentSuiteMetrics is required:
+For running multiple tests concurrently, ConcurrentSuiteMetrics is required:
 
 ```typescript
 import { ConcurrentSuiteMetrics } from 'suite-metrics';
@@ -53,8 +53,8 @@ const concurrentMetricsSingleton = await ConcurrentSuiteMetrics.getInstance();
 const concurrentMetrics = new ConcurrentSuiteMetrics();
 ```
 
-*Note: ConcurrentSuiteMetrics does work fine for sequential tests; however, it requires async calls, a parameter for 
-stopTest(), and a bit more overhead with the mutex locks. It is recommended to only use it when required for simplicity*
+*Note: ConcurrentSuiteMetrics works fine for sequential tests; however, it is more complex (async calls, a parameter 
+for stopTest(), and some mutex lock overhead) so it is recommended to only use it when required*
 
 ### Tracking Tests
 
@@ -75,19 +75,22 @@ Concurrent metrics can run multiple at the same time:
 ```typescript
 const promises = [
     (async () => {
-        await concurrentMetrics.startTest(["Suite Name", "Test Name 1"]);
+        const testName = ["Suite Name", "Test Name 1"];
+        await concurrentMetrics.startTest(testName);
         // Test logic...
-        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 1"]);
+        const test = await concurrentMetrics.stopTest(testName);
     })(),
     (async () => {
-        await concurrentMetrics.startTest(["Suite Name", "Test Name 2"]);
+        const testName = ["Suite Name", "Test Name 2"];
+        await concurrentMetrics.startTest(testName);
         // Test logic...
-        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 2"]);
+        const test = await concurrentMetrics.stopTest(testName);
     })(),
     (async () => {
-        await concurrentMetrics.startTest(["Suite Name", "Test Name 3"]);
+        const testName = ["Suite Name", "Test Name 3"];
+        await concurrentMetrics.startTest(testName);
         // Test logic...
-        const test = await concurrentMetrics.stopTest(["Suite Name", "Test Name 3"]);
+        const test = await concurrentMetrics.stopTest(testName);
     })()
 ];
 
@@ -110,8 +113,7 @@ Both `SuiteMetrics` and `ConcurrentSuiteMetrics` have extensive methods in compo
 #### BaseSuiteMetrics
 
 ```typescript
-metrics.validatePath(["Suite 1", "Test 1"], true); // -> valid
-metrics.validatePath([], false); // -> invalid (error)
+metrics.validatePath(["Suite 1", "Test 1"], true); // -> true if that test exists
 
 metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
 
