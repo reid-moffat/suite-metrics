@@ -5,10 +5,6 @@ import { assertThrows } from "../../../helpers/helpers.js";
 
 suite("[BaseSuiteMetrics] validatePath", function() {
 
-    function assertDoesNotThrow(fn: () => void): void {
-        assert.doesNotThrow(fn);
-    }
-
     function createValidatePathTest(path: any, isTest: boolean): () => void {
         return () => BaseSuiteMetrics.validatePath(path, isTest);
     }
@@ -276,15 +272,15 @@ suite("[BaseSuiteMetrics] validatePath", function() {
 
         suite("Suite", function() {
             test("Accept empty array for suite (top-level suite)", function() {
-                assertDoesNotThrow(createValidatePathTest([], false));
+                assert.doesNotThrow(createValidatePathTest([], false));
             });
 
             test("Accept one element array for suite", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite"], false));
+                assert.doesNotThrow(createValidatePathTest(["Suite"], false));
             });
 
             test("Accept multi-element suite", function () {
-                assertDoesNotThrow(createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false));
+                assert.doesNotThrow(createValidatePathTest(["Suite 1", "Suite 2", "Suite 3", "Suite 4"], false));
             });
 
             test("Accept long suite", function () {
@@ -294,7 +290,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     suite.push(`Suite ${i}`);
                 }
 
-                assertDoesNotThrow(createValidatePathTest(suite, false));
+                assert.doesNotThrow(createValidatePathTest(suite, false));
             });
 
             test("Accept VERY long suite", function () {
@@ -304,42 +300,42 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                     suite.push(`Suite ${i}`);
                 }
 
-                assertDoesNotThrow(createValidatePathTest(suite, false));
+                assert.doesNotThrow(createValidatePathTest(suite, false));
             });
 
             test("Accept shortest input", function() {
-                assertDoesNotThrow(createValidatePathTest(["S"], false));
+                assert.doesNotThrow(createValidatePathTest(["S"], false));
             });
 
             test("Accept whitespaces (but not empty)", function() {
-                assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " Suite       2              "], false));
+                assert.doesNotThrow(createValidatePathTest(["    Suite    1     ", " Suite       2              "], false));
             });
 
             test("Accept lots of whitespaces (but not empty)", function() {
                 const spaces: string = "".repeat(100_000);
-                assertDoesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}Suite${spaces}7${spaces}`], false));
+                assert.doesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}Suite${spaces}7${spaces}`], false));
             });
 
             test("Accept escape characters", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite \n 1 \t", "Suite \r\r\r 222 \t\t\n"], false));
+                assert.doesNotThrow(createValidatePathTest(["Suite \n 1 \t", "Suite \r\r\r 222 \t\t\n"], false));
             });
 
             test("Accept special characters", function() {
-                assertDoesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) "], false));
+                assert.doesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) "], false));
             });
 
             test("Accept emojis", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Suite 2 ✅"], false));
+                assert.doesNotThrow(createValidatePathTest(["Suite 🚀", "Suite 2 ✅"], false));
             });
         });
 
         suite("Test", function() {
             test("Accept two element array for test", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite", "Test"], true));
+                assert.doesNotThrow(createValidatePathTest(["Suite", "Test"], true));
             });
 
             test("Accept multi-element array for test", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true));
+                assert.doesNotThrow(createValidatePathTest(["Suite", "SubSuite", "SubSubSuite", "Test"], true));
             });
 
             test("Accept long suite", function () {
@@ -350,7 +346,7 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 }
                 test.push("Test name");
 
-                assertDoesNotThrow(createValidatePathTest(test, true));
+                assert.doesNotThrow(createValidatePathTest(test, true));
             });
 
             test("Accept VERY long suite", function () {
@@ -361,32 +357,32 @@ suite("[BaseSuiteMetrics] validatePath", function() {
                 }
                 test.push("Test name");
 
-                assertDoesNotThrow(createValidatePathTest(test, true));
+                assert.doesNotThrow(createValidatePathTest(test, true));
             });
 
             test("Accept shortest input", function() {
-                assertDoesNotThrow(createValidatePathTest(["S", "T"], true));
+                assert.doesNotThrow(createValidatePathTest(["S", "T"], true));
             });
 
             test("Accept whitespaces (but not empty)", function() {
-                assertDoesNotThrow(createValidatePathTest(["    Suite    1     ", " test       2              "], true));
+                assert.doesNotThrow(createValidatePathTest(["    Suite    1     ", " test       2              "], true));
             });
 
             test("Accept lots of whitespaces (but not empty)", function() {
                 const spaces: string = "".repeat(100_000);
-                assertDoesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}test${spaces}7${spaces}`], true));
+                assert.doesNotThrow(createValidatePathTest([`${spaces}Suite${spaces}4${spaces}`, `${spaces}test${spaces}7${spaces}`], true));
             });
 
             test("Accept escape characters", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite \n 1 \t", "test \r\r\r 222 \t\t\n"], true));
+                assert.doesNotThrow(createValidatePathTest(["Suite \n 1 \t", "test \r\r\r 222 \t\t\n"], true));
             });
 
             test("Accept special characters", function() {
-                assertDoesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) ", "te%%%#st"], true));
+                assert.doesNotThrow(createValidatePathTest([" S 5uite@s@#%#@^*^% *%*^%*%!!) ", "te%%%#st"], true));
             });
 
             test("Accept emojis", function() {
-                assertDoesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], true));
+                assert.doesNotThrow(createValidatePathTest(["Suite 🚀", "Test ✅"], true));
             });
         });
     });
