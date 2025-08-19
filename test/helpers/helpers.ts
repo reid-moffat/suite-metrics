@@ -50,7 +50,7 @@ function sleepMicroseconds(microseconds: number): void {
  * @param fn Function to run
  * @param expectedMessage Expected error message the function should throw
  */
-function assertThrows(fn: () => void, expectedMessage: string): void {
+function assertThrows(fn: () => any, expectedMessage: string): void {
     try {
         fn();
         assert.fail("Expected function to throw an error");
