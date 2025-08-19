@@ -47,13 +47,13 @@ function sleepMicroseconds(microseconds: number): void {
  * Note: chai's assert.throws() is an include, not equality check. This misses invalid characters at the start or
  * end of the error message, so this stricter method is required for a full check
  *
- * @param fn Function to run
+ * @param func Function to run
  * @param expectedMessage Expected error message the function should throw
  * @param message Message to display if this assertion fails
  */
-function assertThrows(fn: () => any, expectedMessage: string, message?: string): void {
+function assertThrows(func: () => any, expectedMessage: string, message?: string): void {
     try {
-        fn();
+        func();
         assert.fail(message ?? "Expected function to throw an error");
     } catch (error: any) {
         assert.strictEqual(error.message, expectedMessage, message);
@@ -61,18 +61,18 @@ function assertThrows(fn: () => any, expectedMessage: string, message?: string):
 }
 
 /**
+ * Assert that an asynchronous function throws a specified error message
  *
- *
- * @param func
- * @param expectedError
- * @param message
+ * @param func Function to run
+ * @param expectedMessage Expected error message the function should throw
+ * @param message Message to display if this assertion fails
  */
-async function assertThrowsAsync(func: () => Promise<any>, expectedError: string, message: string): Promise<void> {
+async function assertThrowsAsync(func: () => Promise<any>, expectedMessage: string, message: string): Promise<void> {
     try {
         await func();
         assert.fail("Expected function to throw an error");
     } catch (error: any) {
-        assert.strictEqual(error.message, expectedError, message);
+        assert.strictEqual(error.message, expectedMessage, message);
     }
 }
 
