@@ -1,23 +1,9 @@
 import { BaseSuiteMetrics } from "suite-metrics";
 import { assert } from 'chai';
 import { allInputTypes, valueToHumanReadableString } from "../../../helpers/data.ts";
+import { assertThrows } from "../../../helpers/helpers.js";
 
 suite("[BaseSuiteMetrics] validatePath", function() {
-
-    function assertThrows(fn: () => void, expectedMessage: string): void {
-        let errorThrown: boolean = false;
-        let error: any;
-
-        try {
-            fn();
-        } catch (e) {
-            errorThrown = true;
-            error = e;
-        }
-
-        assert.isTrue(errorThrown, 'Expected function to throw an error');
-        assert.strictEqual(error.message, expectedMessage);
-    }
 
     function assertDoesNotThrow(fn: () => void): void {
         assert.doesNotThrow(fn);

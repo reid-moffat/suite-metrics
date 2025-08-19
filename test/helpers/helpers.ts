@@ -42,6 +42,30 @@ function sleepMicroseconds(microseconds: number): void {
 }
 
 /**
+ * Assert that a function throws a specified error message
+ *
+ * Note: chai's assert.throws() is an include, not equality check. This misses invalid characters at the start or
+ * end of the error message, so this stricter method is required for a full check
+ *
+ * @param fn Function to run
+ * @param expectedMessage Expected error message the function should throw
+ */
+function assertThrows(fn: () => void, expectedMessage: string): void {
+    let errorThrown: boolean = false;
+    let error: any;
+
+    try {
+        fn();
+    } catch (e) {
+        errorThrown = true;
+        error = e;
+    }
+
+    assert.isTrue(errorThrown, 'Expected function to throw an error');
+    assert.strictEqual(error.message, expectedMessage);
+}
+
+/**
  *
  *
  * @param func
@@ -57,4 +81,4 @@ async function assertThrowsAsync(func: () => Promise<any>, expectedError: string
     }
 }
 
-export { randomInt, sleep, sleepMicroseconds, assertThrowsAsync };
+export { randomInt, sleep, sleepMicroseconds, assertThrows, assertThrowsAsync };
