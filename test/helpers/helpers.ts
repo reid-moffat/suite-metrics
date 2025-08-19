@@ -51,18 +51,12 @@ function sleepMicroseconds(microseconds: number): void {
  * @param expectedMessage Expected error message the function should throw
  */
 function assertThrows(fn: () => void, expectedMessage: string): void {
-    let errorThrown: boolean = false;
-    let error: any;
-
     try {
         fn();
-    } catch (e) {
-        errorThrown = true;
-        error = e;
+        assert.fail("Expected function to throw an error");
+    } catch (error: any) {
+        assert.strictEqual(error.message, expectedMessage);
     }
-
-    assert.isTrue(errorThrown, 'Expected function to throw an error');
-    assert.strictEqual(error.message, expectedMessage);
 }
 
 /**
@@ -75,7 +69,7 @@ function assertThrows(fn: () => void, expectedMessage: string): void {
 async function assertThrowsAsync(func: () => Promise<any>, expectedError: string, message: string): Promise<void> {
     try {
         await func();
-        assert.fail("Expected function to throw an error, but it didn't");
+        assert.fail("Expected function to throw an error");
     } catch (error: any) {
         assert.strictEqual(error.message, expectedError, message);
     }
