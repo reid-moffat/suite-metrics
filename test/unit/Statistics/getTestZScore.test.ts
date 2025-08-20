@@ -8,9 +8,10 @@ suite("[Statistics] getTestZScore", function () {
     test("Simple data", function() {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
         const tests: Test[] = instance.getTestsInOrder();
-        const result: number = instance.statistics.getTestZScore(tests[0]);
-        console.log(`Result: ${serialize(result, 4)}`);
+        const zScore: number = instance.statistics.getTestZScore(tests[0]);
+        console.log(`Z-score: ${serialize(zScore, 4)}`);
 
-
+        assert.isAtLeast(zScore, -3);
+        assert.isAtMost(zScore, 3);
     });
 });
