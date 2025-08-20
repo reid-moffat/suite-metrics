@@ -12,6 +12,6 @@ suite("[Performance] getFastestTest", function () {
 
         assert.exists(result);
         const allTests: Test[] = instance.performance.getAllTestsSlowestFirst();
-        assert.deepEqual(result, allTests[0]);
+        assert.deepEqual(result, allTests[allTests.length - 1]);
     });
 });
