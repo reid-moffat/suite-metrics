@@ -6,7 +6,7 @@ suite("[BaseSuiteMetrics] toJSON", function() {
     test("Basic data", function () {
         const instance = createSimpleTestData(false);
 
-        const result: string = instance.toJSON();
+        const result: string = instance.toJSONString();
 
         assert.isString(result);
     });

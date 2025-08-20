@@ -121,7 +121,7 @@ metrics.getTestsInOrder(); // Copy of all tests in order they were completed
 
 metrics.getAllData(); // -> all data in this metrics as-is (deeply copied)
 
-metrics.toJSON(); // -> all data in this metrics, serialized to JSON
+metrics.toJSONString(); // -> all data in this metrics, serialized to JSON
 ```
 
 #### queries
@@ -210,7 +210,7 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 | **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks              |
 | **Performance methods**             | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)       |
 | **Statistics methods**              | `O(n)` → `O(1)` | Cache rebuild when tests added (except `interpretZScore()`), then `O(1)/O(k)`                |
-| **Data exporting**                  | `O(n)` | Methods `toJSON()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse     |
+| **Data exporting**                  | `O(n)` | Methods `toJSONString()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse     |
 
 ### ⚡ Performance Best Practices
 

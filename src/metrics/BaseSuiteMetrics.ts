@@ -92,13 +92,13 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Stringifies all data in this metrics instance into JSON
+     * Stringifies all data in this metrics instance into a JSON string
      *
      * @param includeTopLevel true to include the top-level suite as the top level object
      * @param indent Number of indents for each line (default 4)
      * @returns JSON string representing the structure and data of all suites in this metrics instance
      */
-    public toJSON(includeTopLevel = true, indent: number = 4): string {
+    public toJSONString(includeTopLevel = true, indent: number = 4): string {
 
         const suiteToSerializable: (suite: Suite) => SerializableSuite = (suite: Suite): SerializableSuite => ({
             name: suite.name,
