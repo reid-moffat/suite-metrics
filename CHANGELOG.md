@@ -4,7 +4,11 @@
 
 ### Major Changes
 
-- a4935a9: a
+- a4935a9: Major update! 🎉
+* Significantly improved existing functionality, breaking existing contracts
+* Added a thread-safe ConcurrentSuiteMetrics class for running multiple tests at once
+* Added helpers to get more test metrics, statistics, querying, and performance
+* Fixed many bugs with extensive testing
 
 ## 1.3.1
 
@@ -16,9 +20,10 @@
 
 ### Minor Changes
 
-- 56905e5: - Added option to reset Metrics singleton
-  - Added getNameFromMocha to easily get test path format from a Mocha test
-  - Allow passing Mocha contexts to methods in place of literal name arrays
+- 56905e5:
+* Added option to reset Metrics singleton
+* Added getNameFromMocha to easily get the test path format from a Mocha test
+* Allow passing Mocha contexts to methods in place of literal name arrays
 
 ## 1.2.0
 
