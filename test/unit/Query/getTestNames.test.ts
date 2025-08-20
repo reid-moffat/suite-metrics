@@ -7,7 +7,7 @@ suite("[Query] getTestNames", function () {
 
     test("Simple data", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
-        const result = instance.queries.getTestNames([]);
+        const result: string[] = instance.queries.getTestNames([]);
         console.log(`Result: ${serialize(result, 4)}`);
 
         assert.equal(result.length, 0);
