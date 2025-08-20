@@ -9,5 +9,7 @@ suite("[Query] getTestNames", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
         const result = instance.queries.getTestNames([]);
         console.log(`Result: ${serialize(result, 4)}`);
+
+        assert.equal(result.length, 0);
     });
 });
