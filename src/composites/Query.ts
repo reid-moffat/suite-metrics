@@ -92,7 +92,7 @@ class Queries {
      * @returns An array of all tests in this suite (not including sub-suites)
      */
     public getTestNames(path: string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, true);
+        BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
         return Array.from(suite.tests.keys());
