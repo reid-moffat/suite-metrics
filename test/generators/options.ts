@@ -46,8 +46,8 @@ const DEFAULT_OPTIONS: Required<TestDataOptions> = {
     subSuitesPerSuite: 1,
     suiteNamePrefix: "Suite",
     testNamePrefix: "Test",
-    minDuration: 1000, // 1ms in microseconds
-    maxDuration: 10000, // 10ms in microseconds
+    minDuration: 1000,
+    maxDuration: 10_000,
     addTimingDelays: false,
     customStructure: []
 };
