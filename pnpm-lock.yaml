@@ -30,6 +30,9 @@ importers:
       '@types/node':
         specifier: ^22.1.0
         version: 22.1.0
+      '@types/serialize-javascript':
+        specifier: ^5.0.4
+        version: 5.0.4
       bias-random:
         specifier: ^1.0.2
         version: 1.0.2
@@ -45,6 +48,9 @@ importers:
       mocha:
         specifier: ^10.7.0
         version: 10.7.0
+      serialize-javascript:
+        specifier: ^6.0.2
+        version: 6.0.2
       test-inputs:
         specifier: ^1.0.0
         version: 1.0.0
@@ -426,6 +432,9 @@ packages:
 
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
+
+  '@types/serialize-javascript@5.0.4':
+    resolution: {integrity: sha512-Z2R7UKFuNWCP8eoa2o9e5rkD3hmWxx/1L0CYz0k2BZzGh0PhEVMp9kfGiqEml/0IglwNERXZ2hwNzIrSz/KHTA==}
 
   acorn-walk@8.3.3:
     resolution: {integrity: sha512-MxXdReSRhGO7VlFe1bRG/oI7/mdLV9B9JJT0N8vZOhF7gFRR5l3M8W9G8JxmKV+JC5mGqJ0QvqfSOLsCPa4nUw==}
@@ -1723,6 +1732,8 @@ snapshots:
       undici-types: 6.13.0
 
   '@types/semver@7.5.8': {}
+
+  '@types/serialize-javascript@5.0.4': {}
 
   acorn-walk@8.3.3:
     dependencies:
