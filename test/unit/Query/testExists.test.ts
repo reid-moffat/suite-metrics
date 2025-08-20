@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import SuiteMetrics from "suite-metrics";
+import { assertThrows } from "../../helpers/helpers.js";
 
 suite("[BaseSuiteMetrics] testExists", function() {
 
@@ -12,27 +13,27 @@ suite("[BaseSuiteMetrics] testExists", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.testExists("not an array"), 'Test path must be an array', 'Should throw error when path is not an array');
+            assertThrows(() => metrics.queries.testExists("not an array"), 'Test path must be an array', 'Should throw error when path is not an array');
         });
 
         test("Array with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.testExists([123, "test"]), "Test path element at index 0 must be a 'string', got 'number'");
+            assertThrows(() => metrics.queries.testExists([123, "test"]), "Test path element at index 0 must be a 'string', got 'number'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.testExists(["suite", null]), 'Test path element at index 1 must be a' +
+            assertThrows(() => metrics.queries.testExists(["suite", null]), 'Test path element at index 1 must be a' +
                 ' \'string\', got \'object\'', 'Should throw error when array contains null');
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.testExists(["suite", undefined]), 'Test path element at index 1 must' +
+            assertThrows(() => metrics.queries.testExists(["suite", undefined]), 'Test path element at index 1 must' +
                 ' be a \'string\', got \'undefined\'', 'Should throw error when array contains undefined');
         });
 
         test("Array with empty string elements", function() {
-            assert.throws(() => metrics.queries.testExists(["suite", ""]), 'Test path element at index 1 cannot be empty', 'Should throw error when array contains empty string at end');
-            assert.throws(() => metrics.queries.testExists(["", "test"]), 'Test path element at index 0 cannot be empty', 'Should throw error when array contains empty string at start');
+            assertThrows(() => metrics.queries.testExists(["suite", ""]), 'Test path element at index 1 cannot be empty', 'Should throw error when array contains empty string at end');
+            assertThrows(() => metrics.queries.testExists(["", "test"]), 'Test path element at index 0 cannot be empty', 'Should throw error when array contains empty string at start');
         });
 
         test("Empty array", function() {
-            assert.throws(() => metrics.queries.testExists([]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Should throw error when path array is empty');
+            assertThrows(() => metrics.queries.testExists([]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Should throw error when path array is empty');
         });
 
         test("Single-element array", function() {

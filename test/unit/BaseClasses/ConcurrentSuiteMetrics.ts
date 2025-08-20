@@ -5,8 +5,6 @@ import { assertThrowsAsync, sleep } from "../../helpers/helpers.ts";
 
 suite("[ConcurrentSuiteMetrics] Basic tests", function() {
 
-    const _ = null; // Makes 'ignored' parameter for assert.throws() less obvious
-
     let concurrentMetrics: ConcurrentSuiteMetrics;
 
     setup(function() {

@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import SuiteMetrics, { SuiteData } from "suite-metrics";
+import { assertThrows } from "../../helpers/helpers.js";
 
 suite("[SuiteMetrics] Basic tests", function() {
 
@@ -12,16 +13,16 @@ suite("[SuiteMetrics] Basic tests", function() {
     suite("Input Validation", function() {
         test("Non-array names", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest("not an array"), "Test path must be an array", 'Should throw error when test name is not an array');
+            assertThrows(() => metrics.startTest("not an array"), "Test path must be an array", 'Should throw error when test name is not an array');
         });
 
         test("Empty test name", function() {
-            assert.throws(() => metrics.startTest([]), "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)", 'Should throw error when test name array is empty');
+            assertThrows(() => metrics.startTest([]), "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)", 'Should throw error when test name array is empty');
         });
 
         test("Non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.startTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'", 'Should throw error when test name contains non-string element');
+            assertThrows(() => metrics.startTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'", 'Should throw error when test name contains non-string element');
         });
 
         test("Empty suite name for top-level operations", function() {
@@ -33,25 +34,25 @@ suite("[SuiteMetrics] Basic tests", function() {
 
     suite("Error Handling", function() {
         test("Stopping test without starting", function() {
-            assert.throws(() => metrics.stopTest(), "No test is currently running. Call startTest() first to begin a test", 'Should throw error when stopping test without starting');
+            assertThrows(() => metrics.stopTest(), "No test is currently running. Call startTest() first to begin a test", 'Should throw error when stopping test without starting');
         });
 
         test("Non-existent suite", function() {
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["NonExistent"]), "Suite path [NonExistent] does not exist", 'Should throw error when accessing non-existent suite');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent"]), "Suite path [NonExistent] does not exist", 'Should throw error when accessing non-existent suite');
         });
 
         test("Non-existent test", function() {
             metrics.startTest(["NonExistent", "test2"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.queries.getTest(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
+            assertThrows(() => metrics.queries.getTest(["NonExistent", "Test"]), "Test [NonExistent, Test] does not exist", 'Should throw error when accessing non-existent test');
         });
 
         test("Test in non-existent suite", function() {
             metrics.startTest(["Suite1", "Test1"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.queries.getTest(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
+            assertThrows(() => metrics.queries.getTest(["Suite1", "NonExistentTest"]), "Test [Suite1, NonExistentTest] does not exist", 'Should throw error when accessing non-existent test in existing suite');
         });
     });
 

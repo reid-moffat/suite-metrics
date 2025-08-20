@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import SuiteMetrics, { SuiteData } from "suite-metrics";
 import { createSimpleTestData, createNestedTestData } from "../../generators/testDataHelpers.ts";
 import { _MockSuiteMetrics } from "../../generators/mocks.js";
-import { sleep } from "../../helpers/helpers.js";
+import { assertThrows, sleep } from "../../helpers/helpers.js";
 
 suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
@@ -15,24 +15,24 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.metrics.getSuiteMetrics("not an array"), 'Suite path must be an array', 'Should throw error when path is not an array');
+            assertThrows(() => metrics.metrics.getSuiteMetrics("not an array"), 'Suite path must be an array', 'Should throw error when path is not an array');
         });
 
         test("Path with empty strings", function() {
-            assert.throws(() => metrics.metrics.getSuiteMetrics([""]), 'Suite path element at index 0 cannot be empty', 'Should throw error when path contains single empty string');
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["suite", ""]), 'Suite path element at index 1 cannot be empty', 'Should throw error when path contains empty string at end');
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["", "suite"]), 'Suite path element at index 0 cannot be empty', 'Should throw error when path contains empty string at start');
+            assertThrows(() => metrics.metrics.getSuiteMetrics([""]), 'Suite path element at index 0 cannot be empty', 'Should throw error when path contains single empty string');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["suite", ""]), 'Suite path element at index 1 cannot be empty', 'Should throw error when path contains empty string at end');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["", "suite"]), 'Suite path element at index 0 cannot be empty', 'Should throw error when path contains empty string at start');
         });
 
         test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.metrics.getSuiteMetrics([123]), "Suite path element at index 0 must be a 'string', got 'number'");
+            assertThrows(() => metrics.metrics.getSuiteMetrics([123]), "Suite path element at index 0 must be a 'string', got 'number'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["suite", null]), "Suite path element at index 1 must be a 'string', got 'object'");
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["suite", null]), "Suite path element at index 1 must be a 'string', got 'object'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["suite", undefined]), "Suite path element at index 1 must be a 'string', got 'undefined'");
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["suite", undefined]), "Suite path element at index 1 must be a 'string', got 'undefined'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.metrics.getSuiteMetrics([{}, "suite"]), "Suite path element at index 0 must be a 'string', got 'object'");
+            assertThrows(() => metrics.metrics.getSuiteMetrics([{}, "suite"]), "Suite path element at index 0 must be a 'string', got 'object'");
         });
 
         test("Empty array (top-level suite)", function() {
@@ -48,20 +48,20 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     suite("Non-existent Suite Handling", function() {
         test("Non-existent single-level suite", function() {
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["NonExistentSuite"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when single-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentSuite"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when single-level suite does not exist');
         });
 
         test("Non-existent multi-level suite", function() {
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["NonExistent", "Suite"]), 'Suite path [NonExistent, Suite] does not exist', 'Should throw error when multi-level suite does not exist');
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["Non", "Existent", "Suite", "Path"]), 'Suite path [Non, Existent, Suite, Path] does not exist', 'Should throw error when deep multi-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent", "Suite"]), 'Suite path [NonExistent, Suite] does not exist', 'Should throw error when multi-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Non", "Existent", "Suite", "Path"]), 'Suite path [Non, Existent, Suite, Path] does not exist', 'Should throw error when deep multi-level suite does not exist');
         });
 
         test("Partially non-existent nested path", function() {
             metrics.startTest(["Level1", "Level2", "Test1"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["Level1", "NonExistentLevel2"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["NonExistentLevel1", "Level2"]), 'Suite path [NonExistentLevel1, Level2] does not exist', 'Should throw error when first level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Level1", "NonExistentLevel2"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentLevel1", "Level2"]), 'Suite path [NonExistentLevel1, Level2] does not exist', 'Should throw error when first level suite does not exist');
         });
 
         test("Test path used as suite path", function() {
@@ -69,7 +69,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             // Test path should not be accessible as suite path
-            assert.throws(() => metrics.metrics.getSuiteMetrics(["Suite1", "Test1"]), 'Suite path [Suite1, Test1] does not exist', 'Test path should not be accessible as suite path');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Suite1", "Test1"]), 'Suite path [Suite1, Test1] does not exist', 'Test path should not be accessible as suite path');
         });
     });
 
@@ -555,7 +555,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assert.throws(() => newMetrics.metrics.getSuiteMetrics(["ResetSuite"]), 'Suite path [ResetSuite] does not exist');
+            assertThrows(() => newMetrics.metrics.getSuiteMetrics(["ResetSuite"]), 'Suite path [ResetSuite] does not exist');
             assert.isFalse(newMetrics.queries.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
 
             // Should work with new instance

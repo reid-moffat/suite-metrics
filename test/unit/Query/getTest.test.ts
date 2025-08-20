@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import SuiteMetrics from "suite-metrics";
-import { sleep } from "../../helpers/helpers.ts";
+import { assertThrows, sleep } from "../../helpers/helpers.ts";
 
 suite("[BaseSuiteMetrics] getTest", function() {
 
@@ -13,47 +13,47 @@ suite("[BaseSuiteMetrics] getTest", function() {
     suite("Input Validation", function() {
         test("Non-array path", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest("not an array"), "Test path must be an array");
+            assertThrows(() => metrics.queries.getTest("not an array"), "Test path must be an array");
         });
 
         test("Empty path", function() {
-            assert.throws(() => metrics.queries.getTest([]), "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)");
+            assertThrows(() => metrics.queries.getTest([]), "A test must be inside a suite. E.g. [\"Suite 1\", \"Test 2\"] (at least two array elements)");
         });
 
         test("Path with empty strings", function() {
-            assert.throws(() => metrics.queries.getTest(["suite", ""]), "Test path element at index 1 cannot be empty");
+            assertThrows(() => metrics.queries.getTest(["suite", ""]), "Test path element at index 1 cannot be empty");
         });
 
         test("Path with non-string elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'");
+            assertThrows(() => metrics.queries.getTest(["suite", 123]), "Test path element at index 1 must be a 'string', got 'number'");
         });
 
         test("Path with null/undefined elements", function() {
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", null]), "Test path element at index 1 must be a 'string', got 'object'");
+            assertThrows(() => metrics.queries.getTest(["suite", null]), "Test path element at index 1 must be a 'string', got 'object'");
             // @ts-ignore - Testing runtime validation
-            assert.throws(() => metrics.queries.getTest(["suite", undefined]), "Test path element at index 1 must be a 'string', got 'undefined'");
+            assertThrows(() => metrics.queries.getTest(["suite", undefined]), "Test path element at index 1 must be a 'string', got 'undefined'");
         });
     });
 
     suite("Non-existent Test/Suite Handling", function() {
         test("Non-existent suite", function() {
-            assert.throws(() => metrics.queries.getTest(["NonExistentSuite", "Test"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when suite does not exist');
+            assertThrows(() => metrics.queries.getTest(["NonExistentSuite", "Test"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when suite does not exist');
         });
 
         test("Non-existent test in existing suite", function() {
             metrics.startTest(["ExistingSuite", "ExistingTest"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.queries.getTest(["ExistingSuite", "NonExistentTest"]), 'Test [ExistingSuite, NonExistentTest] does not exist', 'Should throw error when test does not exist in existing suite');
+            assertThrows(() => metrics.queries.getTest(["ExistingSuite", "NonExistentTest"]), 'Test [ExistingSuite, NonExistentTest] does not exist', 'Should throw error when test does not exist in existing suite');
         });
 
         test("Non-existent test in nested suite", function() {
             metrics.startTest(["Parent", "Child", "ExistingTest"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.queries.getTest(["Parent", "Child", "NonExistentTest"]), 'Test [Parent, Child, NonExistentTest] does not exist', 'Should throw error when test does not exist in nested suite');
+            assertThrows(() => metrics.queries.getTest(["Parent", "Child", "NonExistentTest"]), 'Test [Parent, Child, NonExistentTest] does not exist', 'Should throw error when test does not exist in nested suite');
         });
 
         test("Test path that points to suite", function() {
@@ -61,14 +61,14 @@ suite("[BaseSuiteMetrics] getTest", function() {
             metrics.stopTest();
 
             // Trying to get test metrics for a suite path should fail
-            assert.throws(() => metrics.queries.getTest(["Suite1", "SubSuite"]), 'Test [Suite1, SubSuite] does not exist', 'Should throw error when path points to suite instead of test');
+            assertThrows(() => metrics.queries.getTest(["Suite1", "SubSuite"]), 'Test [Suite1, SubSuite] does not exist', 'Should throw error when path points to suite instead of test');
         });
 
         test("Partially non-existent nested path", function() {
             metrics.startTest(["Level1", "Level2", "Test1"]);
             metrics.stopTest();
 
-            assert.throws(() => metrics.queries.getTest(["Level1", "NonExistentLevel2", "Test1"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
+            assertThrows(() => metrics.queries.getTest(["Level1", "NonExistentLevel2", "Test1"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
         });
     });
 
@@ -467,7 +467,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assert.throws(() => newMetrics.queries.getTest(["ResetSuite", "Test1"]), 'Suite path [ResetSuite] does not exist');
+            assertThrows(() => newMetrics.queries.getTest(["ResetSuite", "Test1"]), 'Suite path [ResetSuite] does not exist');
             assert.isFalse(newMetrics.queries.testExists(["ResetSuite", "Test1"]), 'Test should not exist after reset');
 
             // Should work with new instance
