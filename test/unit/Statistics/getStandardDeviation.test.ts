@@ -3,7 +3,7 @@ import serialize from "serialize-javascript";
 import { createSimpleTestData } from "../../generators/testDataHelpers.js";
 import { assert } from "chai";
 
-suite("[Statistics] getKSlowestTests", function () {
+suite("[Statistics] getStandardDeviation", function () {
 
     test("Simple data", function() {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
