@@ -148,7 +148,7 @@ class Statistics {
      */
     private ensureValidCachedStdDev(): void {
         // Skip this calculation if the cache is valid
-        const isCacheValid: boolean = this.stdDevTests !== this.suites.getNumTests();
+        const isCacheValid: boolean = this.stdDevTests === this.suites.getNumTests();
         if (isCacheValid) {
             return;
         }
