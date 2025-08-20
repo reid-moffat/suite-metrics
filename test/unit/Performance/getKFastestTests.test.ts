@@ -10,8 +10,9 @@ suite("[Performance] getKFastestTests", function () {
         const result: Test[] = instance.performance.getKFastestTests(2);
         console.log(`Result: ${serialize(result, 4)}`);
 
-        assert.exists(result);
+        assert.lengthOf(result, 2);
         const allTests: Test[] = instance.performance.getAllTestsSlowestFirst();
-        //assert.deepEqual(result, allTests[0]);
+        assert.deepEqual(result[0], allTests[allTests.length - 1]);
+        assert.deepEqual(result[1], allTests[allTests.length - 2]);
     });
 });
