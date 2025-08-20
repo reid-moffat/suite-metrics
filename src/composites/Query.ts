@@ -37,29 +37,17 @@ class Queries {
     }
 
     /**
-     * Returns an array of all the sub-suites names in a given suite. Top-level suite ([]) allowed
+     * Gets the Suite at a specific path
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
-     * @returns An array of all sub-suites directly in this suite (not recursive)
+     * @returns A copy of the Suite object at the given path
+     * @throws Error if the Suite path doesn't exist
      */
-    public getSuiteNames(path: string[]): string[] {
+    public getSuite(path: string[]): Suite {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
-        return Array.from(suite.subSuites.keys());
-    }
-
-    /**
-     * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
-     *
-     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
-     * @returns An array of all tests in this suite (not including sub-suites)
-     */
-    public getTestNames(path: string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, true);
-
-        const suite: Suite = this.suites.navigateToSuite(path);
-        return Array.from(suite.tests.keys());
+        return Utils.deepCopySuite(suite);
     }
 
     /**
@@ -83,17 +71,29 @@ class Queries {
     }
 
     /**
-     * Gets the Suite at a specific path
+     * Returns an array of all the sub-suites names in a given suite. Top-level suite ([]) allowed
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
-     * @returns A copy of the Suite object at the given path
-     * @throws Error if the Suite path doesn't exist
+     * @returns An array of all sub-suites directly in this suite (not recursive)
      */
-    public getSuite(path: string[]): Suite {
+    public getSuiteNames(path: string[]): string[] {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
-        return Utils.deepCopySuite(suite);
+        return Array.from(suite.subSuites.keys());
+    }
+
+    /**
+     * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
+     *
+     * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
+     * @returns An array of all tests in this suite (not including sub-suites)
+     */
+    public getTestNames(path: string[]): string[] {
+        BaseSuiteMetrics.validatePath(path, true);
+
+        const suite: Suite = this.suites.navigateToSuite(path);
+        return Array.from(suite.tests.keys());
     }
 
 
