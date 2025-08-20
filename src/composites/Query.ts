@@ -17,6 +17,8 @@ class Queries {
     /**
      * Checks if a given suite exists
      *
+     * Note: The top-level suite ([]) always exists
+     *
      * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
      * @returns true if the suite exists, false if not
      */
@@ -37,7 +39,7 @@ class Queries {
     }
 
     /**
-     * Gets the Suite at a specific path
+     * Gets the Suite at a specific path. Top-level suite ([]) allowed
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
      * @returns A copy of the Suite object at the given path
