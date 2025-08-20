@@ -147,17 +147,12 @@ class Statistics {
      * Must be called before any method that uses this.stdDev
      */
     private ensureValidCachedStdDev(): void {
+        // Skip this calculation if the cache is valid
         const isCacheValid: boolean = this.stdDevTests !== this.suites.getNumTests();
-
-        if (!isCacheValid) {
-            this.updateCachedStdDev();
+        if (isCacheValid) {
+            return;
         }
-    }
 
-    /**
-     * Updates the cached this.stdDev value to reflect new test additions
-     */
-    private updateCachedStdDev(): void {
         const totalTests: number = this.suites.getNumTests();
 
         if (totalTests < 2) {
