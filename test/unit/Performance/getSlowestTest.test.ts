@@ -11,9 +11,7 @@ suite("[Performance] getSlowestTest", function () {
         console.log(`Result: ${serialize(result, 4)}`);
 
         assert.exists(result);
-
         const allTests: Test[] = instance.performance.getAllTestsSlowestFirst();
-        console.log(`All tests: ${serialize(allTests, 4)}`);
         assert.deepEqual(result, allTests[0]);
     });
 });
