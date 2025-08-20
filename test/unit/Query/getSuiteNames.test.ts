@@ -1,5 +1,6 @@
 import SuiteMetrics from "suite-metrics";
 import { createSimpleTestData } from "../../generators/testDataHelpers.js";
+import { assert } from "chai";
 
 suite("[Query] getSuiteNames", function () {
 
