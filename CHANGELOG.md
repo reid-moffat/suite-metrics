@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 2.0.0
+
+### Major Changes
+
+- a4935a9: a
+
 ## 1.3.1
 
 ### Patch Changes

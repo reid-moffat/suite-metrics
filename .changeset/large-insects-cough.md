@@ -1,5 +1,0 @@
----
-"suite-metrics": major
----
-
-a
