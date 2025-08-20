@@ -142,9 +142,9 @@ class Statistics {
 
 
     /**
-     * Updates the stored stdDev value if required (tests added since last calculation)
+     * Updates the stored stdDev values if required (tests added since last calculation)
      *
-     * Must be called before any method that uses this.stdDev
+     * Must be called before any method that uses this.stdDevPopulation or this.stdDevSample
      */
     private ensureValidCachedStdDev(): void {
         // Skip this calculation if the cache is valid
