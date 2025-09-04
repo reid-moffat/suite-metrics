@@ -203,14 +203,14 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 
 ### Non-Constant Operations
 
-| Operation                           | Complexity | Notes                                                                                        |
-|-------------------------------------|------------|----------------------------------------------------------------------------------------------|
-| **ConcurrentSuiteMetrics methods**  | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests) |
-| **Getting/Adding Suites/Tests**     | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                        |
-| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks              |
-| **Performance methods**             | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)       |
-| **Statistics methods**              | `O(n)` → `O(1)` | Cache rebuild when tests added (except `interpretZScore()`), then `O(1)/O(k)`                |
-| **Data exporting**                  | `O(n)` | Methods `toJSONString()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse     |
+| Operation                           | Complexity | Notes                                                                                                    |
+|-------------------------------------|------------|----------------------------------------------------------------------------------------------------------|
+| **ConcurrentSuiteMetrics methods**  | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests)             |
+| **Getting/Adding Suites/Tests**     | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                                    |
+| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks                          |
+| **Performance methods**             | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)                   |
+| **Statistics methods**              | `O(n)` → `O(1)` | Cache rebuild (`O(m)` for `m` new tests) when tests added (except `interpretZScore()`), then `O(1)/O(k)` |
+| **Data exporting**                  | `O(n)` | Methods `toJSONString()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse           |
 
 ### ⚡ Performance Best Practices
 
