@@ -161,11 +161,12 @@ class Statistics {
         }
 
 
-        // Only need to process new tests
-        const allTests: Test[] = this.suites.getAllTestsInOrder();
-        const newTests: Test[] = allTests.slice(this.cachedCount);
+        // Process all new tests (or all tests if this is the first call)
+        const testsToProcess: Test[] = this.cachedCount > 0
+            ? this.suites.getAllTestsInOrder().slice(this.cachedCount)
+            : this.suites.getAllTestsInOrder();
 
-        for (const test of newTests) {
+        for (const test of testsToProcess) {
             this.cachedSum += test.duration;
             this.cachedSumSquares += test.duration * test.duration;
         }
