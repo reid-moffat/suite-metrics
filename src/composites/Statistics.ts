@@ -155,21 +155,21 @@ class Statistics {
             return;
         }
 
+        // Zero or one test -> can't calculate standard deviation
         if (currentTestCount < 2) {
             throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
         }
 
-        // If this is the first calculation or we need to rebuild from scratch
+        // First calculation -> rebuild from scratch
         if (this.cachedCount === 0) {
             this.calculateStatsFromScratch();
             return;
         }
 
-        // Incremental update: only process new tests
+        // Only need to process new tests
         const allTests: Test[] = this.suites.getAllTestsInOrder();
         const newTests: Test[] = allTests.slice(this.cachedCount);
 
-        // Update running sums with only the new tests - O(m) operation
         for (const test of newTests) {
             this.cachedSum += test.duration;
             this.cachedSumSquares += test.duration * test.duration;
