@@ -1,10 +1,17 @@
 # suite-metrics
 
+## 2.0.1
+
+### Patch Changes
+
+- f5621f0: Cached partial statistic values, optimizing standard deviation calculations after new tests are added (e.g. adding 10 tests to 100,000 tests with a calculated standard deviation only requires looping thrugh the 10 aded tests, not all 100,010)
+
 ## 2.0.0
 
 ### Major Changes
 
 - a4935a9: Major update! 🎉
+
 * Significantly improved existing functionality, breaking existing contracts
 * Added a thread-safe ConcurrentSuiteMetrics class for running multiple tests at once
 * Added helpers to get more test metrics, statistics, querying, and performance
@@ -21,6 +28,7 @@
 ### Minor Changes
 
 - 56905e5:
+
 * Added option to reset Metrics singleton
 * Added getNameFromMocha to easily get the test path format from a Mocha test
 * Allow passing Mocha contexts to methods in place of literal name arrays
