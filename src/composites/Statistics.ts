@@ -160,11 +160,6 @@ class Statistics {
             throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
         }
 
-        // First calculation -> rebuild from scratch
-        if (this.cachedCount === 0) {
-            this.calculateStatsFromScratch();
-            return;
-        }
 
         // Only need to process new tests
         const allTests: Test[] = this.suites.getAllTestsInOrder();
@@ -175,46 +170,15 @@ class Statistics {
             this.cachedSumSquares += test.duration * test.duration;
         }
 
+
+        // Recalculate derived values
         this.cachedCount = currentTestCount;
-
-        // Recalculate derived values using the updated sums - O(1) operation
-        this.updateDerivedStats();
-    }
-
-    /**
-     * Calculates all statistics from scratch - O(n) operation
-     * Used for initial calculation or when cache needs to be rebuilt
-     */
-    private calculateStatsFromScratch(): void {
-        const allTests: Test[] = this.suites.getAllTestsInOrder();
-
-        this.cachedSum = 0;
-        this.cachedSumSquares = 0;
-
-        // Calculate sums - O(n) operation, but only done once or when rebuilding
-        for (const test of allTests) {
-            this.cachedSum += test.duration;
-            this.cachedSumSquares += test.duration * test.duration;
-        }
-
-        this.cachedCount = allTests.length;
-        this.updateDerivedStats();
-    }
-
-    /**
-     * Updates mean and standard deviations using the cached sums - O(1) operation
-     */
-    private updateDerivedStats(): void {
-        // Calculate mean
         this.cachedMean = this.cachedSum / this.cachedCount;
 
-        // Calculate variance using the computational formula: Var(X) = E[X²] - (E[X])²
-        // This avoids the need to iterate through all tests again
         const meanSquare: number = this.cachedSumSquares / this.cachedCount;
         const squareMean: number = this.cachedMean * this.cachedMean;
-        const populationVariance: number = meanSquare - squareMean;
+        const populationVariance: number = meanSquare - squareMean; // Computational formula: Var(X) = E[X²] - (E[X])²
 
-        // Update standard deviations
         this.stdDevPopulation = Math.sqrt(populationVariance);
         this.stdDevSample = Math.sqrt(populationVariance * this.cachedCount / (this.cachedCount - 1));
     }
