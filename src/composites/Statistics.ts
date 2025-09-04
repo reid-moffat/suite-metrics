@@ -9,12 +9,15 @@ class Statistics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    // Store calculated standard deviation (population & sample) for efficiency
+    // Cached calculated standard deviation, making repeated calls without added tests O(1)
     private stdDevPopulation: number = 0;
     private stdDevSample: number = 0;
 
-    // Number of tests present when the stDev was calculated (used to verify if recalculation is required)
-    private stdDevTests: number = 0;
+    // Cached values for various calculations, making calls after adding m tests to n existing tests O(m) (not O(n + m))
+    private cachedCount: number = 0;
+    private cachedSum: number = 0;
+    private cachedSumSquares: number = 0;
+    private cachedMean: number = 0;
 
     public constructor(suites: Suites) {
         this.suites = suites;
@@ -29,7 +32,7 @@ class Statistics {
      * @throws Error If there is insufficient data (less than two total tests)
      */
     public getStandardDeviation(usePopulation: boolean = true): number {
-        this.ensureValidCachedStdDev();
+        this.ensureValidCachedStats();
 
         return usePopulation ? this.stdDevPopulation : this.stdDevSample;
     }
@@ -58,18 +61,15 @@ class Statistics {
      * the same duration)
      */
     public getTestZScore(test: Test, usePopulation: boolean = true): number {
-        this.ensureValidCachedStdDev();
+        this.ensureValidCachedStats();
 
-        // Get statistical measures
-        const mean: number = this.suites.getAverageTestDuration();
         const stdDev: number = usePopulation ? this.stdDevPopulation : this.stdDevSample;
-
         if (stdDev === 0) {
             throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
         }
 
         // Calculate Z-score: (X - μ) / σ
-        return (test.duration - mean) / stdDev;
+        return (test.duration - this.cachedMean) / stdDev;
     }
 
     /**
@@ -82,12 +82,9 @@ class Statistics {
      * @throws Error If there is insufficient data for calculation (<2 total tests, or all tests have the same duration)
      */
     public getAllTestsWithZScores(usePopulation: boolean = true): { test: Test, zScore: number }[] {
-        this.ensureValidCachedStdDev();
+        this.ensureValidCachedStats();
 
-        // Get statistical measures
-        const mean: number = this.suites.getAverageTestDuration();
         const stdDev: number = usePopulation ? this.stdDevPopulation : this.stdDevSample;
-
         if (stdDev === 0) {
             throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
         }
@@ -97,7 +94,7 @@ class Statistics {
         return allTests.map((test: Test) => {
             return {
                 test: test,
-                zScore: (test.duration - mean) / stdDev
+                zScore: (test.duration - this.cachedMean) / stdDev
             };
         });
     }
@@ -142,39 +139,49 @@ class Statistics {
 
 
     /**
-     * Updates the stored stdDev values if required (tests added since last calculation)
+     * Updates cached values (stDev, sum, mean, etc) if required (if tests were added since last calculation)
+     * Must be called before any method that uses any cached value, otherwise cache could be invalid
      *
-     * Must be called before any method that uses this.stdDevPopulation or this.stdDevSample
+     * Given:
+     * n: Number of tests present during the previous call of this method
+     * m: Number of tests added since the previous call of this method
+     * The complexity is O(m), not O(m + n), ensuring maximum efficiency
      */
-    private ensureValidCachedStdDev(): void {
-        // Skip this calculation if the cache is valid
-        const isCacheValid: boolean = this.stdDevTests === this.suites.getNumTests();
-        if (isCacheValid) {
+    private ensureValidCachedStats(): void {
+        const currentTestCount: number = this.suites.getNumTests();
+
+        // Cache is already valid (no tests added since last calculation) -> skip
+        if (this.cachedCount === currentTestCount) {
             return;
         }
 
-        const totalTests: number = this.suites.getNumTests();
-
-        if (totalTests < 2) {
+        // Zero or one test -> can't calculate standard deviation
+        if (currentTestCount < 2) {
             throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
         }
 
-        // Calculate variance
-        const allTests: Test[] = this.suites.getAllTestsInOrder();
-        const mean: number = this.suites.getAverageTestDuration();
 
-        const sumSquaredDifferences: number = allTests.reduce((sum: number, test: Test): number => {
-            const difference: number = test.duration - mean;
-            return sum + (difference * difference);
-        }, 0);
+        // Process all new tests (or all tests if this is the first call)
+        const testsToProcess: Test[] = this.cachedCount > 0
+            ? this.suites.getAllTestsInOrder().slice(this.cachedCount)
+            : this.suites.getAllTestsInOrder();
 
-        // Update population std dev
-        const populationVariance: number = sumSquaredDifferences / allTests.length;
+        for (const test of testsToProcess) {
+            this.cachedSum += test.duration;
+            this.cachedSumSquares += test.duration * test.duration;
+        }
+
+
+        // Recalculate derived values
+        this.cachedCount = currentTestCount;
+        this.cachedMean = this.cachedSum / this.cachedCount;
+
+        const meanSquare: number = this.cachedSumSquares / this.cachedCount;
+        const squareMean: number = this.cachedMean * this.cachedMean;
+        const populationVariance: number = meanSquare - squareMean; // Computational formula: Var(X) = E[X²] - (E[X])²
+
         this.stdDevPopulation = Math.sqrt(populationVariance);
-
-        // Update sample std dev
-        const sampleVariance: number = sumSquaredDifferences / allTests.length - 1;
-        this.stdDevSample = Math.sqrt(sampleVariance);
+        this.stdDevSample = Math.sqrt(populationVariance * this.cachedCount / (this.cachedCount - 1));
     }
 }
 
