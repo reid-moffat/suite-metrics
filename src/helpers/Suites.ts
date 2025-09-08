@@ -147,7 +147,7 @@ class Suites {
     public getAllTestsByDuration(): Test[] {
         if (!this.orderedTestsValid) {
             // Sort by duration in descending order (slowest goes first)
-            this.testsByDuration = [...this.getAllTestsInOrder()].sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.testsByDuration = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
             this.orderedTestsValid = true;
         }
 
