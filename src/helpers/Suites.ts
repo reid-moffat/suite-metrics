@@ -80,6 +80,7 @@ class Suites {
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
         };
+        Object.freeze(test);
 
         // Invalidate sorted cache
         this.orderedTestsValid = false;
