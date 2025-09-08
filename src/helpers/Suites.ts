@@ -80,6 +80,8 @@ class Suites {
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
         };
+
+        // Once a test is added, no modification are required (prevent external modification)
         Object.freeze(test);
 
         // Invalidate sorted cache
