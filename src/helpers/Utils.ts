@@ -10,7 +10,12 @@ class Utils {
      */
     public static deepCopyTest(test: Test): Test {
         return {
-            ...test,
+            name: test.name,
+            startTimestamp: test.startTimestamp,
+            endTimestamp: test.endTimestamp,
+            duration: test.duration,
+            testNumber: test.testNumber,
+            suiteTestNumber: test.suiteTestNumber,
             path: [...test.path]
         };
     }
