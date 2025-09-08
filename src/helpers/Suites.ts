@@ -68,14 +68,12 @@ class Suites {
      */
     public addTest(testPath: string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
-        const testName: string = testPath[testPath.length - 1];
-        const testDuration: number = endTime - startTime;
 
         const test: Test = {
-            name: testName,
+            name: testPath[testPath.length - 1],
             startTimestamp: startTime,
             endTimestamp: endTime,
-            duration: testDuration,
+            duration: endTime - startTime,
             testNumber: this.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
