@@ -101,7 +101,7 @@ class Performance {
      */
     public getAllTestsFastestFirst(): Test[] {
         const tests: Test[] = this.suites.getAllTestsByDuration();
-        return tests.reverse();
+        return [...tests].reverse();
     }
 }
 
