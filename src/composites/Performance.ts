@@ -28,7 +28,7 @@ class Performance {
         const tests: Test[] = this.suites.getAllTestsByDuration();
         const slowestTest: Test = tests[0];
 
-        return Utils.deepCopyTest(slowestTest);
+        return slowestTest;
     }
 
     /**
@@ -51,7 +51,7 @@ class Performance {
         const endIndex: number = Math.min(k, this.suites.getNumTests());
         const slowestTests: Test[] = tests.slice(0, endIndex);
 
-        return Utils.deepCopyTests(slowestTests);
+        return slowestTests;
     }
 
     /**
@@ -61,7 +61,7 @@ class Performance {
      */
     public getAllTestsSlowestFirst(): Test[] {
         const tests: Test[] = this.suites.getAllTestsByDuration();
-        return Utils.deepCopyTests(tests);
+        return tests;
     }
 
     /**
@@ -78,7 +78,7 @@ class Performance {
         const tests: Test[] = this.suites.getAllTestsByDuration();
         const fastestTest: Test = tests[this.suites.getNumTests() - 1];
 
-        return Utils.deepCopyTest(fastestTest);
+        return fastestTest;
     }
 
     /**
@@ -101,7 +101,7 @@ class Performance {
         const startIndex: number = Math.max(0, this.suites.getNumTests() - k);
         const fastestTests: Test[] = tests.slice(startIndex).reverse();
 
-        return Utils.deepCopyTests(fastestTests);
+        return fastestTests;
     }
 
     /**
@@ -111,7 +111,7 @@ class Performance {
      */
     public getAllTestsFastestFirst(): Test[] {
         const tests: Test[] = this.suites.getAllTestsByDuration();
-        return Utils.deepCopyTests(tests).reverse();
+        return tests.reverse();
     }
 }
 

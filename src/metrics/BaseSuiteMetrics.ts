@@ -79,7 +79,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return Utils.deepCopyTests(this.suites.getAllTestsInOrder());
+        return this.suites.getAllTestsInOrder();
     }
 
     /**
