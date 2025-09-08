@@ -9,6 +9,10 @@ class Utils {
      * Creates a deep copy of a Test object to prevent external modifications
      */
     public static deepCopyTest(test: Test): Test {
+        if (!test) {
+            throw new Error(`Cannot copy null/undefined test object: ${JSON.stringify(test)}`);
+        }
+
         return {
             name: test.name,
             startTimestamp: test.startTimestamp,
