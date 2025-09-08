@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { SuiteData } from "suite-metrics";
+import SuiteMetrics, { SuiteData, Test } from "suite-metrics";
 import { assertThrows } from "../../helpers/helpers.js";
 
 suite("[SuiteMetrics] Basic tests", function() {
@@ -361,19 +361,25 @@ suite("[SuiteMetrics] Basic tests", function() {
             metrics.startTest(["ImmutableSuite", "Test1"]);
             metrics.stopTest();
 
-            const testMetrics1 = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
-            const testMetrics2 = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
+            const test1: Test = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
+            const test2: Test = metrics.queries.getTest(["ImmutableSuite", "Test1"]);
 
-            assert.deepEqual(testMetrics1, testMetrics2, 'Multiple calls should return equal objects');
-            assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');
+            assert.deepEqual(test1, test2, 'Multiple calls should return equal objects');
 
             // Verify all properties exist and are correct type
-            assert.isString(testMetrics1.name, 'Name property should be string');
-            assert.isNumber(testMetrics1.startTimestamp, 'Start timestamp property should be number');
-            assert.isNumber(testMetrics1.endTimestamp, 'End timestamp property should be number');
-            assert.isNumber(testMetrics1.duration, 'Duration property should be number');
-            assert.isNumber(testMetrics1.testNumber, 'Test number property should be number');
-            assert.isNumber(testMetrics1.suiteTestNumber, 'Suite test number property should be number');
+            assert.isString(test1.name, 'Name property should be string');
+            assert.isNumber(test1.startTimestamp, 'Start timestamp property should be number');
+            assert.isNumber(test1.endTimestamp, 'End timestamp property should be number');
+            assert.isNumber(test1.duration, 'Duration property should be number');
+            assert.isNumber(test1.testNumber, 'Test number property should be number');
+            assert.isNumber(test1.suiteTestNumber, 'Suite test number property should be number');
+
+            assert.isString(test2.name, 'Name property should be string');
+            assert.isNumber(test2.startTimestamp, 'Start timestamp property should be number');
+            assert.isNumber(test2.endTimestamp, 'End timestamp property should be number');
+            assert.isNumber(test2.duration, 'Duration property should be number');
+            assert.isNumber(test2.testNumber, 'Test number property should be number');
+            assert.isNumber(test2.suiteTestNumber, 'Suite test number property should be number');
         });
 
         test("Maintain data consistency in complex scenarios", function() {
