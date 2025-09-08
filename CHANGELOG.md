@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 2.0.2
+
+### Patch Changes
+
+- 577d28b: Froze test objects to prevent copying overhead for large queries
+
 ## 2.0.1
 
 ### Patch Changes
