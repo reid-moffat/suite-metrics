@@ -69,7 +69,7 @@ class Queries {
             throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} does not exist`);
         }
 
-        return Utils.deepCopyTest(test);
+        return test;
     }
 
     /**

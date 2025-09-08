@@ -250,24 +250,6 @@ suite("[BaseSuiteMetrics] getTest", function() {
     });
 
     suite("Data Immutability and Integrity", function() {
-        test("Return copy of test data (not reference)", function() {
-            metrics.startTest(["ImmutableSuite", "ImmutableTest"]);
-            metrics.stopTest();
-
-            const testMetrics1 = metrics.queries.getTest(["ImmutableSuite", "ImmutableTest"]);
-            const testMetrics2 = metrics.queries.getTest(["ImmutableSuite", "ImmutableTest"]);
-
-            assert.deepEqual(testMetrics1, testMetrics2, 'Multiple calls should return equal objects');
-            assert.notEqual(testMetrics1, testMetrics2, 'Multiple calls should return different object references');
-
-            // Verify modifying returned object doesn't affect internal state
-            // @ts-ignore
-            testMetrics1.duration = 999999;
-            const testMetrics3 = metrics.queries.getTest(["ImmutableSuite", "ImmutableTest"]);
-            assert.notEqual(testMetrics3.duration, 999999, 'Modifying returned object should not affect internal state');
-            assert.deepEqual(testMetrics3, testMetrics2, 'Internal state should remain unchanged after modification');
-        });
-
         test("Readonly properties", function() {
             metrics.startTest(["ReadonlySuite", "ReadonlyTest"]);
             metrics.stopTest();

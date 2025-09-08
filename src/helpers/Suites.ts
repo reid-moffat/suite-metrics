@@ -68,18 +68,19 @@ class Suites {
      */
     public addTest(testPath: string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
-        const testName: string = testPath[testPath.length - 1];
-        const testDuration: number = endTime - startTime;
 
         const test: Test = {
-            name: testName,
+            name: testPath[testPath.length - 1],
             startTimestamp: startTime,
             endTimestamp: endTime,
-            duration: testDuration,
+            duration: endTime - startTime,
             testNumber: this.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
         };
+
+        // Once a test is added, no modification are required (prevent external modification)
+        Object.freeze(test);
 
         // Invalidate sorted cache
         this.orderedTestsValid = false;
@@ -147,7 +148,7 @@ class Suites {
     public getAllTestsByDuration(): Test[] {
         if (!this.orderedTestsValid) {
             // Sort by duration in descending order (slowest goes first)
-            this.testsByDuration = [...this.getAllTestsInOrder()].sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.testsByDuration = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
             this.orderedTestsValid = true;
         }
 

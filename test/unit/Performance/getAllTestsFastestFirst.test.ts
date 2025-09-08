@@ -1,5 +1,4 @@
 import SuiteMetrics, { Test } from "suite-metrics";
-import serialize from "serialize-javascript";
 import { createSimpleTestData } from "../../generators/testDataHelpers.js";
 import { assert } from "chai";
 import { DEFAULT_OPTIONS } from "../../generators/options.js";
@@ -8,15 +7,30 @@ suite("[Performance] getAllTestsFastestFirst", function () {
 
     test("Simple data", function() {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
-        const result: Test[] = instance.performance.getAllTestsFastestFirst();
-        console.log(`Result: ${serialize(result, 4)}`);
 
-        assert.lengthOf(result, DEFAULT_OPTIONS.numSuites * DEFAULT_OPTIONS.testsPerSuite);
-        assert.lengthOf(result, instance.metrics.getTotalTestCount());
+        const fastestTests: Test[] = instance.performance.getAllTestsFastestFirst();
+        const slowestTests: Test[] = instance.performance.getAllTestsSlowestFirst();
 
-        const allTests: Test[] = instance.performance.getAllTestsSlowestFirst();
-        for (let i: number = 0; i < result.length; ++i) {
-            assert.deepEqual(result[i], allTests[allTests.length - i - 1]);
+        // Ensure lengths match
+        assert.lengthOf(fastestTests, DEFAULT_OPTIONS.numSuites * DEFAULT_OPTIONS.testsPerSuite);
+        assert.lengthOf(fastestTests, instance.metrics.getTotalTestCount());
+
+        assert.lengthOf(slowestTests, DEFAULT_OPTIONS.numSuites * DEFAULT_OPTIONS.testsPerSuite);
+        assert.lengthOf(slowestTests, instance.metrics.getTotalTestCount());
+
+        assert.lengthOf(fastestTests, slowestTests.length);
+
+        // Ensure ordering is valid
+        for (let i: number = 0; i < fastestTests.length - 1; ++i) {
+            assert.isAtMost(fastestTests[i].duration, fastestTests[i + 1].duration);
+        }
+        for (let i: number = 0; i < slowestTests.length - 1; ++i) {
+            assert.isAtLeast(slowestTests[i].duration, slowestTests[i + 1].duration);
+        }
+
+        // Ensure data is the same but the order is just swapped
+        for (let i: number = 0; i < slowestTests.length; ++i) {
+            assert.deepEqual(fastestTests[i], slowestTests[slowestTests.length - i - 1]);
         }
     });
 });
