@@ -81,6 +81,7 @@ class Suites {
 
         // Once a test is added, no modification are required (prevent external modification)
         Object.freeze(test);
+        Object.freeze(test.path);
 
         // Invalidate sorted cache
         this.orderedTestsValid = false;
