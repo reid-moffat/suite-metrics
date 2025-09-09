@@ -126,6 +126,10 @@ class Suites {
                         totalTestTime: 0
                     }
                 };
+
+                // Prevent modification (except to aggregateData's fields)
+                Object.freeze(targetSuite);
+
                 currentSuite.subSuites.set(suiteName, targetSuite);
             }
             currentSuite = targetSuite;
