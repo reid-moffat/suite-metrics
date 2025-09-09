@@ -1,4 +1,4 @@
-import { Suite, Test } from "../types/structures.ts";
+import { Suite } from "../types/structures.ts";
 
 /**
  * Miscellaneous helper methods
