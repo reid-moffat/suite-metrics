@@ -96,14 +96,13 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public async startTest(path: string[]): Promise<void> {
-        let release: (() => void) | null = null;
+        BaseSuiteMetrics.validatePath(path, true);
 
+        let release: (() => void) | null = null;
         try {
             release = await this.testMutex.acquire();
 
             // Validate path and ensure test isn't already completed
-            BaseSuiteMetrics.validatePath(path, true);
-
             const testExists: boolean = this.queries.testExists(path);
             if (testExists) {
                 throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
