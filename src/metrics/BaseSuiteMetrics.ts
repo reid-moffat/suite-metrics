@@ -43,7 +43,7 @@ abstract class BaseSuiteMetrics {
         }
 
         // Check each segment individually to provide specific error locations
-        for (let i: number = 0; i < path.length; i++) {
+        for (let i: number = 0; i < path.length; ++i) {
             const segment: any = path[i];
 
             if (typeof segment !== "string") {
