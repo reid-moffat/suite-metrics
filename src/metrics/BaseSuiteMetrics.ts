@@ -117,7 +117,7 @@ abstract class BaseSuiteMetrics {
         }
 
         const serializableData: Record<string, SerializableSuite> = Object.fromEntries(
-            Array.from(this.suites.getAllSuites().entries())
+            Array.from(this.suites.getTopLevelSuite().subSuites.entries())
                 .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, suiteToSerializable(suite)])
         );
 

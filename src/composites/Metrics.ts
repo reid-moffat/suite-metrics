@@ -115,7 +115,7 @@ class Metrics {
         if (topLevelSuite) {
             this.formatSuiteForPrint(this.suites.getTopLevelSuite(), lines, 0);
         } else {
-            for (const suite of this.suites.getAllSuites().values()) {
+            for (const suite of this.suites.getTopLevelSuite().subSuites.values()) {
                 this.formatSuiteForPrint(suite, lines, 0);
             }
         }

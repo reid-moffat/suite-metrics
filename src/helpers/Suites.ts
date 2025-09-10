@@ -32,13 +32,6 @@ class Suites {
 
 
     /**
-     * Gets a reference to all suites in this metrics instance (excluding the top-level suite)
-     */
-    public getAllSuites(): Map<string, Suite> {
-        return this.allSuites;
-    }
-
-    /**
      * Gets a reference to the top-level suite
      */
     public getTopLevelSuite(): Suite {
