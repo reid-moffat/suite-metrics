@@ -167,7 +167,7 @@ class Suites {
      * @param testPath Path of the test to update parent suites for
      * @param duration Duration of the test
      */
-    private updateSubTestCounters(testPath: string[], duration: number): void {
+    private updateSubTestCounters(testPath: readonly string[], duration: number): void {
         // Add time and counter to top-level suite
         let currentSuite: Suite = this.topLevelSuite;
         currentSuite.aggregateData.numTests++;

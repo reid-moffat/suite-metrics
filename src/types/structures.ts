@@ -17,7 +17,7 @@ type Test = {
     /** Order this test was completed in for this suite. E.g. the 3rd of 6 test in the suite -> 3 */
     readonly suiteTestNumber: number;
     /** Path to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3'] */
-    readonly path: string[];
+    readonly path: readonly string[];
 };
 
 /**

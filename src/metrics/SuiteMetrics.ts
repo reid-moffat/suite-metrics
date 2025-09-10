@@ -73,7 +73,6 @@ class SuiteMetrics extends BaseSuiteMetrics {
         const test: Test = this.suites.addTest(testPath, startTime, endTime);
 
         this.activeTest = null;
-
         return test;
     }
 }
