@@ -70,7 +70,7 @@ class Suites {
     public addTest(testPath: readonly string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
 
-        // Create test object and freeze recursively to block modification
+        // Create test object, freeze, and update related suite data
         const testData: Test = {
             name: testPath[testPath.length - 1],
             startTimestamp: startTime,
@@ -81,15 +81,10 @@ class Suites {
             path: testPath
         };
         const test: Test = freeze(testData, true);
+        this.addTestUpdates(suite, test);
 
-        // Invalidate sorted cache
+        // Add to list of tests & invalidate sorted cache
         this.orderedTestsValid = false;
-
-        // Adds test to its parent suite and updates parent counters
-        this.updateSuiteWithTest(suite, test);
-        this.updateTestCounters(test.path, test.duration);
-
-        // Adds to the list of all suites in order
         this.testsInInsertionOrder.push(test);
 
         return test;
@@ -152,7 +147,7 @@ class Suites {
     /**
      * Add a test to a suite
      */
-    private updateSuiteWithTest(suite: Suite, test: Test): void {
+    private addTestUpdates(suite: Suite, test: Test): void {
         // Find and update the suite in our data structures
         if (suite === this.topLevelSuite) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
@@ -170,6 +165,53 @@ class Suites {
                 this.updateSuiteInMap(draft.subSuites, test.path.slice(0, -1), test);
             });
         }
+
+        // Update top-level suite
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            draft.aggregateData.numTests++;
+            draft.aggregateData.totalTestTime += test.duration;
+        });
+
+        const suitePath: readonly string[] = test.path.slice(0, -1);
+        if (suitePath.length === 0) {
+            return;
+        }
+
+        // Helper function to update counters recursively
+        const updateCountersRecursively = (suitesMap: Map<string, Suite>, path: readonly string[], depth: number = 0) => {
+            if (depth >= path.length) return;
+
+            const suiteName = path[depth];
+            const suite = suitesMap.get(suiteName);
+
+            if (suite) {
+                // Create updated suite with new counters
+                const updatedSuite = {
+                    ...suite,
+                    aggregateData: {
+                        numTests: suite.aggregateData.numTests + 1,
+                        totalTestTime: suite.aggregateData.totalTestTime + test.duration
+                    }
+                };
+
+                suitesMap.set(suiteName, freeze(updatedSuite, true));
+
+                // Continue to nested suites
+                if (depth + 1 < path.length) {
+                    updateCountersRecursively(updatedSuite.subSuites, path, depth + 1);
+                }
+            }
+        };
+
+        // Update allSuites
+        this.allSuites = produce(this.allSuites, draft => {
+            updateCountersRecursively(draft, suitePath);
+        });
+
+        // Update topLevelSuite.subSuites
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            updateCountersRecursively(draft.subSuites, suitePath);
+        });
     }
 
     /**
@@ -260,59 +302,6 @@ class Suites {
         }
 
         return newSuite;
-    }
-
-    /**
-     * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
-     *
-     * @param testPath Path of the test to update parent suites for
-     * @param duration Duration of the test
-     */
-    private updateTestCounters(testPath: readonly string[], duration: number): void {
-        // Update top-level suite
-        this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            draft.aggregateData.numTests++;
-            draft.aggregateData.totalTestTime += duration;
-        });
-
-        const suitePath = testPath.slice(0, -1);
-        if (suitePath.length === 0) return;
-
-        // Helper function to update counters recursively
-        const updateCountersRecursively = (suitesMap: Map<string, Suite>, path: readonly string[], depth: number = 0) => {
-            if (depth >= path.length) return;
-
-            const suiteName = path[depth];
-            const suite = suitesMap.get(suiteName);
-
-            if (suite) {
-                // Create updated suite with new counters
-                const updatedSuite = {
-                    ...suite,
-                    aggregateData: {
-                        numTests: suite.aggregateData.numTests + 1,
-                        totalTestTime: suite.aggregateData.totalTestTime + duration
-                    }
-                };
-
-                suitesMap.set(suiteName, freeze(updatedSuite, true));
-
-                // Continue to nested suites
-                if (depth + 1 < path.length) {
-                    updateCountersRecursively(updatedSuite.subSuites, path, depth + 1);
-                }
-            }
-        };
-
-        // Update allSuites
-        this.allSuites = produce(this.allSuites, draft => {
-            updateCountersRecursively(draft, suitePath);
-        });
-
-        // Update topLevelSuite.subSuites
-        this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            updateCountersRecursively(draft.subSuites, suitePath);
-        });
     }
 }
 
