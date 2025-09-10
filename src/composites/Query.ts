@@ -22,7 +22,7 @@ class Queries {
      * @param suitePath Path to check for, e.g. ['suite 1', 'sub-suite 2']
      * @returns true if the suite exists, false if not
      */
-    public suiteExists(suitePath: string[]): boolean {
+    public suiteExists(suitePath: readonly string[]): boolean {
         BaseSuiteMetrics.validatePath(suitePath, false);
         return this.pathExists(suitePath, false);
     }
@@ -33,7 +33,7 @@ class Queries {
      * @param testPath Path to check for, e.g. ['suite 1', 'sub-suite 2', 'test 3']
      * @returns true if the suite exists, false if not
      */
-    public testExists(testPath: string[]): boolean {
+    public testExists(testPath: readonly string[]): boolean {
         BaseSuiteMetrics.validatePath(testPath, true);
         return this.pathExists(testPath, true);
     }
@@ -45,7 +45,7 @@ class Queries {
      * @returns A copy of the Suite object at the given path
      * @throws Error if the Suite path doesn't exist
      */
-    public getSuite(path: string[]): Suite {
+    public getSuite(path: readonly string[]): Suite {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
@@ -59,7 +59,7 @@ class Queries {
      * @returns A copy of the Test object at the given path
      * @throws Error If the test path doesn't exist
      */
-    public getTest(path: string[]): Test {
+    public getTest(path: readonly string[]): Test {
         BaseSuiteMetrics.validatePath(path, true);
         const suite: Suite = this.suites.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
@@ -78,7 +78,7 @@ class Queries {
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
      * @returns An array of all sub-suites directly in this suite (not recursive)
      */
-    public getSuiteNames(path: string[]): string[] {
+    public getSuiteNames(path: readonly string[]): string[] {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
@@ -91,7 +91,7 @@ class Queries {
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
      * @returns An array of all tests in this suite (not including sub-suites)
      */
-    public getTestNames(path: string[]): string[] {
+    public getTestNames(path: readonly string[]): string[] {
         BaseSuiteMetrics.validatePath(path, false);
 
         const suite: Suite = this.suites.navigateToSuite(path);
@@ -105,7 +105,7 @@ class Queries {
      * @param path Path to check if exists
      * @param isTest Specifies if this is checking for a test (false to check for a suite)
      */
-    private pathExists(path: string[], isTest: boolean): boolean {
+    private pathExists(path: readonly string[], isTest: boolean): boolean {
         try {
             if (isTest) {
                 const suite: Suite = this.suites.navigateToSuite(path, { isTestPath: true });
