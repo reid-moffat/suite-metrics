@@ -7,14 +7,11 @@ import { freeze, produce, castDraft } from 'immer';
  */
 class Suites {
 
-    // All suite and test data (child of )
-    private allSuites: Map<string, Suite> = new Map<string, Suite>();
-
     // Top-level suite makes top-level metrics and functions easier to handle
     private topLevelSuite: Suite = freeze({
         name: "<Top-Level suite>",
         tests: new Map<string, Test>(),
-        subSuites: this.allSuites,
+        subSuites: new Map<string, Suite>(),
         aggregateData: {
             numTests: 0,
             totalTestTime: 0
@@ -268,8 +265,6 @@ class Suites {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(suiteName, castDraft(newSuite));
             });
-            this.allSuites.set(suiteName, newSuite);
-
             return newSuite;
         }
 
