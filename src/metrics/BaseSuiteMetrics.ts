@@ -31,7 +31,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements,
      * or a test without a suite/empty test)
      */
-    public static validatePath(path: string[], isTest: boolean): void {
+    public static validatePath(path: readonly string[], isTest: boolean): void {
 
         const type: string = isTest ? "Test" : "Suite";
         if (!Array.isArray(path)) {
@@ -67,7 +67,7 @@ abstract class BaseSuiteMetrics {
      * @returns Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
      * @throws Error If the provided path is invalid (BaseSuiteMetrics.validatePath() is called)
      */
-    public static pathToString(path: string[]): string {
+    public static pathToString(path: readonly string[]): string {
         BaseSuiteMetrics.validatePath(path, false);
         return `[${path.join(", ")}]`;
     }
