@@ -177,12 +177,6 @@ class Suites {
                 }
             }
 
-            // Update the suite in allSuites map
-            this.allSuites = produce(this.allSuites, draft => {
-                // Navigate to the suite and update it
-                updateSuiteInMap(draft, test.path.slice(0, -1), test);
-            });
-
             // Also update the reference in topLevelSuite.subSuites
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 updateSuiteInMap(draft.subSuites, test.path.slice(0, -1), test);
@@ -226,11 +220,6 @@ class Suites {
             }
         };
 
-        // Update allSuites
-        this.allSuites = produce(this.allSuites, draft => {
-            updateCountersRecursively(draft, suitePath);
-        });
-
         // Update topLevelSuite.subSuites
         this.topLevelSuite = produce(this.topLevelSuite, draft => {
             updateCountersRecursively(draft.subSuites, suitePath);
@@ -258,7 +247,7 @@ class Suites {
 
 
         //
-        // Step 2: If parent suite is the top level suite,
+        // Step 2: If parent suite is the top level suite, add it directly
         //
 
         if (parentSuite === this.topLevelSuite) {
@@ -270,36 +259,10 @@ class Suites {
 
 
         //
-        // Step 3: If not,
+        // Step 3: If not, add to the current parent suite
         //
 
-        const addSuiteToMap = (suitesMap: Map<string, Suite>, targetParent: Suite, suiteName: string, newSuite: Suite) => {
-            for (const [key, suite] of suitesMap) {
-                if (suite === targetParent) {
-                    // Found the parent - create updated version with new suite
-                    const updatedParent: Suite = {
-                        name: suite.name,
-                        tests: suite.tests,
-                        subSuites: new Map(suite.subSuites).set(suiteName, newSuite),
-                        aggregateData: suite.aggregateData
-                    };
-                    suitesMap.set(key, freeze(updatedParent, true));
-                    return;
-                }
-
-                // Recursively search in nested suites
-                addSuiteToMap(suite.subSuites, targetParent, suiteName, newSuite);
-            }
-        }
-
-        // Update nested suite structure
-        this.allSuites = produce(this.allSuites, draft => {
-            addSuiteToMap(draft, parentSuite, suiteName, newSuite);
-        });
-
-        this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            addSuiteToMap(draft.subSuites, parentSuite, suiteName, newSuite);
-        });
+        // Update nested suite structure (TODO)
 
         return newSuite;
     }
