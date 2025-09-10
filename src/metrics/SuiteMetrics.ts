@@ -54,8 +54,9 @@ class SuiteMetrics extends BaseSuiteMetrics {
 
         this.activeTest = {
             testPath: path,
-            startTime: microtime.now()
+            startTime: -1
         };
+        this.activeTest.startTime = microtime.now() // Get at the last moment for highest accuracy
     }
 
     /**
