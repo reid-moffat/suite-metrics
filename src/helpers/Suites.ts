@@ -70,7 +70,8 @@ class Suites {
     public addTest(testPath: string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
 
-        const test: Test = freeze({
+        // Create test object and freeze recursively to block modification
+        const testData: Test = {
             name: testPath[testPath.length - 1],
             startTimestamp: startTime,
             endTimestamp: endTime,
@@ -78,7 +79,8 @@ class Suites {
             testNumber: this.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
-        });
+        };
+        const test: Test = freeze(testData, true);
 
         // Invalidate sorted cache
         this.orderedTestsValid = false;
