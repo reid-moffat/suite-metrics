@@ -3,7 +3,6 @@ import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 import { E_CANCELED, E_TIMEOUT, Mutex, withTimeout } from 'async-mutex';
 import { Test } from "../types/structures.ts";
 
-
 // Path segments joined with '::'
 type TestKey = string;
 
@@ -23,7 +22,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private static _instance: ConcurrentSuiteMetrics | null = null;
 
     // Stores key (joined path) and start time for each active test
-    private readonly activeTests: Map<TestKey, StartTime> = new Map<string, number>();
+    private readonly activeTests: Map<TestKey, StartTime> = new Map();
 
     // Mutexes for the lazy singleton and for any specific instance
     private static readonly instanceMutex = withTimeout(new Mutex(), 100);
