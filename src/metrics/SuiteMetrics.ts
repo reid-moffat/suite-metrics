@@ -3,7 +3,7 @@ import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
 import { Test } from "../types/structures.ts";
 
 // Metadata for the currently running test
-type TestMetadata = { testPath: string[]; startTime: number; };
+type TestMetadata = { testPath: readonly string[]; startTime: number; };
 
 /**
  * Provides metrics for tests and test suites
@@ -44,7 +44,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Note: Only one test may be active at a time. For multiple concurrent tests, use ConcurrentSuiteMetrics
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public startTest(path: string[]): void {
+    public startTest(path: readonly string[]): void {
         if (this.activeTest !== null) {
             throw new Error('Only one test may run at a time with SuiteMetrics. Call stopTest() first before ' +
                 'starting a new test, or use ConcurrentSuiteMetrics to run multiple tests simultaneously');
