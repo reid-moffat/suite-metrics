@@ -1,5 +1,4 @@
 import { Test } from "../types/structures.ts";
-import Utils from "../helpers/Utils.ts";
 import Suites from "../helpers/Suites.ts";
 
 /**
