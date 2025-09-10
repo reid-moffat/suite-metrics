@@ -102,6 +102,8 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             release = await this.testMutex.acquire();
 
             // Validate path and ensure test isn't already completed
+            BaseSuiteMetrics.validatePath(path, true);
+
             const testExists: boolean = this.queries.testExists(path);
             if (testExists) {
                 throw new Error(`Test ${BaseSuiteMetrics.pathToString(path)} already exists`);
