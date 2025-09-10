@@ -23,7 +23,6 @@ class Queries {
      * @returns true if the suite exists, false if not
      */
     public suiteExists(suitePath: readonly string[]): boolean {
-        BaseSuiteMetrics.validatePath(suitePath, false);
         return this.pathExists(suitePath, false);
     }
 
@@ -34,7 +33,6 @@ class Queries {
      * @returns true if the suite exists, false if not
      */
     public testExists(testPath: readonly string[]): boolean {
-        BaseSuiteMetrics.validatePath(testPath, true);
         return this.pathExists(testPath, true);
     }
 
