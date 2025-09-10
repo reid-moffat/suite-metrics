@@ -141,13 +141,13 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public async stopTest(path: string[]): Promise<Test> {
-        const endTime: number = microtime.now();
-        let release: (() => void) | null = null;
+        const endTime: number = microtime.now(); // Get immediately for highest accuracy
+        BaseSuiteMetrics.validatePath(path, true);
 
+        let release: (() => void) | null = null;
         try {
             release = await this.testMutex.acquire();
 
-            BaseSuiteMetrics.validatePath(path, true);
             const testKey: string = this.createTestKey(path);
 
             // Verify test exists

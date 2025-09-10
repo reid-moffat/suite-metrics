@@ -62,7 +62,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Stops timing the currently active test, storing the test information
      */
     public stopTest(): Test {
-        const endTime: number = microtime.now();
+        const endTime: number = microtime.now(); // Get immediately for highest accuracy
 
         if (this.activeTest === null) {
             throw new Error('No test is currently running. Call startTest() first to begin a test');
