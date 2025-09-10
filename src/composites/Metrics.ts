@@ -1,7 +1,6 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
-import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 
 /**
  * Methods for calculating overall test metrics
@@ -68,7 +67,6 @@ class Metrics {
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
     public getSuiteMetrics(path: readonly string[]): SuiteData {
-        BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.suites.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite

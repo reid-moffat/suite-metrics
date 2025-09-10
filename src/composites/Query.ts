@@ -46,8 +46,6 @@ class Queries {
      * @throws Error if the Suite path doesn't exist
      */
     public getSuite(path: readonly string[]): Suite {
-        BaseSuiteMetrics.validatePath(path, false);
-
         const suite: Suite = this.suites.navigateToSuite(path);
         return Utils.deepCopySuite(suite);
     }
@@ -60,7 +58,6 @@ class Queries {
      * @throws Error If the test path doesn't exist
      */
     public getTest(path: readonly string[]): Test {
-        BaseSuiteMetrics.validatePath(path, true);
         const suite: Suite = this.suites.navigateToSuite(path, { isTestPath: true });
         const testName: string = path[path.length - 1];
 
@@ -79,8 +76,6 @@ class Queries {
      * @returns An array of all sub-suites directly in this suite (not recursive)
      */
     public getSuiteNames(path: readonly string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, false);
-
         const suite: Suite = this.suites.navigateToSuite(path);
         return Array.from(suite.subSuites.keys());
     }
@@ -92,8 +87,6 @@ class Queries {
      * @returns An array of all tests in this suite (not including sub-suites)
      */
     public getTestNames(path: readonly string[]): string[] {
-        BaseSuiteMetrics.validatePath(path, false);
-
         const suite: Suite = this.suites.navigateToSuite(path);
         return Array.from(suite.tests.keys());
     }

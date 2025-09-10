@@ -105,6 +105,7 @@ class Suites {
      */
     public navigateToSuite(path: readonly string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
+        BaseSuiteMetrics.validatePath(path, isTestPath);
         const loopLength: number = path.length + (isTestPath ? -1 : 0);
 
         // Loop through suite path, creating undefined suites if necessary (or throwing an error)
