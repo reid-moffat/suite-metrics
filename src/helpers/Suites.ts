@@ -7,7 +7,7 @@ import { freeze, produce, castDraft, WritableDraft } from 'immer';
  */
 class Suites {
 
-    // All suite and test data
+    // All suite and test data (child of )
     private allSuites: Map<string, Suite> = new Map<string, Suite>();
 
     // Top-level suite makes top-level metrics and functions easier to handle
@@ -248,10 +248,13 @@ class Suites {
     }
 
     /**
-     * Adds a new suite to its parent
+     * Adds a new suite to its parent, updating any required stats
      */
     private addSuite(parentSuite: Suite, suiteName: string): Suite {
-        // Create and add suite
+        //
+        // Step 1: Create and freeze suite
+        //
+
         const suiteData: Suite = {
             name: suiteName,
             tests: new Map<string, Test>(),
@@ -263,40 +266,52 @@ class Suites {
         };
         const newSuite: Suite = freeze(suiteData, true);
 
+
+        //
+        // Step 2: If parent suite is the top level suite,
+        //
+
         if (parentSuite === this.topLevelSuite) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(suiteName, castDraft(newSuite));
             });
             this.allSuites.set(suiteName, newSuite);
-        } else {
-            const addSuiteToMap = (suitesMap: Map<string, Suite>, targetParent: Suite, suiteName: string, newSuite: Suite) => {
-                for (const [key, suite] of suitesMap) {
-                    if (suite === targetParent) {
-                        // Found the parent - create updated version with new suite
-                        const updatedParent: Suite = {
-                            name: suite.name,
-                            tests: suite.tests,
-                            subSuites: new Map(suite.subSuites).set(suiteName, newSuite),
-                            aggregateData: suite.aggregateData
-                        };
-                        suitesMap.set(key, freeze(updatedParent, true));
-                        return;
-                    }
 
-                    // Recursively search in nested suites
-                    addSuiteToMap(suite.subSuites, targetParent, suiteName, newSuite);
-                }
-            }
-
-            // Update nested suite structure
-            this.allSuites = produce(this.allSuites, draft => {
-                addSuiteToMap(draft, parentSuite, suiteName, newSuite);
-            });
-
-            this.topLevelSuite = produce(this.topLevelSuite, draft => {
-                addSuiteToMap(draft.subSuites, parentSuite, suiteName, newSuite);
-            });
+            return newSuite;
         }
+
+
+        //
+        // Step 3: If not,
+        //
+
+        const addSuiteToMap = (suitesMap: Map<string, Suite>, targetParent: Suite, suiteName: string, newSuite: Suite) => {
+            for (const [key, suite] of suitesMap) {
+                if (suite === targetParent) {
+                    // Found the parent - create updated version with new suite
+                    const updatedParent: Suite = {
+                        name: suite.name,
+                        tests: suite.tests,
+                        subSuites: new Map(suite.subSuites).set(suiteName, newSuite),
+                        aggregateData: suite.aggregateData
+                    };
+                    suitesMap.set(key, freeze(updatedParent, true));
+                    return;
+                }
+
+                // Recursively search in nested suites
+                addSuiteToMap(suite.subSuites, targetParent, suiteName, newSuite);
+            }
+        }
+
+        // Update nested suite structure
+        this.allSuites = produce(this.allSuites, draft => {
+            addSuiteToMap(draft, parentSuite, suiteName, newSuite);
+        });
+
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            addSuiteToMap(draft.subSuites, parentSuite, suiteName, newSuite);
+        });
 
         return newSuite;
     }
