@@ -196,11 +196,17 @@ class Suites {
             // This is our target suite - update it within the current produce context
             const suite = suitesMap.get(currentSuiteName);
             if (suite) {
-                // Don't call produce() here - we're already inside a produce() call
-                // Just update the draft directly
-                const updatedSuite = { ...suite };
-                updatedSuite.tests = new Map(suite.tests);
-                updatedSuite.tests.set(test.name, test);
+                // Create new suite with updated tests map
+                const newTests = new Map(suite.tests);
+                newTests.set(test.name, test);
+
+                const updatedSuite: Suite = {
+                    name: suite.name,
+                    tests: newTests,
+                    subSuites: suite.subSuites,
+                    aggregateData: suite.aggregateData
+                };
+
                 suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
             }
         } else {
