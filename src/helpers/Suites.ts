@@ -1,5 +1,6 @@
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
+import { freeze } from 'immer';
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
