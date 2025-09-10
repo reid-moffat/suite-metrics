@@ -154,15 +154,48 @@ class Suites {
                 draft.tests.set(test.name, castDraft(test));
             });
         } else {
+            const updateSuiteInMap = (suitesMap: Map<string, Suite>, suitePath: readonly string[], test: Test) => {
+                if (suitePath.length === 0) {
+                    return;
+                }
+
+                const [currentSuiteName, ...remainingPath] = suitePath;
+
+                if (remainingPath.length === 0) {
+                    // This is our target suite - update it within the current produce context
+                    const suite = suitesMap.get(currentSuiteName);
+                    if (suite) {
+                        // Create new suite with updated tests map
+                        const newTests = new Map(suite.tests);
+                        newTests.set(test.name, test);
+
+                        const updatedSuite: Suite = {
+                            name: suite.name,
+                            tests: newTests,
+                            subSuites: suite.subSuites,
+                            aggregateData: suite.aggregateData
+                        };
+
+                        suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
+                    }
+                } else {
+                    // Keep navigating deeper
+                    const suite = suitesMap.get(currentSuiteName);
+                    if (suite) {
+                        updateSuiteInMap(suite.subSuites, remainingPath, test);
+                    }
+                }
+            }
+
             // Update the suite in allSuites map
             this.allSuites = produce(this.allSuites, draft => {
                 // Navigate to the suite and update it
-                this.updateSuiteInMap(draft, test.path.slice(0, -1), test);
+                updateSuiteInMap(draft, test.path.slice(0, -1), test);
             });
 
             // Also update the reference in topLevelSuite.subSuites
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
-                this.updateSuiteInMap(draft.subSuites, test.path.slice(0, -1), test);
+                updateSuiteInMap(draft.subSuites, test.path.slice(0, -1), test);
             });
         }
 
@@ -212,42 +245,6 @@ class Suites {
         this.topLevelSuite = produce(this.topLevelSuite, draft => {
             updateCountersRecursively(draft.subSuites, suitePath);
         });
-    }
-
-    /**
-     * Helper to recursively find and update a suite in a map structure
-     */
-    private updateSuiteInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[], test: Test): void {
-        if (suitePath.length === 0) {
-            return;
-        }
-
-        const [currentSuiteName, ...remainingPath] = suitePath;
-
-        if (remainingPath.length === 0) {
-            // This is our target suite - update it within the current produce context
-            const suite = suitesMap.get(currentSuiteName);
-            if (suite) {
-                // Create new suite with updated tests map
-                const newTests = new Map(suite.tests);
-                newTests.set(test.name, test);
-
-                const updatedSuite: Suite = {
-                    name: suite.name,
-                    tests: newTests,
-                    subSuites: suite.subSuites,
-                    aggregateData: suite.aggregateData
-                };
-
-                suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
-            }
-        } else {
-            // Keep navigating deeper
-            const suite = suitesMap.get(currentSuiteName);
-            if (suite) {
-                this.updateSuiteInMap(suite.subSuites, remainingPath, test);
-            }
-        }
     }
 
     /**
