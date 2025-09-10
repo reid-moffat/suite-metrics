@@ -186,20 +186,29 @@ class Suites {
      * Helper to recursively find and update a suite in a map structure
      */
     private updateSuiteInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[], test: Test): void {
-        if (suitePath.length === 0) return;
+        if (suitePath.length === 0) {
+            return;
+        }
 
         const [currentSuiteName, ...remainingPath] = suitePath;
-        const suite: Suite | undefined = suitesMap.get(currentSuiteName);
 
-        if (suite && remainingPath.length === 0) {
-            // This is our target suite - add the test
-            const updatedSuite: Suite = produce(suite, draft => {
-                draft.tests.set(test.name, castDraft(test));
-            });
-            suitesMap.set(currentSuiteName, updatedSuite);
-        } else if (suite && remainingPath.length > 0) {
+        if (remainingPath.length === 0) {
+            // This is our target suite - update it within the current produce context
+            const suite = suitesMap.get(currentSuiteName);
+            if (suite) {
+                // Don't call produce() here - we're already inside a produce() call
+                // Just update the draft directly
+                const updatedSuite = { ...suite };
+                updatedSuite.tests = new Map(suite.tests);
+                updatedSuite.tests.set(test.name, test);
+                suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
+            }
+        } else {
             // Keep navigating deeper
-            this.updateSuiteInMap(suite.subSuites, remainingPath, test);
+            const suite = suitesMap.get(currentSuiteName);
+            if (suite) {
+                this.updateSuiteInMap(suite.subSuites, remainingPath, test);
+            }
         }
     }
 
@@ -232,50 +241,43 @@ class Suites {
             draft.aggregateData.totalTestTime += duration;
         });
 
-        // Update each parent suite in the hierarchy
-        const suitePath: readonly string[] = testPath.slice(0, -1);
-        if (suitePath.length === 0) {
-            return;
-        }
+        const suitePath = testPath.slice(0, -1);
+        if (suitePath.length === 0) return;
 
-        const updateSuiteCountersInMap = (suitesMap: Map<string, Suite>, suitePath: readonly string[], duration: number) => {
-            const findSuiteInMap = (suitesMap: Map<string, Suite>, suitePath: readonly string[]) => {
-                if (suitePath.length === 0) return undefined;
+        // Helper function to update counters recursively
+        const updateCountersRecursively = (suitesMap: Map<string, Suite>, path: readonly string[], depth: number = 0) => {
+            if (depth >= path.length) return;
 
-                let currentSuite: Suite | undefined = suitesMap.get(suitePath[0]);
-                for (let i: number = 1; i < suitePath.length && currentSuite; i++) {
-                    currentSuite = currentSuite.subSuites.get(suitePath[i]);
-                }
+            const suiteName = path[depth];
+            const suite = suitesMap.get(suiteName);
 
-                return currentSuite;
-            }
-
-            for (let i: number = 0; i < suitePath.length; i++) {
-                const currentPath: readonly string[] = suitePath.slice(0, i + 1);
-                const suiteName: string = currentPath[currentPath.length - 1];
-                const suite: Suite | undefined = findSuiteInMap(suitesMap, currentPath);
-
-                if (suite) {
-                    const updatedSuite: Suite = produce(suite, (draft: WritableDraft<Suite>) => {
-                        draft.aggregateData.numTests++;
-                        draft.aggregateData.totalTestTime += duration;
-                    });
-
-                    if (currentPath.length === 1) {
-                        suitesMap.set(suiteName, updatedSuite);
+            if (suite) {
+                // Create updated suite with new counters
+                const updatedSuite = {
+                    ...suite,
+                    aggregateData: {
+                        numTests: suite.aggregateData.numTests + 1,
+                        totalTestTime: suite.aggregateData.totalTestTime + duration
                     }
+                };
+
+                suitesMap.set(suiteName, freeze(updatedSuite, true));
+
+                // Continue to nested suites
+                if (depth + 1 < path.length) {
+                    updateCountersRecursively(updatedSuite.subSuites, path, depth + 1);
                 }
             }
-        }
+        };
 
-        // Update allSuites map
+        // Update allSuites
         this.allSuites = produce(this.allSuites, draft => {
-            updateSuiteCountersInMap(draft, suitePath, duration);
+            updateCountersRecursively(draft, suitePath);
         });
 
         // Update topLevelSuite.subSuites
         this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            updateSuiteCountersInMap(draft.subSuites, suitePath, duration);
+            updateCountersRecursively(draft.subSuites, suitePath);
         });
     }
 }
