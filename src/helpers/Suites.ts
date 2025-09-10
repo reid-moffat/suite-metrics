@@ -233,13 +233,7 @@ class Suites {
         });
 
         // Update each parent suite in the hierarchy
-        this.updateParentSuiteCounters(testPath.slice(0, -1), duration);
-    }
-
-    /**
-     * Helper to update counters for parent suites
-     */
-    private updateParentSuiteCounters(suitePath: readonly string[], duration: number): void {
+        const suitePath: readonly string[] = testPath.slice(0, -1);
         if (suitePath.length === 0) {
             return;
         }
