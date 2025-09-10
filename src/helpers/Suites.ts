@@ -1,6 +1,6 @@
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
-import { freeze, produce } from 'immer';
+import { freeze, produce, castDraft } from 'immer';
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
@@ -166,7 +166,7 @@ class Suites {
         // Find and update the suite in our data structures
         if (suite === this.topLevelSuite) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
-                draft.tests.set(test.name, test);
+                draft.tests.set(test.name, castDraft(test));
             });
         } else {
             // Update the suite in allSuites map
@@ -194,7 +194,7 @@ class Suites {
         if (suite && remainingPath.length === 0) {
             // This is our target suite - add the test
             const updatedSuite: Suite = produce(suite, draft => {
-                draft.tests.set(test.name, test);
+                draft.tests.set(test.name, castDraft(test));
             });
             suitesMap.set(currentSuiteName, updatedSuite);
         } else if (suite && remainingPath.length > 0) {
@@ -209,7 +209,7 @@ class Suites {
     private addSuiteToParent(parentSuite: Suite, suiteName: string, newSuite: Suite): void {
         if (parentSuite === this.topLevelSuite) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
-                draft.subSuites.set(suiteName, newSuite);
+                draft.subSuites.set(suiteName, castDraft(newSuite));
             });
             // Also update allSuites
             this.allSuites.set(suiteName, newSuite);
