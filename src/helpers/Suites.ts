@@ -105,19 +105,18 @@ class Suites {
      */
     public navigateToSuite(path: readonly string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
-        const suitePath: readonly string[] = isTestPath ? path.slice(0, -1) : path;
-
-        let currentSuite: Suite = this.topLevelSuite;
+        const loopLength: number = path.length + (isTestPath ? -1 : 0);
 
         // Loop through suite path, creating undefined suites if necessary (or throwing an error)
-        for (const suiteName of suitePath) {
-            let targetSuite: Suite | undefined = currentSuite.subSuites.get(suiteName);
+        let currentSuite: Suite = this.topLevelSuite;
+        for (let i: number = 0; i < loopLength; ++i) {
+            let targetSuite: Suite | undefined = currentSuite.subSuites.get(path[i]);
             if (targetSuite === undefined) {
                 if (!createIfMissing) {
-                    throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(suitePath)} does not exist`);
+                    throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(path)} does not exist (suite '${path[i]}' is not defined)`);
                 }
 
-                targetSuite = this.addSuite(currentSuite, suiteName);
+                targetSuite = this.addSuite(currentSuite, path[i]);
             }
             currentSuite = targetSuite;
         }
