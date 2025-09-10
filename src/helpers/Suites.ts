@@ -70,7 +70,7 @@ class Suites {
     public addTest(testPath: string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
 
-        const test: Test = {
+        const test: Test = freeze({
             name: testPath[testPath.length - 1],
             startTimestamp: startTime,
             endTimestamp: endTime,
@@ -78,7 +78,7 @@ class Suites {
             testNumber: this.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
-        };
+        });
 
         // Once a test is added, no modification are required (prevent external modification)
         Object.freeze(test);
