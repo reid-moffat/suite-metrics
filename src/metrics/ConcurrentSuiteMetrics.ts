@@ -94,7 +94,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async startTest(path: string[]): Promise<void> {
+    public async startTest(path: readonly string[]): Promise<void> {
         BaseSuiteMetrics.validatePath(path, true);
 
         let release: (() => void) | null = null;
@@ -139,7 +139,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
-    public async stopTest(path: string[]): Promise<Test> {
+    public async stopTest(path: readonly string[]): Promise<Test> {
         const endTime: number = microtime.now(); // Get immediately for highest accuracy
         BaseSuiteMetrics.validatePath(path, true);
 
@@ -184,7 +184,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
      */
-    private createTestKey(testPath: string[]): string {
+    private createTestKey(testPath: readonly string[]): string {
         return testPath.join('::');
     }
 }
