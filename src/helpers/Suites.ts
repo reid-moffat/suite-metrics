@@ -1,6 +1,6 @@
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
-import { freeze, produce, castDraft } from 'immer';
+import { freeze, produce, castDraft, WritableDraft } from 'immer';
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
@@ -254,13 +254,24 @@ class Suites {
      * Recursively update counters in a suite map
      */
     private updateSuiteCountersInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[], duration: number): void {
-        for (let i = 0; i < suitePath.length; i++) {
-            const currentPath = suitePath.slice(0, i + 1);
-            const suiteName = currentPath[currentPath.length - 1];
-            const suite = this.findSuiteInMap(suitesMap, currentPath);
+        const findSuiteInMap = (suitesMap: Map<string, Suite>, suitePath: readonly string[]) => {
+            if (suitePath.length === 0) return undefined;
+
+            let currentSuite: Suite | undefined = suitesMap.get(suitePath[0]);
+            for (let i: number = 1; i < suitePath.length && currentSuite; i++) {
+                currentSuite = currentSuite.subSuites.get(suitePath[i]);
+            }
+
+            return currentSuite;
+        }
+
+        for (let i: number = 0; i < suitePath.length; i++) {
+            const currentPath: readonly string[] = suitePath.slice(0, i + 1);
+            const suiteName: string = currentPath[currentPath.length - 1];
+            const suite: Suite | undefined = findSuiteInMap(suitesMap, currentPath);
 
             if (suite) {
-                const updatedSuite = produce(suite, draft => {
+                const updatedSuite: Suite = produce(suite, (draft: WritableDraft<Suite>) => {
                     draft.aggregateData.numTests++;
                     draft.aggregateData.totalTestTime += duration;
                 });
@@ -270,20 +281,6 @@ class Suites {
                 }
             }
         }
-    }
-
-    /**
-     * Helper to find a suite in nested map structure
-     */
-    private findSuiteInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[]): Suite | undefined {
-        if (suitePath.length === 0) return undefined;
-
-        let currentSuite = suitesMap.get(suitePath[0]);
-        for (let i = 1; i < suitePath.length && currentSuite; i++) {
-            currentSuite = currentSuite.subSuites.get(suitePath[i]);
-        }
-
-        return currentSuite;
     }
 }
 
