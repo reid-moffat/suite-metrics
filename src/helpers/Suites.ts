@@ -121,7 +121,7 @@ class Suites {
             currentSuite = targetSuite;
         }
 
-        // The final, depeest suite
+        // The final, deepest suite
         return currentSuite;
     }
 
