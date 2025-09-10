@@ -109,6 +109,7 @@ class Suites {
 
         let currentSuite: Suite = this.topLevelSuite;
 
+        // Loop through suite path, creating undefined suites if necessary (or throwing an error)
         for (const suiteName of suitePath) {
             let targetSuite: Suite | undefined = currentSuite.subSuites.get(suiteName);
             if (targetSuite === undefined) {
@@ -116,23 +117,12 @@ class Suites {
                     throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(suitePath)} does not exist`);
                 }
 
-                // Create and add suite
-                const suiteData: Suite = {
-                    name: suiteName,
-                        tests: new Map<string, Test>(),
-                        subSuites: new Map<string, Suite>(),
-                        aggregateData: {
-                        numTests: 0,
-                            totalTestTime: 0
-                    }
-                };
-                targetSuite = freeze(suiteData, true);
-
-                this.addSuiteToParent(currentSuite, suiteName, targetSuite);
+                targetSuite = this.addSuite(currentSuite, suiteName);
             }
             currentSuite = targetSuite;
         }
 
+        // The final, depeest suite
         return currentSuite;
     }
 
@@ -221,7 +211,19 @@ class Suites {
     /**
      * Adds a new suite to its parent
      */
-    private addSuiteToParent(parentSuite: Suite, suiteName: string, newSuite: Suite): void {
+    private addSuite(parentSuite: Suite, suiteName: string): Suite {
+        // Create and add suite
+        const suiteData: Suite = {
+            name: suiteName,
+            tests: new Map<string, Test>(),
+            subSuites: new Map<string, Suite>(),
+            aggregateData: {
+                numTests: 0,
+                totalTestTime: 0
+            }
+        };
+        const newSuite: Suite = freeze(suiteData, true);
+
         if (parentSuite === this.topLevelSuite) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(suiteName, castDraft(newSuite));
@@ -232,6 +234,8 @@ class Suites {
             // Update nested suite structure - this is more complex and would need
             // similar recursive updating as updateSuiteWithTest
         }
+
+        return newSuite;
     }
 
     /**
