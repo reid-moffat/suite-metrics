@@ -228,11 +228,35 @@ class Suites {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(suiteName, castDraft(newSuite));
             });
-            // Also update allSuites
             this.allSuites.set(suiteName, newSuite);
         } else {
-            // Update nested suite structure - this is more complex and would need
-            // similar recursive updating as updateSuiteWithTest
+            const addSuiteToMap = (suitesMap: Map<string, Suite>, targetParent: Suite, suiteName: string, newSuite: Suite) => {
+                for (const [key, suite] of suitesMap) {
+                    if (suite === targetParent) {
+                        // Found the parent - create updated version with new suite
+                        const updatedParent: Suite = {
+                            name: suite.name,
+                            tests: suite.tests,
+                            subSuites: new Map(suite.subSuites).set(suiteName, newSuite),
+                            aggregateData: suite.aggregateData
+                        };
+                        suitesMap.set(key, freeze(updatedParent, true));
+                        return;
+                    }
+
+                    // Recursively search in nested suites
+                    addSuiteToMap(suite.subSuites, targetParent, suiteName, newSuite);
+                }
+            }
+
+            // Update nested suite structure
+            this.allSuites = produce(this.allSuites, draft => {
+                addSuiteToMap(draft, parentSuite, suiteName, newSuite);
+            });
+
+            this.topLevelSuite = produce(this.topLevelSuite, draft => {
+                addSuiteToMap(draft.subSuites, parentSuite, suiteName, newSuite);
+            });
         }
 
         return newSuite;
