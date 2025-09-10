@@ -6,9 +6,9 @@
 type Test = {
     /** The test's name. Determined during startTest(), this is unique for the suite it's in */
     readonly name: string;
-    /** Timestamp the test began, in microseconds. Obtained at the end of startTest() for maximal accuracy */
+    /** Timestamp the test began (microseconds since epoch). Obtained at the end of startTest() for maximal accuracy */
     readonly startTimestamp: number;
-    /** Timestamp the test ended at, in microseconds. Obtained at the beginning of stopTest() for maximal accuracy */
+    /** Timestamp the test ended at (microseconds since epoch). Obtained at the beginning of stopTest() for maximal accuracy */
     readonly endTimestamp: number;
     /** Duration the test took, in microseconds. Equal to endTimestamp - startTimestamp */
     readonly duration: number;
