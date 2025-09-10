@@ -67,7 +67,7 @@ class Metrics {
      * @param path Path to the desired suite for, e.g. ['suite 1', 'sub-suite 2']. Top-level suite ([]) allowed
      * @returns An object with suite metadata, and metrics for direct & subtests
      */
-    public getSuiteMetrics(path: string[]): SuiteData {
+    public getSuiteMetrics(path: readonly string[]): SuiteData {
         BaseSuiteMetrics.validatePath(path, false);
         const suite: Suite = this.suites.navigateToSuite(path);
 
