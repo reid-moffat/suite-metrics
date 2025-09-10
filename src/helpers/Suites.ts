@@ -102,7 +102,7 @@ class Suites {
                     throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(path)} does not exist (suite '${path[i]}' is not defined)`);
                 }
 
-                targetSuite = this.addSuite(currentSuite, path[i]);
+                targetSuite = this.addSuite(path, path[i]);
             }
             currentSuite = targetSuite;
         }
@@ -229,7 +229,7 @@ class Suites {
     /**
      * Adds a new suite to its parent, updating any required stats
      */
-    private addSuite(parentSuite: Suite, suiteName: string): Suite {
+    private addSuite(suitePath: readonly string[], suiteName: string): Suite {
         //
         // Step 1: Create and freeze suite
         //
@@ -250,7 +250,7 @@ class Suites {
         // Step 2: If parent suite is the top level suite, add it directly
         //
 
-        if (parentSuite === this.topLevelSuite) {
+        if (suitePath.length === 0) {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(suiteName, castDraft(newSuite));
             });
@@ -262,7 +262,37 @@ class Suites {
         // Step 3: If not, add to the current parent suite
         //
 
-        // Update nested suite structure (TODO)
+        // Adding to nested suite
+        const updateSuiteAtPath = (suitesMap: Map<string, Suite>, path: readonly string[], depth: number = 0) => {
+            if (depth >= path.length) {
+                // We've reached the target parent - add the new suite
+                suitesMap.set(suiteName, newSuite);
+                return;
+            }
+
+            const currentSuiteName = path[depth];
+            const currentSuite = suitesMap.get(currentSuiteName);
+
+            if (currentSuite) {
+                if (depth === path.length - 1) {
+                    // This is our target parent suite
+                    const updatedSuite: Suite = {
+                        name: currentSuite.name,
+                        tests: currentSuite.tests,
+                        subSuites: new Map(currentSuite.subSuites).set(suiteName, newSuite),
+                        aggregateData: currentSuite.aggregateData
+                    };
+                    suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
+                } else {
+                    // Keep going deeper
+                    updateSuiteAtPath(currentSuite.subSuites, path, depth + 1);
+                }
+            }
+        };
+
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            updateSuiteAtPath(draft.subSuites, suitePath);
+        });
 
         return newSuite;
     }
