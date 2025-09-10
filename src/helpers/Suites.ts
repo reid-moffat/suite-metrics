@@ -1,6 +1,6 @@
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
-import { freeze } from 'immer';
+import { freeze, produce } from 'immer';
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
@@ -8,10 +8,10 @@ import { freeze } from 'immer';
 class Suites {
 
     // All suite and test data
-    private readonly allSuites: Map<string, Suite> = new Map<string, Suite>();
+    private allSuites: Map<string, Suite> = new Map<string, Suite>();
 
     // Top-level suite makes top-level metrics and functions easier to handle
-    private readonly topLevelSuite: Suite = {
+    private topLevelSuite: Suite = freeze({
         name: "<Top-Level suite>",
         tests: new Map<string, Test>(),
         subSuites: this.allSuites,
@@ -19,7 +19,7 @@ class Suites {
             numTests: 0,
             totalTestTime: 0
         }
-    };
+    }, true);
 
     // All tests in order of insertion
     private readonly testsInInsertionOrder: Test[] = [];
@@ -67,7 +67,7 @@ class Suites {
      * @param endTime Time the test was completed at
      * @returns The created Test object
      */
-    public addTest(testPath: string[], startTime: number, endTime: number): Test {
+    public addTest(testPath: readonly string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
 
         // Create test object and freeze recursively to block modification
@@ -85,8 +85,8 @@ class Suites {
         // Invalidate sorted cache
         this.orderedTestsValid = false;
 
-        // Adds test to its parent suite and updates stats counter
-        suite.tests.set(test.name, test);
+        // Adds test to its parent suite and updates parent counters
+        this.updateSuiteWithTest(suite, test);
         this.updateSubTestCounters(test.path, test.duration);
 
         // Adds to the list of all suites in order
@@ -103,9 +103,9 @@ class Suites {
      * @param options.createIfMissing Set to true to create the suite and all parent suites above it if required (default: false)
      * @param options.isTestPath Set to true if the path is a test (default: false). Will use the test's parent suite
      */
-    public navigateToSuite(path: string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
+    public navigateToSuite(path: readonly string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
-        const suitePath: string[] = isTestPath ? path.slice(0, -1) : path;
+        const suitePath: readonly string[] = isTestPath ? path.slice(0, -1) : path;
 
         let currentSuite: Suite = this.topLevelSuite;
 
@@ -116,20 +116,19 @@ class Suites {
                     throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(suitePath)} does not exist`);
                 }
 
-                targetSuite = {
+                // Create and add suite
+                const suiteData: Suite = {
                     name: suiteName,
-                    tests: new Map<string, Test>(),
-                    subSuites: new Map<string, Suite>(),
-                    aggregateData: {
+                        tests: new Map<string, Test>(),
+                        subSuites: new Map<string, Suite>(),
+                        aggregateData: {
                         numTests: 0,
-                        totalTestTime: 0
+                            totalTestTime: 0
                     }
                 };
+                targetSuite = freeze(suiteData, true);
 
-                // Prevent modification (except to aggregateData's fields)
-                Object.freeze(targetSuite);
-
-                currentSuite.subSuites.set(suiteName, targetSuite);
+                this.addSuiteToParent(currentSuite, suiteName, targetSuite);
             }
             currentSuite = targetSuite;
         }
@@ -161,27 +160,130 @@ class Suites {
 
 
     /**
+     * Add a test to a suite
+     */
+    private updateSuiteWithTest(suite: Suite, test: Test): void {
+        // Find and update the suite in our data structures
+        if (suite === this.topLevelSuite) {
+            this.topLevelSuite = produce(this.topLevelSuite, draft => {
+                draft.tests.set(test.name, test);
+            });
+        } else {
+            // Update the suite in allSuites map
+            this.allSuites = produce(this.allSuites, draft => {
+                // Navigate to the suite and update it
+                this.updateSuiteInMap(draft, test.path.slice(0, -1), test);
+            });
+
+            // Also update the reference in topLevelSuite.subSuites
+            this.topLevelSuite = produce(this.topLevelSuite, draft => {
+                this.updateSuiteInMap(draft.subSuites, test.path.slice(0, -1), test);
+            });
+        }
+    }
+
+    /**
+     * Helper to recursively find and update a suite in a map structure
+     */
+    private updateSuiteInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[], test: Test): void {
+        if (suitePath.length === 0) return;
+
+        const [currentSuiteName, ...remainingPath] = suitePath;
+        const suite: Suite | undefined = suitesMap.get(currentSuiteName);
+
+        if (suite && remainingPath.length === 0) {
+            // This is our target suite - add the test
+            const updatedSuite: Suite = produce(suite, draft => {
+                draft.tests.set(test.name, test);
+            });
+            suitesMap.set(currentSuiteName, updatedSuite);
+        } else if (suite && remainingPath.length > 0) {
+            // Keep navigating deeper
+            this.updateSuiteInMap(suite.subSuites, remainingPath, test);
+        }
+    }
+
+    /**
+     * Adds a new suite to its parent
+     */
+    private addSuiteToParent(parentSuite: Suite, suiteName: string, newSuite: Suite): void {
+        if (parentSuite === this.topLevelSuite) {
+            this.topLevelSuite = produce(this.topLevelSuite, draft => {
+                draft.subSuites.set(suiteName, newSuite);
+            });
+            // Also update allSuites
+            this.allSuites.set(suiteName, newSuite);
+        } else {
+            // Update nested suite structure - this is more complex and would need
+            // similar recursive updating as updateSuiteWithTest
+        }
+    }
+
+    /**
      * Updates the subtest counter (test #s & time) for all suites above this test (including the direct parent suite)
      *
      * @param testPath Path of the test to update parent suites for
      * @param duration Duration of the test
      */
     private updateSubTestCounters(testPath: readonly string[], duration: number): void {
-        // Add time and counter to top-level suite
-        let currentSuite: Suite = this.topLevelSuite;
-        currentSuite.aggregateData.numTests++;
-        currentSuite.aggregateData.totalTestTime += duration;
+        // Update top-level suite
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            draft.aggregateData.numTests++;
+            draft.aggregateData.totalTestTime += duration;
+        });
+        // Update each parent suite in the hierarchy
+        this.updateParentSuiteCounters(testPath.slice(0, -1), duration);
+    }
 
-        // Add time and counter to each parent suite
-        for (const suiteName of testPath.slice(0, -1)) {
-            currentSuite = currentSuite.subSuites.get(suiteName)!;
-            if (currentSuite === undefined) {
-                throw new Error(`Error updating counters: suite '${suiteName}' not found`);
+    /**
+     * Helper to update counters for parent suites
+     */
+    private updateParentSuiteCounters(suitePath: readonly string[], duration: number): void {
+        if (suitePath.length === 0) return;
+        // Update allSuites map
+        this.allSuites = produce(this.allSuites, draft => {
+            this.updateSuiteCountersInMap(draft, suitePath, duration);
+        });
+        // Update topLevelSuite.subSuites
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            this.updateSuiteCountersInMap(draft.subSuites, suitePath, duration);
+        });
+    }
+
+    /**
+     * Recursively update counters in a suite map
+     */
+    private updateSuiteCountersInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[], duration: number): void {
+        for (let i = 0; i < suitePath.length; i++) {
+            const currentPath = suitePath.slice(0, i + 1);
+            const suiteName = currentPath[currentPath.length - 1];
+            const suite = this.findSuiteInMap(suitesMap, currentPath);
+
+            if (suite) {
+                const updatedSuite = produce(suite, draft => {
+                    draft.aggregateData.numTests++;
+                    draft.aggregateData.totalTestTime += duration;
+                });
+
+                if (currentPath.length === 1) {
+                    suitesMap.set(suiteName, updatedSuite);
+                }
             }
-
-            currentSuite.aggregateData.numTests++;
-            currentSuite.aggregateData.totalTestTime += duration;
         }
+    }
+
+    /**
+     * Helper to find a suite in nested map structure
+     */
+    private findSuiteInMap(suitesMap: Map<string, Suite>, suitePath: readonly string[]): Suite | undefined {
+        if (suitePath.length === 0) return undefined;
+
+        let currentSuite = suitesMap.get(suitePath[0]);
+        for (let i = 1; i < suitePath.length && currentSuite; i++) {
+            currentSuite = currentSuite.subSuites.get(suitePath[i]);
+        }
+
+        return currentSuite;
     }
 }
 
