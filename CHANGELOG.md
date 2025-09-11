@@ -1,5 +1,12 @@
 # suite-metrics
 
+## 2.1.1
+
+### Patch Changes
+
+- ad03bd0: Improved caching for performance metrics (no re-build for fastest tests). Minor wording, documentation, testing, and
+  refactoring updates
+
 ## 2.1.0
 
 ### Minor Changes
@@ -7,19 +14,21 @@
 ae722d4:
 
 Main update:
-* Fully freeze all suite and test data with Immer, preventing all state-breaking external updates
-* Removed unnecessary Suite copying (immutable), significantly improving query performance
-* Made suite aggregateData fields readonly
+
+- Fully freeze all suite and test data with Immer, preventing all state-breaking external updates
+- Removed unnecessary Suite copying (immutable), significantly improving query performance
+- Made suite aggregateData fields readonly
 
 Minor additions:
-* Slight start time accuracy improvement
-* Clarified paths are readonly as parameters
-* Clarified Test start & end times are relative to epoch
-* Added path to Suite object
-* Method documentation improvements
-* Minor error message clarity improvements
-* Minor refactoring for clarity and efficiency
-* Fixed CI/CD testing gaps
+
+- Slight start time accuracy improvement
+- Clarified paths are readonly as parameters
+- Clarified Test start & end times are relative to epoch
+- Added path to Suite object
+- Method documentation improvements
+- Minor error message clarity improvements
+- Minor refactoring for clarity and efficiency
+- Fixed CI/CD testing gaps
 
 ## 2.0.2
 
