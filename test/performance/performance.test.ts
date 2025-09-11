@@ -1,5 +1,6 @@
 import SuiteMetrics from "suite-metrics";
 import { createNestedTestData } from "../generators/testDataHelpers.js";
+import { assert } from "chai";
 
 suite("Performance", function () {
 
@@ -17,7 +18,9 @@ suite("Performance", function () {
 
             const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
 
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            const totalTests: number = metrics.metrics.getTotalTestCount();
+            console.log(`Total tests: ` + totalTests);
+            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
         });
 
         test("Balanced", function() {
@@ -33,7 +36,9 @@ suite("Performance", function () {
 
             const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
 
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            const totalTests: number = metrics.metrics.getTotalTestCount();
+            console.log(`Total tests: ` + totalTests);
+            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
         });
 
         test("Wide & shallow", function() {
@@ -49,7 +54,9 @@ suite("Performance", function () {
 
             const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
 
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            const totalTests: number = metrics.metrics.getTotalTestCount();
+            console.log(`Total tests: ` + totalTests);
+            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
         });
     });
 
