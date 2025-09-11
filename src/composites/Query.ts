@@ -50,7 +50,7 @@ class Queries {
      * Gets the Test at a specific path
      *
      * @param path Path of the desired test, e.g. ['suite 1', 'sub-suite 2', 'test 3']
-     * @returns A copy of the Test object at the given path
+     * @returns The Test object at the given path
      * @throws Error If the test path doesn't exist
      */
     public getTest(path: readonly string[]): Test {
@@ -70,6 +70,7 @@ class Queries {
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
      * @returns An array of all sub-suites directly in this suite (not recursive)
+     * @throws Error if the Suite path doesn't exist
      */
     public getSuiteNames(path: readonly string[]): string[] {
         const suite: Suite = this.suites.navigateToSuite(path);
@@ -80,7 +81,8 @@ class Queries {
      * Returns an array of all the test names in a given suite. Top-level suite ([]) allowed
      *
      * @param path Path to the desired suite, e.g. ['suite 1', 'sub-suite 2']
-     * @returns An array of all tests in this suite (not including sub-suites)
+     * @returns An array of all tests directly in this suite (not including sub-suites)
+     * @throws Error if the Suite path doesn't exist
      */
     public getTestNames(path: readonly string[]): string[] {
         const suite: Suite = this.suites.navigateToSuite(path);

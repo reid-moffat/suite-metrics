@@ -45,7 +45,7 @@ class Suites {
     }
 
     /**
-     * Gets the average completion duration for all tests in this metrics instance
+     * Gets the average completion duration for all tests in this metrics instance (rounded to the nearest microsecond)
      */
     public getAverageTestDuration(): number {
         return Math.round(this.getTopLevelSuite().aggregateData.totalTestTime / this.getNumTests());
@@ -57,7 +57,7 @@ class Suites {
      * @param testPath Path to this test
      * @param startTime Time the test was started at
      * @param endTime Time the test was completed at
-     * @returns The created Test object
+     * @returns The newly created Test object
      */
     public addTest(testPath: readonly string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
@@ -93,10 +93,11 @@ class Suites {
     public navigateToSuite(path: readonly string[], options: { createIfMissing?: boolean; isTestPath?: boolean; } = {}): Suite {
         const { createIfMissing = false, isTestPath = false } = options;
         BaseSuiteMetrics.validatePath(path, isTestPath);
+
+        let currentSuite: Suite = this.topLevelSuite;
         const loopLength: number = path.length + (isTestPath ? -1 : 0);
 
         // Loop through suite path, creating undefined suites if necessary (or throwing an error)
-        let currentSuite: Suite = this.topLevelSuite;
         for (let i: number = 0; i < loopLength; ++i) {
             let targetSuite: Suite | undefined = currentSuite.subSuites.get(path[i]);
             if (targetSuite === undefined) {
