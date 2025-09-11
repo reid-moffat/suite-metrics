@@ -42,8 +42,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        const tests: Test[] = this.suites.getAllTestsSlowestFirst();
-        return tests.slice(0, k);
+        return this.suites.getAllTestsSlowestFirst().slice(0, k);
     }
 
     /**
@@ -84,8 +83,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        const tests: Test[] = this.suites.getAllTestsFastestFirst();
-        return tests.slice(0, k);
+        return this.suites.getAllTestsFastestFirst().slice(0, k);
     }
 
     /**
