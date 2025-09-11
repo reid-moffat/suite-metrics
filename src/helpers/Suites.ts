@@ -258,62 +258,46 @@ class Suites {
             return newSuite;
         }
 
-        // For nested suites, we need to find the path and update the chain
-        // Step 1: Build path from top-level to parent suite
-        const pathToParent: { suite: Suite; childName: string }[] = [];
-
-        const hierarchyRefs: Suite[] = [];
-        let currentSuite: Suite = this.topLevelSuite;
-        let nextIndex: number = 0;
-        while (true) {
-            hierarchyRefs.push(currentSuite);
-
-            const next: Suite | undefined = currentSuite.subSuites.get(suiteName);
-            if (!next) {
-                throw new Error(`Internal error: Suite`);
-            }
-            break;
-        }
-
-        // Find path by searching through the hierarchy
-        const findPath = (suite: Suite, target: Suite, path: { suite: Suite; childName: string }[]): boolean => {
-            if (suite === target) {
-                return true;
-            }
-
-            for (const [childName, childSuite] of suite.subSuites) {
-                path.push({ suite, childName });
-                if (findPath(childSuite, target, path)) {
-                    return true;
+        // For nested suites, we need to update the entire chain from top-level down
+        // Use the parent suite's path to navigate and update
+        const updateNestedSuite = (suitesMap: Map<string, Suite>, pathToParent: readonly string[], depth: number = 0): void => {
+            if (depth >= pathToParent.length) {
+                // We've reached the parent suite - add the new suite
+                const parentName: string = pathToParent[pathToParent.length - 1];
+                const parent: Suite | undefined = suitesMap.get(parentName);
+                if (parent) {
+                    const updatedParent = produce(parent, draft => {
+                        draft.subSuites.set(suiteName, castDraft(newSuite));
+                    });
+                    suitesMap.set(parentName, updatedParent);
                 }
-                path.pop();
+                return;
             }
-            return false;
+
+            const currentSuiteName = pathToParent[depth];
+            const currentSuite = suitesMap.get(currentSuiteName);
+
+            if (currentSuite) {
+                if (depth === pathToParent.length - 1) {
+                    // This is the parent suite - add the new suite to it
+                    const updatedParent = produce(currentSuite, draft => {
+                        draft.subSuites.set(suiteName, castDraft(newSuite));
+                    });
+                    suitesMap.set(currentSuiteName, updatedParent);
+                } else {
+                    // This is an intermediate suite - recursively update its children
+                    const updatedSuite = produce(currentSuite, draft => {
+                        updateNestedSuite(draft.subSuites, pathToParent, depth + 1);
+                    });
+                    suitesMap.set(currentSuiteName, updatedSuite);
+                }
+            }
         };
 
-        if (!findPath(this.topLevelSuite, parentSuite, pathToParent)) {
-            throw new Error("Parent suite not found in hierarchy");
-        }
-
-        // Step 2: Create updated parent suite with new suite added
-        let updatedSuite: Suite = produce(parentSuite, draft => {
-            draft.subSuites.set(suiteName, castDraft(newSuite));
+        // Update the top-level suite
+        this.topLevelSuite = produce(this.topLevelSuite, draft => {
+            updateNestedSuite(draft.subSuites, parentSuite.path);
         });
-
-        // Step 3: Walk back up the chain, updating references
-        for (let i = pathToParent.length - 1; i >= 0; i--) {
-            const { suite: ancestorSuite, childName } = pathToParent[i];
-
-            updatedSuite = produce(ancestorSuite, draft => {
-                draft.subSuites.set(childName, castDraft(updatedSuite));
-            });
-
-            // If we've reached the top-level suite, update the main reference
-            if (ancestorSuite === this.topLevelSuite) {
-                this.topLevelSuite = updatedSuite;
-                break;
-            }
-        }
 
         return newSuite;
     }
