@@ -260,7 +260,14 @@ class Suites {
         }
 
         // For nested suites, we need to update the entire chain from top-level down as refs are immutable
-        const updateNestedSuite = (suitesMap: Map<string, Suite>, pathToParent: readonly string[], depth: number = 0): void => {
+        const updateNestedSuite = (
+            suitesMap: Map<string, Suite>,
+            pathToParent: readonly string[],
+            newSuiteName: string,
+            newSuite: Suite,
+            depth: number = 0
+        ): void => {
+
             // Get the next suite in the hierarchy
             const currentSuiteName: string = pathToParent[depth];
             const currentSuite: Suite | undefined = suitesMap.get(currentSuiteName);
@@ -270,23 +277,17 @@ class Suites {
 
             // Parent suite -> add the new suite to it
             if (depth === pathToParent.length - 1) {
-                const updatedParent: Suite = produce(currentSuite, draft => {
-                    draft.subSuites.set(newSuiteName, castDraft(newSuite));
-                });
-                suitesMap.set(currentSuiteName, updatedParent);
+                currentSuite.subSuites.set(newSuiteName, castDraft(newSuite));
                 return;
             }
 
-            // Intermediate suite -> recursively update its children
-            const updatedSuite: Suite = produce(currentSuite, draft => {
-                updateNestedSuite(draft.subSuites, pathToParent, depth + 1);
-            });
-            suitesMap.set(currentSuiteName, updatedSuite);
-        };
+            // Intermediary suite -> recursively update the next level
+            updateNestedSuite(currentSuite.subSuites, pathToParent, newSuiteName, newSuite, depth + 1);
+        }
 
-        // Update the top-level suite
+        // Start updating from the top-level suite
         this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            updateNestedSuite(draft.subSuites, parentSuite.path);
+            updateNestedSuite(draft.subSuites, parentSuite.path, newSuiteName, newSuite);
         });
 
         return newSuite;
