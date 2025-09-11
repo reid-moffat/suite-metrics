@@ -151,7 +151,14 @@ class Suites {
         // Update sorted cached arrays if required
         if (!this.orderedTestsValid) {
             this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
-            this.allTestsFastestFirst = [...this.allTestsSlowestFirst].reverse();
+
+            // Manual reverse for efficiency
+            const len: number = this.allTestsSlowestFirst.length;
+            const startIndex: number = len - 1;
+            this.allTestsFastestFirst = new Array(len);
+            for (let i: number = 0; i < len; ++i) {
+                this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
+            }
 
             this.orderedTestsValid = true;
         }
