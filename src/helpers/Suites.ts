@@ -102,7 +102,7 @@ class Suites {
                     throw new Error(`Suite path ${BaseSuiteMetrics.pathToString(path)} does not exist (suite '${path[i]}' is not defined)`);
                 }
 
-                targetSuite = this.addSuite(path, path[i]);
+                targetSuite = this.addSuite(currentSuite, path[i]);
             }
             currentSuite = targetSuite;
         }
@@ -227,10 +227,12 @@ class Suites {
     }
 
     /**
-     * Adds a new suite to its parent, updating any required stats
+     * Adds a new (empty) suite to the suite hierarchy
+     *
+     * Only its direct parent needs to be updated (suite added to subSuites) as no tests are added
      */
-    private addSuite(suitePath: readonly string[], suiteName: string): Suite {
-        // First, create and freeze suite
+    private addSuite(parentSuite: Suite, suiteName: string): Suite {
+        // Create and freeze suite
         const suiteData: Suite = {
             name: suiteName,
             tests: new Map<string, Test>(),
@@ -242,41 +244,71 @@ class Suites {
         };
         const newSuite: Suite = freeze(suiteData, true);
 
-        // Helper to update suites
-        const updateSuiteAtPath = (suitesMap: Map<string, Suite>, path: readonly string[], depth: number = 0) => {
+        // If parent is top-level suite, handle insertion directly
+        if (parentSuite === this.topLevelSuite) {
+            this.topLevelSuite = produce(this.topLevelSuite, draft => {
+                draft.subSuites.set(suiteName, castDraft(newSuite));
+            });
 
-            // We've reached the target parent -> add the new suite
-            if (depth === path.length) {
-                suitesMap.set(suiteName, castDraft(newSuite));
-                return;
+            return newSuite;
+        }
+
+        // For nested suites, we need to find the path and update the chain
+        // Step 1: Build path from top-level to parent suite
+        const pathToParent: { suite: Suite; childName: string }[] = [];
+
+        const hierarchyRefs: Suite[] = [];
+        let currentSuite: Suite = this.topLevelSuite;
+        let nextIndex: number = 0;
+        while (true) {
+            hierarchyRefs.push(currentSuite);
+
+            const next: Suite | undefined = currentSuite.subSuites.get(suiteName);
+            if (!next) {
+                throw new Error(`Internal error: Suite`);
+            }
+            break;
+        }
+
+        // Find path by searching through the hierarchy
+        const findPath = (suite: Suite, target: Suite, path: { suite: Suite; childName: string }[]): boolean => {
+            if (suite === target) {
+                return true;
             }
 
-            // Get suite to update
-            const currentSuiteName: string = path[depth];
-            const currentSuite: Suite | undefined = suitesMap.get(currentSuiteName);
-            if (!currentSuite) {
-                throw new Error(`Internal: Cannot get suite ${currentSuiteName} from parent suite ${BaseSuiteMetrics.pathToString(path.slice(0, depth))}`);
+            for (const [childName, childSuite] of suite.subSuites) {
+                path.push({ suite, childName });
+                if (findPath(childSuite, target, path)) {
+                    return true;
+                }
+                path.pop();
             }
-
-            if (depth === path.length - 1) {
-                // Target parent suite
-                const updatedSuite: Suite = {
-                    name: currentSuite.name,
-                    tests: currentSuite.tests,
-                    subSuites: new Map(currentSuite.subSuites).set(suiteName, newSuite),
-                    aggregateData: currentSuite.aggregateData
-                };
-                suitesMap.set(currentSuiteName, freeze(updatedSuite, true));
-            } else {
-                // Keep going deeper
-                updateSuiteAtPath(currentSuite.subSuites, path, depth + 1);
-            }
+            return false;
         };
 
-        // Recursively update suites from the top-level
-        this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            updateSuiteAtPath(draft.subSuites, suitePath);
+        if (!findPath(this.topLevelSuite, parentSuite, pathToParent)) {
+            throw new Error("Parent suite not found in hierarchy");
+        }
+
+        // Step 2: Create updated parent suite with new suite added
+        let updatedSuite: Suite = produce(parentSuite, draft => {
+            draft.subSuites.set(suiteName, castDraft(newSuite));
         });
+
+        // Step 3: Walk back up the chain, updating references
+        for (let i = pathToParent.length - 1; i >= 0; i--) {
+            const { suite: ancestorSuite, childName } = pathToParent[i];
+
+            updatedSuite = produce(ancestorSuite, draft => {
+                draft.subSuites.set(childName, castDraft(updatedSuite));
+            });
+
+            // If we've reached the top-level suite, update the main reference
+            if (ancestorSuite === this.topLevelSuite) {
+                this.topLevelSuite = updatedSuite;
+                break;
+            }
+        }
 
         return newSuite;
     }
