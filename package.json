@@ -42,9 +42,10 @@
   "scripts": {
     "lint": "tsc",
     "build": "tsup src/index.ts --format cjs,esm --dts --minify --clean",
-    "test": "npm run build && cross-env TS_NODE_PROJECT='./tsconfig.json' mocha",
-    "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) npm run deploy (verify files look good)\"",
-    "deploy": "git checkout main && git pull && npm run build && npm publish"
+    "test": "pnpm run build && pnpm run loadTS && mocha",
+    "deployHelp": "echo \"1) Run 'changeset' 2) Merge changes to main 3) Merge changeset PR 4) pnpm run deploy (verify files look good)\"",
+    "deploy": "git checkout main && git pull && pnpm run build && pnpm publish",
+    "loadTS": "cross-env TS_NODE_PROJECT='./tsconfig.json'"
   },
   "files": [
     "dist",
@@ -55,6 +56,7 @@
   ],
   "dependencies": {
     "async-mutex": "^0.5.0",
+    "immer": "^10.1.3",
     "microtime": "^3.1.1"
   },
   "devDependencies": {

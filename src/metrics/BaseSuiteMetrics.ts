@@ -5,7 +5,6 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import Utils from "../helpers/Utils.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -31,7 +30,7 @@ abstract class BaseSuiteMetrics {
      * @throws Error if the provided path is invalid (not an array of strings, contains empty/whitespace elements,
      * or a test without a suite/empty test)
      */
-    public static validatePath(path: string[], isTest: boolean): void {
+    public static validatePath(path: readonly string[], isTest: boolean): void {
 
         const type: string = isTest ? "Test" : "Suite";
         if (!Array.isArray(path)) {
@@ -43,7 +42,7 @@ abstract class BaseSuiteMetrics {
         }
 
         // Check each segment individually to provide specific error locations
-        for (let i: number = 0; i < path.length; i++) {
+        for (let i: number = 0; i < path.length; ++i) {
             const segment: any = path[i];
 
             if (typeof segment !== "string") {
@@ -67,7 +66,7 @@ abstract class BaseSuiteMetrics {
      * @returns Path joined with a comma a space, enclosed in square brackets. E.g. '[suite 1, sub-suite 2, test 3]'
      * @throws Error If the provided path is invalid (BaseSuiteMetrics.validatePath() is called)
      */
-    public static pathToString(path: string[]): string {
+    public static pathToString(path: readonly string[]): string {
         BaseSuiteMetrics.validatePath(path, false);
         return `[${path.join(", ")}]`;
     }
@@ -83,12 +82,12 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Exports all the data in this metrics instance as-is (deep copied to prevent reference leakage)
+     * Gets all data in the metrics
      *
-     * @returns The top-level suite
+     * @returns A top-level Suite object that contains all suites and tests in their hierarchical order
      */
     public getAllData(): Suite {
-        return Utils.deepCopySuite(this.suites.getTopLevelSuite());
+        return this.suites.getTopLevelSuite();
     }
 
     /**
@@ -117,7 +116,7 @@ abstract class BaseSuiteMetrics {
         }
 
         const serializableData: Record<string, SerializableSuite> = Object.fromEntries(
-            Array.from(this.suites.getAllSuites().entries())
+            Array.from(this.suites.getTopLevelSuite().subSuites.entries())
                 .map(([key, suite]: [string, Suite]): [string, SerializableSuite] => [key, suiteToSerializable(suite)])
         );
 

@@ -48,20 +48,20 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
 
     suite("Non-existent Suite Handling", function() {
         test("Non-existent single-level suite", function() {
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentSuite"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when single-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentSuite"]), "Suite path [NonExistentSuite] does not exist (suite 'NonExistentSuite' is not defined)", 'Should throw error when single-level suite does not exist');
         });
 
         test("Non-existent multi-level suite", function() {
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent", "Suite"]), 'Suite path [NonExistent, Suite] does not exist', 'Should throw error when multi-level suite does not exist');
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["Non", "Existent", "Suite", "Path"]), 'Suite path [Non, Existent, Suite, Path] does not exist', 'Should throw error when deep multi-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent", "Suite"]), "Suite path [NonExistent, Suite] does not exist (suite 'NonExistent' is not defined)", 'Should throw error when multi-level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Non", "Existent", "Suite", "Path"]), "Suite path [Non, Existent, Suite, Path] does not exist (suite 'Non' is not defined)", "Should throw error when deep multi-level suite does not exist");
         });
 
         test("Partially non-existent nested path", function() {
             metrics.startTest(["Level1", "Level2", "Test1"]);
             metrics.stopTest();
 
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["Level1", "NonExistentLevel2"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentLevel1", "Level2"]), 'Suite path [NonExistentLevel1, Level2] does not exist', 'Should throw error when first level suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Level1", "NonExistentLevel2"]), "Suite path [Level1, NonExistentLevel2] does not exist (suite 'NonExistentLevel2' is not defined)", 'Should throw error when intermediate suite does not exist');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistentLevel1", "Level2"]), "Suite path [NonExistentLevel1, Level2] does not exist (suite 'NonExistentLevel1' is not defined)", 'Should throw error when first level suite does not exist');
         });
 
         test("Test path used as suite path", function() {
@@ -69,7 +69,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             metrics.stopTest();
 
             // Test path should not be accessible as suite path
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["Suite1", "Test1"]), 'Suite path [Suite1, Test1] does not exist', 'Test path should not be accessible as suite path');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["Suite1", "Test1"]), "Suite path [Suite1, Test1] does not exist (suite 'Test1' is not defined)", 'Test path should not be accessible as suite path');
         });
     });
 
@@ -555,7 +555,7 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assertThrows(() => newMetrics.metrics.getSuiteMetrics(["ResetSuite"]), 'Suite path [ResetSuite] does not exist');
+            assertThrows(() => newMetrics.metrics.getSuiteMetrics(["ResetSuite"]), "Suite path [ResetSuite] does not exist (suite 'ResetSuite' is not defined)");
             assert.isFalse(newMetrics.queries.suiteExists(["ResetSuite"]), 'Suite should not exist after reset');
 
             // Should work with new instance

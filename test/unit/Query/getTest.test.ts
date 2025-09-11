@@ -39,7 +39,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
 
     suite("Non-existent Test/Suite Handling", function() {
         test("Non-existent suite", function() {
-            assertThrows(() => metrics.queries.getTest(["NonExistentSuite", "Test"]), 'Suite path [NonExistentSuite] does not exist', 'Should throw error when suite does not exist');
+            assertThrows(() => metrics.queries.getTest(["NonExistentSuite", "Test"]), "Suite path [NonExistentSuite, Test] does not exist (suite 'NonExistentSuite' is not defined)", "Should throw error when suite does not exist");
         });
 
         test("Non-existent test in existing suite", function() {
@@ -68,7 +68,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
             metrics.startTest(["Level1", "Level2", "Test1"]);
             metrics.stopTest();
 
-            assertThrows(() => metrics.queries.getTest(["Level1", "NonExistentLevel2", "Test1"]), 'Suite path [Level1, NonExistentLevel2] does not exist', 'Should throw error when intermediate suite does not exist');
+            assertThrows(() => metrics.queries.getTest(["Level1", "NonExistentLevel2", "Test1"]), "Suite path [Level1, NonExistentLevel2, Test1] does not exist (suite 'NonExistentLevel2' is not defined)", 'Should throw error when intermediate suite does not exist');
         });
     });
 
@@ -449,16 +449,16 @@ suite("[BaseSuiteMetrics] getTest", function() {
             SuiteMetrics.resetInstance();
             const newMetrics = SuiteMetrics.getInstance();
 
-            assertThrows(() => newMetrics.queries.getTest(["ResetSuite", "Test1"]), 'Suite path [ResetSuite] does not exist');
-            assert.isFalse(newMetrics.queries.testExists(["ResetSuite", "Test1"]), 'Test should not exist after reset');
+            assertThrows(() => newMetrics.queries.getTest(["ResetSuite", "Test1"]), "Suite path [ResetSuite, Test1] does not exist (suite 'ResetSuite' is not defined)");
+            assert.isFalse(newMetrics.queries.testExists(["ResetSuite", "Test1"]), "Test should not exist after reset");
 
             // Should work with new instance
             newMetrics.startTest(["NewSuite", "NewTest"]);
             newMetrics.stopTest();
 
             const newTestMetrics = newMetrics.queries.getTest(["NewSuite", "NewTest"]);
-            assert.strictEqual(newTestMetrics.name, "NewTest", 'New test should work correctly after reset');
-            assert.strictEqual(newTestMetrics.testNumber, 1, 'Test counter should be reset');
+            assert.strictEqual(newTestMetrics.name, "NewTest", "New test should work correctly after reset");
+            assert.strictEqual(newTestMetrics.testNumber, 1, "Test counter should be reset");
         });
     });
 });

@@ -1,5 +1,4 @@
 import { Test } from "../types/structures.ts";
-import Utils from "../helpers/Utils.ts";
 import Suites from "../helpers/Suites.ts";
 
 /**
@@ -18,11 +17,11 @@ class Performance {
      * Gets the slowest test across all suites
      *
      * @returns The test with the longest duration
-     * @throws Error if there are no tests in this metrics instance
+     * @throws Error If there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
         if (this.suites.getNumTests() === 0) {
-            throw new Error(`There are no tests in this cache, could not get the slowest test`);
+            throw new Error(`No tests have been completed, could not get the slowest test`);
         }
 
         return this.suites.getAllTestsByDuration()[0];
@@ -31,10 +30,9 @@ class Performance {
     /**
      * Gets the k slowest tests across all suites, sorted by duration descending
      *
-     * @param k Number of slowest tests to return. Must be a positive integer
+     * @param k Number of slowest tests to return
      * @returns Array of the k slowest tests, sorted by duration descending
-     * @throws Error If k is not a positive integer
-     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
+     * @throws Error If k is not a positive integer, or it is greater than the total number of tests
      */
     public getKSlowestTests(k: number): Test[] {
         if (!Number.isInteger(k) || k <= 0) {
@@ -62,11 +60,11 @@ class Performance {
      * Gets the fastest test across all suites
      *
      * @returns The test with the shortest duration
-     * @throws Error if there are no tests in this metrics instance
+     * @throws Error If there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
         if (this.suites.getNumTests() === 0) {
-            throw new Error(`There are no tests in this cache, could not get the fastest test`);
+            throw new Error(`No tests have been completed, could not get the fastest test`);
         }
 
         const tests: Test[] = this.suites.getAllTestsByDuration();
@@ -78,8 +76,7 @@ class Performance {
      *
      * @param k Number of fastest tests to return. Must be a positive integer
      * @returns Array of the k fastest tests, sorted by duration ascending
-     * @throws Error If k is not a positive integer
-     * @throws Error if k is greater than the total number of tests (getTotalTestCount())
+     * @throws Error If k is not a positive integer, or it is greater than the total number of tests
      */
     public getKFastestTests(k: number): Test[] {
         if (!Number.isInteger(k) || k <= 0) {

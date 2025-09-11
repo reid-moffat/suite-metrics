@@ -222,6 +222,14 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 In typical scenarios, performance overhead is **negligible** due to efficient caching. For large cases (~10,000+ tests),
 following the recommended patterns above to reduce overhead.
 
+## 📃 Changelog
+
+To view the release notes for each version, view the changelog:
+
+* On GitHub: [Link](https://github.com/reid-moffat/suite-metrics/blob/main/CHANGELOG.md)
+* On npm: [package page](https://www.npmjs.com/package/suite-metrics?activeTab=code) -> CHANGELOG.md
+* In the repository: CHANGELOG.md
+
 ---
 
 ☕ [Buy me a coffee](https://buymeacoffee.com/reidmoffat) if this package helped you!
