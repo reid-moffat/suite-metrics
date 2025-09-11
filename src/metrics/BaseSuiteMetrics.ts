@@ -5,7 +5,6 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import Utils from "../helpers/Utils.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
@@ -88,7 +87,7 @@ abstract class BaseSuiteMetrics {
      * @returns The top-level suite
      */
     public getAllData(): Suite {
-        return Utils.deepCopySuite(this.suites.getTopLevelSuite());
+        return this.suites.getTopLevelSuite();
     }
 
     /**
