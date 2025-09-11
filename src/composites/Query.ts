@@ -97,6 +97,8 @@ class Queries {
      * @param isTest Specifies if this is checking for a test (false to check for a suite)
      */
     private pathExists(path: readonly string[], isTest: boolean): boolean {
+        BaseSuiteMetrics.validatePath(path, isTest);
+
         try {
             if (isTest) {
                 const suite: Suite = this.suites.navigateToSuite(path, { isTestPath: true });
