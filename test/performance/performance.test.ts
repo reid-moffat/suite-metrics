@@ -1,5 +1,5 @@
-import { createNestedTestData } from "../generators/testDataHelpers.js";
 import SuiteMetrics from "suite-metrics";
+import { createNestedTestData } from "../generators/testDataHelpers.js";
 
 suite("Performance", function () {
 

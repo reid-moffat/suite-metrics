@@ -18,8 +18,6 @@ interface TestDataOptions {
     minDuration?: number;
     /** Maximum duration for tests in microseconds (mocked, does not take longer for higher numbers) */
     maxDuration?: number;
-    /** Whether to add realistic timing delays */
-    addTimingDelays?: boolean;
     /** Custom suite structure (overrides other suite options) */
     customStructure?: SuiteStructure[];
 }
@@ -48,7 +46,6 @@ const DEFAULT_OPTIONS: Required<TestDataOptions> = {
     testNamePrefix: "Test",
     minDuration: 1000,
     maxDuration: 10_000,
-    addTimingDelays: false,
     customStructure: []
 };
 
