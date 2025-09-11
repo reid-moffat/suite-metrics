@@ -140,32 +140,6 @@ class Suites {
      * Add a test to a suite and update counters (total tests & time) for suite hierarchy
      */
     private addTestUpdates(suite: Suite, test: Test): void {
-        // Helper function to recursively update a suite in the hierarchy
-        const updateSuiteInHierarchy = (
-            suitesMap: Map<string, Suite>,
-            targetPath: readonly string[],
-            test: Test,
-            depth: number = 0
-        ): void => {
-            const currentSuiteName = targetPath[depth];
-            const currentSuite = suitesMap.get(currentSuiteName);
-
-            if (!currentSuite) {
-                throw new Error(`Internal error: Suite '${currentSuiteName}' not found while updating test hierarchy`);
-            }
-
-            // If this is the target suite (deepest level), add the test
-            if (depth === targetPath.length - 1) {
-                currentSuite.tests.set(test.name, castDraft(test));
-            } else {
-                // Recursively update the next level down
-                updateSuiteInHierarchy(currentSuite.subSuites, targetPath, test, depth + 1);
-            }
-
-            // Update aggregate data for this suite
-            currentSuite.aggregateData.numTests++;
-            currentSuite.aggregateData.totalTestTime += test.duration;
-        };
 
         // If the target suite is the top-level suite, handle it directly
         if (suite === this.topLevelSuite) {
@@ -177,13 +151,38 @@ class Suites {
             return;
         }
 
+        // Recursively update a suite in the hierarchy
+        const updateSuiteInHierarchy = (
+            suitesMap: Map<string, Suite>,
+            targetPath: readonly string[],
+            test: Test,
+            depth: number = 0
+        ): void => {
+            // Get the next suite in the hierarchy
+            const currentSuiteName: string = targetPath[depth];
+            const currentSuite: Suite | undefined = suitesMap.get(currentSuiteName);
+            if (!currentSuite) {
+                throw new Error(`Internal error: Suite '${currentSuiteName}' not found while adding test ${BaseSuiteMetrics.pathToString(test.path)}`);
+            }
+
+            if (depth === targetPath.length - 1) {
+                // Direct parent suite -> add the test
+                currentSuite.tests.set(test.name, castDraft(test));
+            } else {
+                // Intermediary suite -> recursively update
+                updateSuiteInHierarchy(currentSuite.subSuites, targetPath, test, depth + 1);
+            }
+
+            // Update aggregate data for this suite
+            currentSuite.aggregateData.numTests++;
+            currentSuite.aggregateData.totalTestTime += test.duration;
+        };
+
         // For nested suites, update the entire chain from top-level down
         this.topLevelSuite = produce(this.topLevelSuite, draft => {
-            // Update top-level suite's aggregate data
             draft.aggregateData.numTests++;
             draft.aggregateData.totalTestTime += test.duration;
 
-            // Update the nested suite hierarchy
             updateSuiteInHierarchy(draft.subSuites, suite.path, test);
         });
     }
@@ -214,7 +213,6 @@ class Suites {
             this.topLevelSuite = produce(this.topLevelSuite, draft => {
                 draft.subSuites.set(newSuiteName, castDraft(newSuite));
             });
-
             return newSuite;
         }
 
@@ -226,7 +224,6 @@ class Suites {
             newSuite: Suite,
             depth: number = 0
         ): void => {
-
             // Get the next suite in the hierarchy
             const currentSuiteName: string = pathToParent[depth];
             const currentSuite: Suite | undefined = suitesMap.get(currentSuiteName);
@@ -234,14 +231,13 @@ class Suites {
                 throw new Error(`Internal error: Suite '${currentSuiteName}' not found while adding suite '${newSuiteName}' to path ${BaseSuiteMetrics.pathToString(pathToParent)}`);
             }
 
-            // Parent suite -> add the new suite to it
             if (depth === pathToParent.length - 1) {
+                // Parent suite -> add the new suite to it
                 currentSuite.subSuites.set(newSuiteName, castDraft(newSuite));
-                return;
+            } else {
+                // Intermediary suite -> recursively update the next level
+                updateNestedSuite(currentSuite.subSuites, pathToParent, newSuiteName, newSuite, depth + 1);
             }
-
-            // Intermediary suite -> recursively update the next level
-            updateNestedSuite(currentSuite.subSuites, pathToParent, newSuiteName, newSuite, depth + 1);
         }
 
         // Start updating from the top-level suite
