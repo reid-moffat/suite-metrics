@@ -97,18 +97,25 @@ class Queries {
     private pathExists(path: readonly string[], isTest: boolean): boolean {
         BaseSuiteMetrics.validatePath(path, isTest);
 
-        try {
-            if (isTest) {
-                const suite: Suite = this.suites.navigateToSuite(path, { isTestPath: true });
-                const testName: string = path[path.length - 1];
-                return suite.tests.has(testName);
-            } else {
-                this.suites.navigateToSuite(path);
-                return true;
+        const loopLength: number = path.length + (isTest ? -1 : 0);
+        
+        // Navigate through the suite hierarchy to check if path exists
+        let currentSuite: Suite = this.suites.getTopLevelSuite();
+        for (let i: number = 0; i < loopLength; ++i) {
+            const targetSuite: Suite | undefined = currentSuite.subSuites.get(path[i]);
+            if (targetSuite === undefined) {
+                return false;
             }
-        } catch {
-            return false;
+            currentSuite = targetSuite;
         }
+
+        // Checking for a test -> verify it exists in the final suite
+        if (isTest) {
+            const testName: string = path[path.length - 1];
+            return currentSuite.tests.has(testName);
+        }
+
+        return true;
     }
 }
 
