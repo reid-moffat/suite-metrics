@@ -38,7 +38,7 @@ suite("[SuiteMetrics] Basic tests", function() {
         });
 
         test("Non-existent suite", function() {
-            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent"]), "Suite path [NonExistent] does not exist", 'Should throw error when accessing non-existent suite');
+            assertThrows(() => metrics.metrics.getSuiteMetrics(["NonExistent"]), "Suite path [NonExistent] does not exist (suite 'NonExistent' is not defined)", 'Should throw error when accessing non-existent suite');
         });
 
         test("Non-existent test", function() {
