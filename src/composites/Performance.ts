@@ -43,8 +43,7 @@ class Performance {
         }
 
         const tests: Test[] = this.suites.getAllTestsSlowestFirst();
-        const endIndex: number = Math.min(k, this.suites.getNumTests());
-        return tests.slice(0, endIndex);
+        return tests.slice(0, k);
     }
 
     /**
@@ -86,8 +85,7 @@ class Performance {
         }
 
         const tests: Test[] = this.suites.getAllTestsFastestFirst();
-        const endIndex: number = Math.min(k, this.suites.getNumTests());
-        return tests.slice(0, endIndex);
+        return tests.slice(0, k);
     }
 
     /**
