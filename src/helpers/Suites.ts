@@ -124,11 +124,30 @@ class Suites {
     }
 
     /**
-     * Gets all tests by their completion duration
+     * Gets all tests by their completion duration, slowest (longer duration) first
      *
      * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
      */
-    public getAllTestsByDuration(): Test[] {
+    public getAllTestsSlowestFirst(): Test[] {
+        this.ensureSortedCache();
+        return this.allTestsSlowestFirst;
+    }
+
+    /**
+     * Gets all tests by their completion duration, fastest (lower duration) first
+     *
+     * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
+     */
+    public getAllTestsFastestFirst(): Test[] {
+        this.ensureSortedCache();
+        return this.allTestsFastestFirst;
+    }
+
+
+    /**
+     * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
+     */
+    private ensureSortedCache() {
         // Update sorted cached arrays if required
         if (!this.orderedTestsValid) {
             this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
@@ -136,10 +155,7 @@ class Suites {
 
             this.orderedTestsValid = true;
         }
-
-        return this.allTestsSlowestFirst;
     }
-
 
     /**
      * Add a test to a suite and update counters (total tests & time) for suite hierarchy

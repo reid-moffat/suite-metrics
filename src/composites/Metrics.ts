@@ -49,7 +49,7 @@ class Metrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        const sortedTests: Test[] = this.suites.getAllTestsByDuration();
+        const sortedTests: Test[] = this.suites.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {
