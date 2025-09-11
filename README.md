@@ -172,7 +172,7 @@ metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, in 
 
 metrics.performance.getAllTestsSlowestFirst(); // -> all tests, slowest first
 
-metrics.performance.getFastestTest(); // -> fastest test voerall
+metrics.performance.getFastestTest(); // -> fastest test overall
 
 metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, in order
 
