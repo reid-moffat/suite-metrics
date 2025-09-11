@@ -24,10 +24,10 @@ class Metrics {
     }
 
     /**
-     * Gets the average completion duration for all tests in this metrics instance
+     * Gets the average completion duration (microseconds) for all tests in this metrics instance
      *
      * @returns The average test completion duration, rounded to the nearest microsecond
-     * @throws Error if there are no completed tests in this instance
+     * @throws Error If there are no completed tests in this instance
      */
     public getAverageTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
@@ -42,7 +42,7 @@ class Metrics {
      *
      * @returns The median test completion duration, in microseconds. May be a decimal (x.5) when an even number of
      *          tests are present
-     * @throws Error if there are no completed tests in this instance
+     * @throws Error If there are no completed tests in this instance
      */
     public getMedianTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
@@ -70,7 +70,14 @@ class Metrics {
         const suite: Suite = this.suites.navigateToSuite(path);
 
         // Direct metrics: Test and duration data for just the tests directly in this suite
-        const directMetrics: SuiteTestMetrics = this.calculateDirectTestMetrics(suite);
+        const directTests: number = suite.tests.size;
+        const directTime: number = Array.from(suite.tests.values()).reduce((sum: number, test: Test): number => sum + test.duration, 0);
+        const averageDirectTime: number = directTests === 0 ? 0 : directTime / directTests;
+        const directMetrics: SuiteTestMetrics = {
+            numTests: directTests,
+            totalTime: directTime,
+            averageTime: averageDirectTime
+        };
 
         // Total metrics: Test and duration data for all tests in this suite and all sub-suites
         const totalTests: number = suite.aggregateData.numTests;
@@ -83,8 +90,8 @@ class Metrics {
         };
 
         // Sub metrics: Test and duration data for all tests in all sub-suites (but not this suite directly)
-        const subTests: number = totalTests - directMetrics.numTests;
-        const subTime: number = totalTime - directMetrics.totalTime;
+        const subTests: number = totalTests - directTests;
+        const subTime: number = totalTime - directTime;
         const averageSubTime: number = subTests === 0 ? 0 : subTime / subTests;
         const subMetrics: SuiteTestMetrics = {
             numTests: subTests,
@@ -123,28 +130,6 @@ class Metrics {
         return lines.join('\n');
     }
 
-
-    /**
-     * Calculates metrics for all tests directly in a suite
-     *
-     * @param suite Suite object to calculate metrics for
-     */
-    private calculateDirectTestMetrics(suite: Suite): SuiteTestMetrics {
-        const numTests: number = suite.tests.size;
-
-        if (numTests === 0) {
-            return { numTests: 0, totalTime: 0, averageTime: 0 };
-        }
-
-        const totalTime: number = Array.from(suite.tests.values())
-            .reduce((sum: number, test: Test): number => sum + test.duration, 0);
-
-        return {
-            numTests,
-            totalTime,
-            averageTime: totalTime / numTests
-        };
-    }
 
     /**
      * Formats suite information for printing
