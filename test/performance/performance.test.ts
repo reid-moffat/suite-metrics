@@ -111,4 +111,38 @@ suite("Performance", function () {
         });
     });
      */
+
+    /*
+    For 1m tests:
+
+    Minimal Tests Per Suite:
+
+   {
+     numSuites: 9,
+     testsPerSuite: 1,
+     maxDepth: 6,
+     subSuitesPerSuite: 10
+   }
+   // → 999,999 tests (0.00% error)
+
+Balanced Structure:
+
+   {
+     numSuites: 5,
+     testsPerSuite: 19,
+     maxDepth: 5,
+     subSuitesPerSuite: 10
+   }
+   // → 999,995 tests (0.00% error)
+
+More Realistic Structure:
+
+   {
+     numSuites: 19,
+     testsPerSuite: 37,
+     maxDepth: 5,
+     subSuitesPerSuite: 6
+   }
+   // → 999,666 tests (0.03% error)
+     */
 });
