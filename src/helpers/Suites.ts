@@ -23,10 +23,12 @@ class Suites {
     // All tests in order of insertion
     private readonly testsInInsertionOrder: Test[] = [];
 
-    // All tests for a given metrics sorted from slowest to fastest
-    private testsByDuration: Test[] = [];
+    // All tests sorted from slowest to fastest (decreasing duration)
+    private allTestsSlowestFirst: Test[] = [];
+    // All tests sorted from fastest to slowest (increasing duration)
+    private allTestsFastestFirst: Test[] = [];
 
-    // If the sorted list above is valid
+    // If the sorted lists (testsByDuration, testsByDurationReversed) are valid
     private orderedTestsValid: boolean = false;
 
 
@@ -122,20 +124,45 @@ class Suites {
     }
 
     /**
-     * Gets all tests by their completion duration
+     * Gets all tests by their completion duration, slowest (longer duration) first
      *
      * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
      */
-    public getAllTestsByDuration(): Test[] {
-        if (!this.orderedTestsValid) {
-            // Sort by duration in descending order (slowest goes first)
-            this.testsByDuration = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
-            this.orderedTestsValid = true;
-        }
-
-        return this.testsByDuration;
+    public getAllTestsSlowestFirst(): Test[] {
+        this.ensureSortedCache();
+        return this.allTestsSlowestFirst;
     }
 
+    /**
+     * Gets all tests by their completion duration, fastest (lower duration) first
+     *
+     * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
+     */
+    public getAllTestsFastestFirst(): Test[] {
+        this.ensureSortedCache();
+        return this.allTestsFastestFirst;
+    }
+
+
+    /**
+     * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
+     */
+    private ensureSortedCache() {
+        // Update sorted cached arrays if required
+        if (!this.orderedTestsValid) {
+            this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+
+            // Manual reverse for efficiency
+            const len: number = this.allTestsSlowestFirst.length;
+            const startIndex: number = len - 1;
+            this.allTestsFastestFirst = new Array(len);
+            for (let i: number = 0; i < len; ++i) {
+                this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
+            }
+
+            this.orderedTestsValid = true;
+        }
+    }
 
     /**
      * Add a test to a suite and update counters (total tests & time) for suite hierarchy

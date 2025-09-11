@@ -450,7 +450,6 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             const metrics = createSimpleTestData(true, {
                 numSuites: 15,
                 testsPerSuite: 20,
-                addTimingDelays: false // Fast generation for performance test
             });
             const endTime = Date.now();
 

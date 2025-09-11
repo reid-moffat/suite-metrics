@@ -37,7 +37,12 @@ suite("[BaseSuiteMetrics] testExists", function() {
         });
 
         test("Single-element array", function() {
-            assert.isFalse(metrics.queries.testExists(["suite1", "just-test"]), 'Single-element array should return false');
+            assertThrows(() => metrics.queries.testExists(["just-test"]), 'A test must be inside a suite. E.g. ["Suite 1", "Test 2"] (at least two array elements)', 'Single-element array should throw error');
+        });
+
+        test("Arrays with whitespace-only strings", function() {
+            assertThrows(() => metrics.queries.testExists(["   ", "test"]), "Test path element at index 0 cannot be whitespace-only", "Should throw error when array contains whitespace-only string");
+            assertThrows(() => metrics.queries.testExists(["suite", "\t\n  "]), "Test path element at index 1 cannot be whitespace-only", "Should throw error when test name is whitespace-only");
         });
     });
 

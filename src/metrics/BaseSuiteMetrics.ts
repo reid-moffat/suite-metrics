@@ -72,7 +72,9 @@ abstract class BaseSuiteMetrics {
     }
 
     /**
-     * Gets all tests in order
+     * Gets all tests in completion order
+     *
+     * Note: To get tests ordered by completion speed, see performance methods (e.g. metrics.performance.getAllTestsFastestFirst())
      *
      * @returns An array of all tests in this metrics instance, sorted by time of completion (first test completion
      * is ordered first)

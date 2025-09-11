@@ -24,7 +24,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the slowest test`);
         }
 
-        return this.suites.getAllTestsByDuration()[0];
+        return this.suites.getAllTestsSlowestFirst()[0];
     }
 
     /**
@@ -42,9 +42,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        const tests: Test[] = this.suites.getAllTestsByDuration();
-        const endIndex: number = Math.min(k, this.suites.getNumTests());
-        return tests.slice(0, endIndex);
+        return this.suites.getAllTestsSlowestFirst().slice(0, k);
     }
 
     /**
@@ -53,7 +51,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        return this.suites.getAllTestsByDuration();
+        return this.suites.getAllTestsSlowestFirst();
     }
 
     /**
@@ -67,8 +65,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the fastest test`);
         }
 
-        const tests: Test[] = this.suites.getAllTestsByDuration();
-        return tests[this.suites.getNumTests() - 1];
+        return this.suites.getAllTestsFastestFirst()[0];
     }
 
     /**
@@ -86,9 +83,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        const tests: Test[] = this.suites.getAllTestsByDuration();
-        const startIndex: number = Math.max(0, this.suites.getNumTests() - k);
-        return tests.slice(startIndex).reverse();
+        return this.suites.getAllTestsFastestFirst().slice(0, k);
     }
 
     /**
@@ -97,8 +92,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        const tests: Test[] = this.suites.getAllTestsByDuration();
-        return [...tests].reverse();
+        return this.suites.getAllTestsFastestFirst();
     }
 }
 

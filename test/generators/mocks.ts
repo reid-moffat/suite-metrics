@@ -3,7 +3,10 @@ import microtime from "microtime";
 import { randomInt } from "../helpers/helpers.ts";
 
 // Set the initial time 1 hour ago for a semi-realistic start time
-const hourInMicrosec = 60 * 60 * 1000 * 1000;
+const hourInMicrosec: number = 60 * 60 * 1000 * 1000;
+
+// Max delay constant
+const maxDelay: number = 5_000 - 100 + 1;
 
 /**
  * Test version of SuiteMetrics that allows mocking tests
@@ -26,7 +29,7 @@ class _MockSuiteMetrics extends SuiteMetrics {
         this.currentMockTime += duration;
 
         // Add a slight, random delay to simulate the time between tests (e.g., framework overhead)
-        const interTestDelay = Math.floor(Math.random() * (5_000 - 100 + 1)) + 100; // (0.1ms - 5ms)
+        const interTestDelay: number = Math.floor(Math.random() * maxDelay) + 100; // (0.1ms - 5ms)
         this.currentMockTime += interTestDelay;
     }
 }
@@ -67,7 +70,7 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
         this.currentConcurrentCount++;
 
         // Add a slight, random delay to simulate the time between tests (e.g., framework overhead)
-        const interTestDelay = Math.floor(Math.random() * (5_000 - 100 + 1)) + 100; // (0.1ms - 5ms)
+        const interTestDelay: number = Math.floor(Math.random() * maxDelay) + 100; // (0.1ms - 5ms)
         this.currentMockTime += interTestDelay;
 
         // If this was the LAST test in the concurrent batch, reset the batch counters

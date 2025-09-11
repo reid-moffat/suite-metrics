@@ -729,7 +729,6 @@ suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
             const metrics = createSimpleTestData(false, {
                 numSuites: 20,
                 testsPerSuite: 25,
-                addTimingDelays: false // Fast generation
             });
             const endTime = Date.now();
 
