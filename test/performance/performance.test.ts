@@ -3,26 +3,65 @@ import { createNestedTestData } from "../generators/testDataHelpers.js";
 
 suite("Performance", function () {
 
-    test("10k tests", function() {
-        const generatorOptions = {
-            numSuites: 10,
-            testsPerSuite: 10,
-            maxDepth: 3,
-            subSuitesPerSuite: 10,
-            minDuration: 500,
-            maxDuration: 50_000
-        };
+    suite("10k tests", function() {
+        test("10k suites", function() {
+            const generatorOptions = {
+                numSuites: 9,
+                testsPerSuite: 1,
+                maxDepth: 4,
+                subSuitesPerSuite: 10,
 
-        const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
+                minDuration: 500,
+                maxDuration: 50_000
+            };
 
-        console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
+
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
+
+        test("Balanced", function() {
+            const generatorOptions = {
+                numSuites: 1,
+                testsPerSuite: 27,
+                maxDepth: 4,
+                subSuitesPerSuite: 7,
+
+                minDuration: 500,
+                maxDuration: 50_000
+            };
+
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
+
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
+
+        test("Wide & shallow", function() {
+            const generatorOptions = {
+                numSuites: 13,
+                testsPerSuite: 9,
+                maxDepth: 3,
+                subSuitesPerSuite: 9,
+
+                minDuration: 500,
+                maxDuration: 50_000
+            };
+
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
+
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
     });
 
-    test("100k tests", function() {
+    suite("100k tests", function() {
+        test("100k tests", function() {
 
+        });
     });
 
-    test("1m tests", function() {
+    suite("1m tests", function() {
+        test("100k tests", function() {
 
+        });
     });
 });
