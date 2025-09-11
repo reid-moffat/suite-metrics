@@ -40,9 +40,9 @@ type Suite = {
     /** Stores aggregate test data for all tests in this suite AND sub-suites to prevent the need for recursive calls */
     readonly aggregateData: {
         /** Number of tests in this suite AND in all sub-suites of this suite */
-        numTests: number;
+        readonly numTests: number;
         /** Total duration for all tests in this suite AND all sub-suites of this suite */
-        totalTestTime: number;
+        readonly totalTestTime: number;
     };
 };
 

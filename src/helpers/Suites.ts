@@ -174,8 +174,9 @@ class Suites {
             }
 
             // Update aggregate data for this suite
-            currentSuite.aggregateData.numTests++;
-            currentSuite.aggregateData.totalTestTime += test.duration;
+            const draftSuite = castDraft(currentSuite);
+            draftSuite.aggregateData.numTests++;
+            draftSuite.aggregateData.totalTestTime += test.duration;
         };
 
         // For nested suites, update the entire chain from top-level down
