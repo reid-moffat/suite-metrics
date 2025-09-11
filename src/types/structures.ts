@@ -6,18 +6,20 @@
 type Test = {
     /** The test's name. Determined during startTest(), this is unique for the suite it's in */
     readonly name: string;
+    /** Path to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3'] */
+    readonly path: readonly string[];
+
     /** Timestamp the test began (microseconds since epoch). Obtained at the end of startTest() for maximal accuracy */
     readonly startTimestamp: number;
     /** Timestamp the test ended at (microseconds since epoch). Obtained at the beginning of stopTest() for maximal accuracy */
     readonly endTimestamp: number;
     /** Duration the test took, in microseconds. Equal to endTimestamp - startTimestamp */
     readonly duration: number;
+
     /** Order this test was completed in for all tests in any suite. E.g. 34th test of 150 -> 34 */
     readonly testNumber: number;
     /** Order this test was completed in for this suite. E.g. the 3rd of 6 test in the suite -> 3 */
     readonly suiteTestNumber: number;
-    /** Path to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3'] */
-    readonly path: readonly string[];
 };
 
 /**
@@ -28,6 +30,8 @@ type Test = {
 type Suite = {
     /** The suite's name */
     readonly name: string;
+    /** Path to this suite. E.g. ['suite 1', 'sub-suite 2'] */
+    readonly path: readonly string[];
     /** All tests directly in this suite (doesn't include sub-suites). Maps the test name to the Test type object */
     readonly tests: Map<string, Test>;
     /** All sub-suites directly within this suite (non-recursive). Maps the suite name to the Suite type object */

@@ -10,8 +10,10 @@ class Suites {
     // Top-level suite makes top-level metrics and functions easier to handle
     private topLevelSuite: Suite = freeze({
         name: "<Top-Level suite>",
+        path: [],
         tests: new Map<string, Test>(),
         subSuites: new Map<string, Suite>(),
+
         aggregateData: {
             numTests: 0,
             totalTestTime: 0
@@ -161,6 +163,7 @@ class Suites {
 
                         const updatedSuite: Suite = {
                             name: suite.name,
+                            path: [], // TODO
                             tests: newTests,
                             subSuites: suite.subSuites,
                             aggregateData: suite.aggregateData
@@ -235,8 +238,10 @@ class Suites {
         // Create and freeze suite
         const suiteData: Suite = {
             name: suiteName,
+            path: [...parentSuite.path, suiteName],
             tests: new Map<string, Test>(),
             subSuites: new Map<string, Suite>(),
+
             aggregateData: {
                 numTests: 0,
                 totalTestTime: 0
