@@ -25,8 +25,10 @@ class Suites {
 
     // All tests for a given metrics sorted from slowest to fastest
     private testsByDuration: Test[] = [];
+    // All tests for a given metrics sorted from fastest to slowest
+    private testsByDurationReversed: Test[] = [];
 
-    // If the sorted list above is valid
+    // If the sorted lists (testsByDuration, testsByDurationReversed) are valid
     private orderedTestsValid: boolean = false;
 
 
@@ -127,9 +129,11 @@ class Suites {
      * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
      */
     public getAllTestsByDuration(): Test[] {
+        // Update sorted cached arrays if required
         if (!this.orderedTestsValid) {
-            // Sort by duration in descending order (slowest goes first)
             this.testsByDuration = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+            this.testsByDurationReversed = [...this.testsByDuration].reverse();
+
             this.orderedTestsValid = true;
         }
 
