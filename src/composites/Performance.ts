@@ -1,5 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
+import SortedTestCache from "../helpers/caches/SortedTests.js";
 
 /**
  * Performance-related queries for finding slow and fast tests
@@ -9,8 +10,12 @@ class Performance {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    public constructor(suites: Suites) {
+    // Sorted test cache ref
+    private readonly sortedTestCache: SortedTestCache;
+
+    public constructor(suites: Suites, sortedTestCache: SortedTestCache) {
         this.suites = suites;
+        this.sortedTestCache = sortedTestCache;
     }
 
     /**
@@ -24,7 +29,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the slowest test`);
         }
 
-        return this.suites.getAllTestsSlowestFirst()[0];
+        return this.sortedTestCache.getAllTestsSlowestFirst()[0];
     }
 
     /**
@@ -42,7 +47,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        return this.suites.getAllTestsSlowestFirst().slice(0, k);
+        return this.sortedTestCache.getAllTestsSlowestFirst().slice(0, k);
     }
 
     /**
@@ -51,7 +56,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        return this.suites.getAllTestsSlowestFirst();
+        return this.sortedTestCache.getAllTestsSlowestFirst();
     }
 
     /**
@@ -65,7 +70,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the fastest test`);
         }
 
-        return this.suites.getAllTestsFastestFirst()[0];
+        return this.sortedTestCache.getAllTestsFastestFirst()[0];
     }
 
     /**
@@ -83,7 +88,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        return this.suites.getAllTestsFastestFirst().slice(0, k);
+        return this.sortedTestCache.getAllTestsFastestFirst().slice(0, k);
     }
 
     /**
@@ -92,7 +97,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        return this.suites.getAllTestsFastestFirst();
+        return this.sortedTestCache.getAllTestsFastestFirst();
     }
 }
 

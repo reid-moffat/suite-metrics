@@ -1,6 +1,8 @@
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
 import { freeze, produce, castDraft } from 'immer';
+import SortedTestCache from "./caches/SortedTests.js";
+import sortedTests from "./caches/SortedTests.js";
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
@@ -20,16 +22,12 @@ class Suites {
         }
     }, true);
 
-    // All tests in order of insertion
-    private readonly testsInInsertionOrder: Test[] = [];
+    // Sorted test cache ref
+    private readonly sortedTestCache: SortedTestCache;
 
-    // All tests sorted from slowest to fastest (decreasing duration)
-    private allTestsSlowestFirst: Test[] = [];
-    // All tests sorted from fastest to slowest (increasing duration)
-    private allTestsFastestFirst: Test[] = [];
-
-    // If the sorted lists (testsByDuration, testsByDurationReversed) are valid
-    private orderedTestsValid: boolean = false;
+    public constructor(sortedTestCache: SortedTestCache) {
+        this.sortedTestCache = sortedTestCache;
+    }
 
 
     /**
@@ -43,7 +41,7 @@ class Suites {
      * Gets the total number of tests in this metrics instance
      */
     public getNumTests(): number {
-        return this.testsInInsertionOrder.length;
+        return this.sortedTestCache.getAllTestsInOrder().length;
     }
 
     /**
@@ -64,7 +62,7 @@ class Suites {
     public addTest(testPath: readonly string[], startTime: number, endTime: number): Test {
         const suite: Suite = this.navigateToSuite(testPath, { createIfMissing: true, isTestPath: true });
 
-        // Create test object, freeze, and update related suite data
+        // Create test object and freeze
         const testData: Test = {
             name: testPath[testPath.length - 1],
             startTimestamp: startTime,
@@ -75,11 +73,9 @@ class Suites {
             path: testPath
         };
         const test: Test = freeze(testData, true);
-        this.addTestUpdates(suite, test);
 
-        // Add to list of tests & invalidate sorted cache
-        this.orderedTestsValid = false;
-        this.testsInInsertionOrder.push(test);
+        // Add to and update suite hierarchy
+        this.addTestData(suite, test);
 
         return test;
     }
@@ -120,54 +116,17 @@ class Suites {
      * Returns an array with all tests in this metrics instance, in the order they were inserted in
      */
     public getAllTestsInOrder(): Test[] {
-        return this.testsInInsertionOrder;
+        return this.sortedTestCache.getAllTestsInOrder();
     }
 
-    /**
-     * Gets all tests by their completion duration, slowest (longer duration) first
-     *
-     * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
-     */
-    public getAllTestsSlowestFirst(): Test[] {
-        this.ensureSortedCache();
-        return this.allTestsSlowestFirst;
-    }
-
-    /**
-     * Gets all tests by their completion duration, fastest (lower duration) first
-     *
-     * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
-     */
-    public getAllTestsFastestFirst(): Test[] {
-        this.ensureSortedCache();
-        return this.allTestsFastestFirst;
-    }
-
-
-    /**
-     * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
-     */
-    private ensureSortedCache() {
-        // Update sorted cached arrays if required
-        if (!this.orderedTestsValid) {
-            this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
-
-            // Manual reverse for efficiency
-            const len: number = this.allTestsSlowestFirst.length;
-            const startIndex: number = len - 1;
-            this.allTestsFastestFirst = new Array(len);
-            for (let i: number = 0; i < len; ++i) {
-                this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
-            }
-
-            this.orderedTestsValid = true;
-        }
-    }
 
     /**
      * Add a test to a suite and update counters (total tests & time) for suite hierarchy
      */
-    private addTestUpdates(suite: Suite, test: Test): void {
+    private addTestData(suite: Suite, test: Test): void {
+
+        // Add to cache
+        this.sortedTestCache.addTest(test);
 
         // If the target suite is the top-level suite, handle it directly
         if (suite === this.topLevelSuite) {

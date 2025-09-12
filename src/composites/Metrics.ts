@@ -1,6 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import SortedTestCache from "../helpers/caches/SortedTests.js";
 
 /**
  * Methods for calculating overall test metrics
@@ -10,8 +11,12 @@ class Metrics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    public constructor(suites: Suites) {
+    // Sorted test cache ref
+    private readonly sortedTestCache: SortedTestCache;
+
+    public constructor(suites: Suites, sortedTestCache: SortedTestCache) {
         this.suites = suites;
+        this.sortedTestCache = sortedTestCache;
     }
 
     /**
@@ -49,7 +54,7 @@ class Metrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        const sortedTests: Test[] = this.suites.getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.sortedTestCache.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {

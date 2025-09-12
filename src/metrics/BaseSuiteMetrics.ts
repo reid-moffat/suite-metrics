@@ -5,20 +5,28 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
+import SortedTestCache from "../helpers/caches/SortedTests.js";
+import StatisticsCache from "../helpers/caches/Statistics.js";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
  */
 abstract class BaseSuiteMetrics {
 
-    protected readonly suites: Suites = new Suites();
+    // Caches for expensive values
+    private readonly sortedTestCache: SortedTestCache = new SortedTestCache();
+    private readonly statisticsCache: StatisticsCache = new StatisticsCache();
+
+    // All suites and their directly related methods
+    protected readonly suites: Suites = new Suites(this.sortedTestCache);
+
 
     /** Queries for Tests, Suites, and their data */
     public readonly queries: Queries = new Queries(this.suites);
     /** Aggregate metrics such as test averages and total counts */
-    public readonly metrics: Metrics = new Metrics(this.suites);
+    public readonly metrics: Metrics = new Metrics(this.suites, this.sortedTestCache);
     /** Gets fastest and slowest test(s) */
-    public readonly performance: Performance = new Performance(this.suites);
+    public readonly performance: Performance = new Performance(this.suites, this.sortedTestCache);
     /** Statistical methods around Z-scores */
     public readonly statistics: Statistics = new Statistics(this.suites);
 
