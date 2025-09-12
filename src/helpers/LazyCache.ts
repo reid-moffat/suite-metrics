@@ -29,11 +29,15 @@ class LazyCache {
     private stdDevPopulation: number = 0;
     private stdDevSample: number = 0;
 
-    // Cached values for various calculations, making calls after adding m tests to n existing tests O(m) (not O(n + m))
+    // Cached mean test duration
+    private meanDuration: number = 0;
+
+    // Cached values for the calculations above (making adding m tests O(m), not O(n))
     private cachedCount: number = 0;
     private cachedSum: number = 0;
     private cachedSumSquares: number = 0;
-    private meanDuration: number = 0;
+
+    private statisticsValid: boolean = false;
 
 
     /**
@@ -44,6 +48,7 @@ class LazyCache {
 
         // Invalidate caches
         this.sortedTestsValid = false;
+        this.statisticsValid = false;
     }
 
     /**
@@ -101,7 +106,6 @@ class LazyCache {
      * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
      */
     private ensuredSortedTests(): void {
-
         // Skip if valid
         if (this.sortedTestsValid) {
             return;
@@ -130,18 +134,16 @@ class LazyCache {
      * The complexity is O(m), not O(m + n), ensuring maximum efficiency
      */
     private ensureValidCachedStats(): void {
-        const currentTestCount: number = this.getNumTests();
-
-        // Cache is already valid (no tests added since last calculation) -> skip
-        if (this.cachedCount === currentTestCount) {
+        // Skip if valid
+        if (this.statisticsValid) {
             return;
         }
 
         // Zero or one test -> can't calculate standard deviation
+        const currentTestCount: number = this.getNumTests();
         if (currentTestCount < 2) {
             throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
         }
-
 
         // Process all new tests (or all tests if this is the first call)
         const testsToProcess: Test[] = this.cachedCount > 0
@@ -152,7 +154,6 @@ class LazyCache {
             this.cachedSum += test.duration;
             this.cachedSumSquares += test.duration * test.duration;
         }
-
 
         // Recalculate derived values
         this.cachedCount = currentTestCount;
