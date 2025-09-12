@@ -21,7 +21,8 @@ class LazyCache {
     // All tests sorted from fastest to slowest (increasing duration)
     private allTestsFastestFirst: Test[] = freeze([]);
 
-    private sortedTestsValid: boolean = false;
+    // Tests present during the last sort
+    private lastSortedCount: number = 0;
 
     //
     // Statistics caches
@@ -50,7 +51,6 @@ class LazyCache {
 
         // Invalidate caches
         this.frozenTestsInInsertionOrder = null;
-        this.sortedTestsValid = false;
         this.statisticsValid = false;
     }
 
@@ -110,18 +110,43 @@ class LazyCache {
 
     /**
      * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
+     *
+     * Uses partial (merge) sorting optimization when possible for better performance
      */
     private ensuredSortedTests(): void {
         // Skip if valid
-        if (this.sortedTestsValid) {
+        const cacheValid: boolean = this.lastSortedCount === this.getNumTests();
+        if (cacheValid) {
             return;
         }
 
-        // Re-sort tests to get slowest first
-        const newSlowestTests: Test[] = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
-        this.allTestsSlowestFirst = freeze(newSlowestTests);
+        const currentTestCount: number = this.testsInInsertionOrder.length;
 
-        // Manual reverse slowest tests for efficiency
+        // If we have no tests, initialize empty frozen arrays
+        if (currentTestCount === 0) {
+            this.allTestsSlowestFirst = freeze([]);
+            this.allTestsFastestFirst = freeze([]);
+            this.lastSortedCount = 0;
+            return;
+        }
+
+        // If the array was previously sorted, we can merge sort it
+        if (this.lastSortedCount > 0) {
+            const newTests: Test[] = this.testsInInsertionOrder.slice(this.lastSortedCount);
+            const newTestsSorted: Test[] = newTests.sort((a: Test, b: Test): number => b.duration - a.duration);
+
+            // Merge sorted arrays (slowest first)
+            this.allTestsSlowestFirst = freeze(
+                this.mergeSortedArrays(this.allTestsSlowestFirst, newTestsSorted, (a: Test, b: Test): number => b.duration - a.duration)
+            );
+        } else {
+            // Full sort: sort all tests from scratch
+            this.allTestsSlowestFirst = freeze(
+                [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration)
+            );
+        }
+
+        // Create fastest-first array by reversing slowest-first
         const len: number = this.allTestsSlowestFirst.length;
         const startIndex: number = len - 1;
         const fastestFirst = new Array(len);
@@ -130,7 +155,40 @@ class LazyCache {
         }
         this.allTestsFastestFirst = freeze(fastestFirst);
 
-        this.sortedTestsValid = true;
+        this.lastSortedCount = currentTestCount;
+    }
+
+    /**
+     * Merges two sorted arrays maintaining sort order
+     */
+    private mergeSortedArrays(arr1: Test[], arr2: Test[], compareFn: (a: Test, b: Test) => number): Test[] {
+        const result: Test[] = [];
+        let i: number = 0, j: number = 0;
+
+        // Merge arrays while both have elements
+        while (i < arr1.length && j < arr2.length) {
+            if (compareFn(arr1[i], arr2[j]) <= 0) {
+                result.push(arr1[i]);
+                i++;
+            } else {
+                result.push(arr2[j]);
+                j++;
+            }
+        }
+
+        // Add remaining elements from arr1
+        while (i < arr1.length) {
+            result.push(arr1[i]);
+            i++;
+        }
+
+        // Add remaining elements from arr2
+        while (j < arr2.length) {
+            result.push(arr2[j]);
+            j++;
+        }
+
+        return result;
     }
 
     /**
