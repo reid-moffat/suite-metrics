@@ -173,6 +173,10 @@ class LazyCache {
 
         this.stdDevPopulation = Math.sqrt(populationVariance);
         this.stdDevSample = Math.sqrt(populationVariance * this.cachedCount / (this.cachedCount - 1));
+
+
+        // Stats cache is now valid
+        this.statisticsValid = true;
     }
 }
 
