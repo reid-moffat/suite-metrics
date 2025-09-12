@@ -119,7 +119,7 @@ metrics.validatePath(["Suite 1", "Test 1"], true); // -> true if that test exist
 
 metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
 
-metrics.getTestsInOrder(); // Copy of all tests in order they were completed
+metrics.getTestsInOrder(); // -> all tests in the order they were completed
 
 metrics.getAllData(); // -> all data in this metrics as-is (deeply copied)
 
@@ -170,15 +170,15 @@ console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summar
 ```typescript
 metrics.performance.getSlowestTest(); // -> slowest test overall
 
-metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, in order
+metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, from slowest to fastest
 
 metrics.performance.getAllTestsSlowestFirst(); // -> all tests, slowest first
 
 metrics.performance.getFastestTest(); // -> fastest test overall
 
-metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, in order
+metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, from fastest to slowest
 
-metrics.performance.getAllTestsFastestFirst(); // -> all tests, slowest first
+metrics.performance.getAllTestsFastestFirst(); // -> all tests, fastest first
 ```
 
 #### statistics
@@ -190,7 +190,7 @@ metrics.statistics.getTestZScore(/* <test object> */); // -> Z-score for the tes
 
 metrics.statistics.getAllTestsWithZScores(); // -> every test with their Z-score
 
-metrics.statistics.interpretZScore(2); // -> human-readable z score interpretation (e.g. below)
+metrics.statistics.interpretZScore(2); // -> human-readable z score interpretation (e.g. see below)
 result = {
     interpretation: 'Unusual performance',
     severity: 'unusual',
