@@ -12,8 +12,9 @@ class LazyCache {
     // Ordered tests caches
     //
 
-    // All tests in order of insertion
-    private testsInInsertionOrder: Test[] = freeze([]);
+    // All tests in order of insertion + cached frozen version to return
+    private testsInInsertionOrder: Test[] = [];
+    private frozenTestsInInsertionOrder: Test[] | null = null;
 
     // All tests sorted from slowest to fastest (decreasing duration)
     private allTestsSlowestFirst: Test[] = freeze([]);
@@ -45,13 +46,10 @@ class LazyCache {
      * Adds a test to this cache (must be called after every test addition in order)
      */
     public addTest(test: Test): void {
-        this.testsInInsertionOrder = freeze(
-            produce(this.testsInInsertionOrder, (draft: WritableDraft<Test>[]): void => {
-                draft.push(castDraft(test));
-            })
-        );
+        this.testsInInsertionOrder.push(castDraft(test));
 
         // Invalidate caches
+        this.frozenTestsInInsertionOrder = null;
         this.sortedTestsValid = false;
         this.statisticsValid = false;
     }
@@ -67,7 +65,10 @@ class LazyCache {
      * Returns an array with all tests in this metrics instance, in the order they were inserted in
      */
     public getAllTestsInOrder(): Test[] {
-        return this.testsInInsertionOrder;
+        if (!this.frozenTestsInInsertionOrder) {
+            this.frozenTestsInInsertionOrder = freeze([...this.testsInInsertionOrder]);
+        }
+        return this.frozenTestsInInsertionOrder;
     }
 
     /**
