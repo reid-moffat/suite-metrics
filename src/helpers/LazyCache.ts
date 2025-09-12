@@ -1,8 +1,15 @@
 import { Test } from "../types/structures.ts";
 
+/**
+ * Caches expensive computation values (sorted tests, stats) and lazily re-evaluates them
+ */
 class LazyCache {
 
     public constructor() { }
+
+    //
+    // Ordered tests caches
+    //
 
     // All tests in order of insertion
     private readonly testsInInsertionOrder: Test[] = [];
@@ -13,6 +20,20 @@ class LazyCache {
     private allTestsFastestFirst: Test[] = [];
 
     private sortedTestsValid: boolean = false;
+
+    //
+    // Statistics caches
+    //
+
+    // Cached calculated standard deviation, making repeated calls without added tests O(1)
+    private stdDevPopulation: number = 0;
+    private stdDevSample: number = 0;
+
+    // Cached values for various calculations, making calls after adding m tests to n existing tests O(m) (not O(n + m))
+    private cachedCount: number = 0;
+    private cachedSum: number = 0;
+    private cachedSumSquares: number = 0;
+    private meanDuration: number = 0;
 
 
     /**
@@ -60,6 +81,23 @@ class LazyCache {
     }
 
     /**
+     * Gets the standard deviation (sample or population)
+     */
+    public getStdDev(population: boolean): number {
+        this.ensureValidCachedStats();
+        return population ? this.stdDevPopulation : this.stdDevSample;
+    }
+
+    /**
+     * Gets the mean test duration in microseconds
+     */
+    public getMeanDuration(): number {
+        this.ensureValidCachedStats();
+        return this.meanDuration;
+    }
+
+
+    /**
      * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
      */
     private ensuredSortedTests(): void {
@@ -80,6 +118,52 @@ class LazyCache {
         }
 
         this.sortedTestsValid = true;
+    }
+
+    /**
+     * Updates cached values (stDev, sum, mean, etc) if required (if tests were added since last calculation)
+     * Must be called before any method that uses any cached value, otherwise cache could be invalid
+     *
+     * Given:
+     * n: Number of tests present during the previous call of this method
+     * m: Number of tests added since the previous call of this method
+     * The complexity is O(m), not O(m + n), ensuring maximum efficiency
+     */
+    private ensureValidCachedStats(): void {
+        const currentTestCount: number = this.getNumTests();
+
+        // Cache is already valid (no tests added since last calculation) -> skip
+        if (this.cachedCount === currentTestCount) {
+            return;
+        }
+
+        // Zero or one test -> can't calculate standard deviation
+        if (currentTestCount < 2) {
+            throw new Error('Cannot calculate standard deviation: at least 2 total tests are required');
+        }
+
+
+        // Process all new tests (or all tests if this is the first call)
+        const testsToProcess: Test[] = this.cachedCount > 0
+            ? this.getAllTestsInOrder().slice(this.cachedCount)
+            : this.getAllTestsInOrder();
+
+        for (const test of testsToProcess) {
+            this.cachedSum += test.duration;
+            this.cachedSumSquares += test.duration * test.duration;
+        }
+
+
+        // Recalculate derived values
+        this.cachedCount = currentTestCount;
+        this.meanDuration = this.cachedSum / this.cachedCount;
+
+        const meanSquare: number = this.cachedSumSquares / this.cachedCount;
+        const squareMean: number = this.meanDuration * this.meanDuration;
+        const populationVariance: number = meanSquare - squareMean; // Computational formula: Var(X) = E[X²] - (E[X])²
+
+        this.stdDevPopulation = Math.sqrt(populationVariance);
+        this.stdDevSample = Math.sqrt(populationVariance * this.cachedCount / (this.cachedCount - 1));
     }
 }
 
