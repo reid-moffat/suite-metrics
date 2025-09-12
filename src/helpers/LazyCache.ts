@@ -1,3 +1,4 @@
+import { castDraft, freeze, produce, WritableDraft } from 'immer';
 import { Test } from "../types/structures.ts";
 
 /**
@@ -12,12 +13,12 @@ class LazyCache {
     //
 
     // All tests in order of insertion
-    private readonly testsInInsertionOrder: Test[] = [];
+    private testsInInsertionOrder: Test[] = freeze([]);
 
     // All tests sorted from slowest to fastest (decreasing duration)
-    private allTestsSlowestFirst: Test[] = [];
+    private allTestsSlowestFirst: Test[] = freeze([]);
     // All tests sorted from fastest to slowest (increasing duration)
-    private allTestsFastestFirst: Test[] = [];
+    private allTestsFastestFirst: Test[] = freeze([]);
 
     private sortedTestsValid: boolean = false;
 
@@ -44,7 +45,11 @@ class LazyCache {
      * Adds a test to this cache (must be called after every test addition in order)
      */
     public addTest(test: Test): void {
-        this.testsInInsertionOrder.push(test);
+        this.testsInInsertionOrder = freeze(
+            produce(this.testsInInsertionOrder, (draft: WritableDraft<Test>[]): void => {
+                draft.push(castDraft(test));
+            })
+        );
 
         // Invalidate caches
         this.sortedTestsValid = false;
@@ -111,15 +116,18 @@ class LazyCache {
             return;
         }
 
-        this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+        // Re-sort tests to get slowest first
+        const newSlowestTests: Test[] = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+        this.allTestsSlowestFirst = freeze(newSlowestTests);
 
-        // Manual reverse in-place for efficiency
+        // Manual reverse slowest tests for efficiency
         const len: number = this.allTestsSlowestFirst.length;
         const startIndex: number = len - 1;
-        this.allTestsFastestFirst = new Array(len);
+        const fastestFirst = new Array(len);
         for (let i: number = 0; i < len; ++i) {
-            this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
+            fastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
         }
+        this.allTestsFastestFirst = freeze(fastestFirst);
 
         this.sortedTestsValid = true;
     }
