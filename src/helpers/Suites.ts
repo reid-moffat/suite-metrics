@@ -111,13 +111,6 @@ class Suites {
         return currentSuite;
     }
 
-    /**
-     * Returns an array with all tests in this metrics instance, in the order they were inserted in
-     */
-    public getAllTestsInOrder(): Test[] {
-        return this.lazyCache.getAllTestsInOrder();
-    }
-
 
     /**
      * Add a test to a suite and update counters (total tests & time) for suite hierarchy

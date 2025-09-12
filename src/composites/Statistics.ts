@@ -96,7 +96,7 @@ class Statistics {
         }
 
         // Calculate Z scores
-        const allTests: Test[] = this.suites.getAllTestsInOrder();
+        const allTests: Test[] = this.lazyCache.getAllTestsInOrder();
         return allTests.map((test: Test) => {
             return {
                 test: test,
@@ -169,8 +169,8 @@ class Statistics {
 
         // Process all new tests (or all tests if this is the first call)
         const testsToProcess: Test[] = this.cachedCount > 0
-            ? this.suites.getAllTestsInOrder().slice(this.cachedCount)
-            : this.suites.getAllTestsInOrder();
+            ? this.lazyCache.getAllTestsInOrder().slice(this.cachedCount)
+            : this.lazyCache.getAllTestsInOrder();
 
         for (const test of testsToProcess) {
             this.cachedSum += test.duration;
