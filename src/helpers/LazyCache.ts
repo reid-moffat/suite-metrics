@@ -115,12 +115,11 @@ class LazyCache {
      */
     private ensuredSortedTests(): void {
         // Skip if valid
-        const cacheValid: boolean = this.lastSortedCount === this.getNumTests();
+        const currentTestCount: number = this.getNumTests();
+        const cacheValid: boolean = this.lastSortedCount === currentTestCount;
         if (cacheValid) {
             return;
         }
-
-        const currentTestCount: number = this.testsInInsertionOrder.length;
 
         // If we have no tests, initialize empty frozen arrays
         if (currentTestCount === 0) {
