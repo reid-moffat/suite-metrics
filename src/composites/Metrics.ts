@@ -1,7 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
-import LazyCache from "../helpers/SortedTests.ts";
+import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Methods for calculating overall test metrics
@@ -11,7 +11,7 @@ class Metrics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    // Sorted test cache ref
+    // Ref to lazy-loaded expensive values cache
     private readonly lazyCache: LazyCache;
 
     public constructor(suites: Suites, lazyCache: LazyCache) {

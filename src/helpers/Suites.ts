@@ -1,7 +1,7 @@
 import { freeze, produce, castDraft } from 'immer';
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
-import LazyCache from "./SortedTests.ts";
+import LazyCache from "./LazyCache.ts";
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them
@@ -21,7 +21,7 @@ class Suites {
         }
     }, true);
 
-    // Sorted test cache ref
+    // Ref to lazy-loaded expensive values cache
     private readonly lazyCache: LazyCache;
 
     public constructor(lazyCache: LazyCache) {
