@@ -12,8 +12,7 @@ class LazyCache {
     // All tests sorted from fastest to slowest (increasing duration)
     private allTestsFastestFirst: Test[] = [];
 
-    // If the sorted lists (testsByDuration, testsByDurationReversed) are valid
-    private cacheValid: boolean = false;
+    private sortedTestsValid: boolean = false;
 
 
     /**
@@ -21,6 +20,9 @@ class LazyCache {
      */
     public addTest(test: Test): void {
         this.testsInInsertionOrder.push(test);
+
+        // Invalidate caches
+        this.sortedTestsValid = false;
     }
 
     /**
@@ -36,7 +38,7 @@ class LazyCache {
      * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
      */
     public getAllTestsSlowestFirst(): Test[] {
-        this.ensureSortedCache();
+        this.ensuredSortedTests();
         return this.allTestsSlowestFirst;
     }
 
@@ -46,28 +48,31 @@ class LazyCache {
      * Requires a cache rebuild (O(n * log(n)) sort) after an insertion
      */
     public getAllTestsFastestFirst(): Test[] {
-        this.ensureSortedCache();
+        this.ensuredSortedTests();
         return this.allTestsFastestFirst;
     }
 
     /**
      * Ensures sorted test caches (allTestsSlowestFirst & allTestsFastestFirst) are valid
      */
-    private ensureSortedCache() {
-        // Update sorted cached arrays if required
-        if (!this.cacheValid) {
-            this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+    private ensuredSortedTests(): void {
 
-            // Manual reverse for efficiency
-            const len: number = this.allTestsSlowestFirst.length;
-            const startIndex: number = len - 1;
-            this.allTestsFastestFirst = new Array(len);
-            for (let i: number = 0; i < len; ++i) {
-                this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
-            }
-
-            this.cacheValid = true;
+        // Skip if valid
+        if (this.sortedTestsValid) {
+            return;
         }
+
+        this.allTestsSlowestFirst = [...this.testsInInsertionOrder].sort((a: Test, b: Test): number => b.duration - a.duration);
+
+        // Manual reverse in-place for efficiency
+        const len: number = this.allTestsSlowestFirst.length;
+        const startIndex: number = len - 1;
+        this.allTestsFastestFirst = new Array(len);
+        for (let i: number = 0; i < len; ++i) {
+            this.allTestsFastestFirst[i] = this.allTestsSlowestFirst[startIndex - i];
+        }
+
+        this.sortedTestsValid = true;
     }
 }
 
