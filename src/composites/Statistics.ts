@@ -154,7 +154,7 @@ class Statistics {
      * The complexity is O(m), not O(m + n), ensuring maximum efficiency
      */
     private ensureValidCachedStats(): void {
-        const currentTestCount: number = this.suites.getNumTests();
+        const currentTestCount: number = this.lazyCache.getNumTests();
 
         // Cache is already valid (no tests added since last calculation) -> skip
         if (this.cachedCount === currentTestCount) {

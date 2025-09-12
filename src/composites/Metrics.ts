@@ -25,7 +25,7 @@ class Metrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.suites.getNumTests();
+        return this.lazyCache.getNumTests();
     }
 
     /**

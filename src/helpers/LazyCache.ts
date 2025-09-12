@@ -26,6 +26,13 @@ class LazyCache {
     }
 
     /**
+     * Gets the total number of tests in this metrics instance
+     */
+    public getNumTests(): number {
+        return this.testsInInsertionOrder.length;
+    }
+
+    /**
      * Returns an array with all tests in this metrics instance, in the order they were inserted in
      */
     public getAllTestsInOrder(): Test[] {

@@ -37,17 +37,10 @@ class Suites {
     }
 
     /**
-     * Gets the total number of tests in this metrics instance
-     */
-    public getNumTests(): number {
-        return this.lazyCache.getAllTestsInOrder().length;
-    }
-
-    /**
      * Gets the average completion duration for all tests in this metrics instance (rounded to the nearest microsecond)
      */
     public getAverageTestDuration(): number {
-        return Math.round(this.getTopLevelSuite().aggregateData.totalTestTime / this.getNumTests());
+        return Math.round(this.getTopLevelSuite().aggregateData.totalTestTime / this.lazyCache.getNumTests());
     }
 
     /**
@@ -67,7 +60,7 @@ class Suites {
             startTimestamp: startTime,
             endTimestamp: endTime,
             duration: endTime - startTime,
-            testNumber: this.getNumTests() + 1,
+            testNumber: this.lazyCache.getNumTests() + 1,
             suiteTestNumber: suite.tests.size + 1,
             path: testPath
         };
