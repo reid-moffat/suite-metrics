@@ -26,7 +26,7 @@ abstract class BaseSuiteMetrics {
     /** Gets fastest and slowest test(s) */
     public readonly performance: Performance = new Performance(this.suites, this.lazyCache);
     /** Statistical methods around Z-scores */
-    public readonly statistics: Statistics = new Statistics(this.suites);
+    public readonly statistics: Statistics = new Statistics(this.suites, this.lazyCache);
 
     /**
      * Validates a test or suite path, throwing an error if invalid

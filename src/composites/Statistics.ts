@@ -1,5 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
+import LazyCache from "../helpers/LazyCache.js";
 
 /**
  * Statistical methods surrounding Tests and Suites
@@ -8,6 +9,10 @@ class Statistics {
 
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
+
+    // Ref to lazy-loaded expensive values cache
+    private readonly lazyCache: LazyCache;
+
 
     // Cached calculated standard deviation, making repeated calls without added tests O(1)
     private stdDevPopulation: number = 0;
@@ -19,8 +24,9 @@ class Statistics {
     private cachedSumSquares: number = 0;
     private cachedMean: number = 0;
 
-    public constructor(suites: Suites) {
+    public constructor(suites: Suites, lazyCache: LazyCache) {
         this.suites = suites;
+        this.lazyCache = lazyCache;
     }
 
     /**
