@@ -1,8 +1,7 @@
+import { freeze, produce, castDraft } from 'immer';
 import { Suite, Test } from "../types/structures.ts";
 import BaseSuiteMetrics from "../metrics/BaseSuiteMetrics.ts";
-import { freeze, produce, castDraft } from 'immer';
-import SortedTestCache from "./caches/SortedTests.js";
-import sortedTests from "./caches/SortedTests.js";
+import SortedTestCache from "./SortedTests.ts";
 
 /**
  * Stores all Suite and Test data for an instance, as well as provides helpers for working with them

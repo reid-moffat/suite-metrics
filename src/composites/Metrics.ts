@@ -1,7 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
-import SortedTestCache from "../helpers/caches/SortedTests.js";
+import SortedTestCache from "../helpers/SortedTests.ts";
 
 /**
  * Methods for calculating overall test metrics

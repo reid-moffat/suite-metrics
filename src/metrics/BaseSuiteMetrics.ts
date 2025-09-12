@@ -5,7 +5,7 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import SortedTestCache from "../helpers/caches/SortedTests.js";
+import SortedTestCache from "../helpers/SortedTests.js";
 import StatisticsCache from "../helpers/caches/Statistics.js";
 
 /**

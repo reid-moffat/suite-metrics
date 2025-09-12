@@ -1,6 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
-import SortedTestCache from "../helpers/caches/SortedTests.js";
+import SortedTestCache from "../helpers/SortedTests.ts";
 
 /**
  * Performance-related queries for finding slow and fast tests

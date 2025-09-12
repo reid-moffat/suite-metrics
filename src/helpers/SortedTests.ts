@@ -1,9 +1,8 @@
-import Cache from "../Cache.ts";
-import { Test } from "../../types/structures.ts";
+import { Test } from "../types/structures.ts";
 
-class SortedTestCache extends Cache {
+class SortedTestCache {
 
-    public constructor() { super() }
+    public constructor() { }
 
     // All tests in order of insertion
     private readonly testsInInsertionOrder: Test[] = [];
