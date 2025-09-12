@@ -11,11 +11,11 @@ class Performance {
     private readonly suites: Suites;
 
     // Sorted test cache ref
-    private readonly sortedTestCache: LazyCache;
+    private readonly lazyCache: LazyCache;
 
-    public constructor(suites: Suites, sortedTestCache: LazyCache) {
+    public constructor(suites: Suites, lazyCache: LazyCache) {
         this.suites = suites;
-        this.sortedTestCache = sortedTestCache;
+        this.lazyCache = lazyCache;
     }
 
     /**
@@ -29,7 +29,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the slowest test`);
         }
 
-        return this.sortedTestCache.getAllTestsSlowestFirst()[0];
+        return this.lazyCache.getAllTestsSlowestFirst()[0];
     }
 
     /**
@@ -47,7 +47,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        return this.sortedTestCache.getAllTestsSlowestFirst().slice(0, k);
+        return this.lazyCache.getAllTestsSlowestFirst().slice(0, k);
     }
 
     /**
@@ -56,7 +56,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        return this.sortedTestCache.getAllTestsSlowestFirst();
+        return this.lazyCache.getAllTestsSlowestFirst();
     }
 
     /**
@@ -70,7 +70,7 @@ class Performance {
             throw new Error(`No tests have been completed, could not get the fastest test`);
         }
 
-        return this.sortedTestCache.getAllTestsFastestFirst()[0];
+        return this.lazyCache.getAllTestsFastestFirst()[0];
     }
 
     /**
@@ -88,7 +88,7 @@ class Performance {
             throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
         }
 
-        return this.sortedTestCache.getAllTestsFastestFirst().slice(0, k);
+        return this.lazyCache.getAllTestsFastestFirst().slice(0, k);
     }
 
     /**
@@ -97,7 +97,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        return this.sortedTestCache.getAllTestsFastestFirst();
+        return this.lazyCache.getAllTestsFastestFirst();
     }
 }
 

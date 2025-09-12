@@ -22,10 +22,10 @@ class Suites {
     }, true);
 
     // Sorted test cache ref
-    private readonly sortedTestCache: LazyCache;
+    private readonly lazyCache: LazyCache;
 
-    public constructor(sortedTestCache: LazyCache) {
-        this.sortedTestCache = sortedTestCache;
+    public constructor(lazyCache: LazyCache) {
+        this.lazyCache = lazyCache;
     }
 
 
@@ -40,7 +40,7 @@ class Suites {
      * Gets the total number of tests in this metrics instance
      */
     public getNumTests(): number {
-        return this.sortedTestCache.getAllTestsInOrder().length;
+        return this.lazyCache.getAllTestsInOrder().length;
     }
 
     /**
@@ -115,7 +115,7 @@ class Suites {
      * Returns an array with all tests in this metrics instance, in the order they were inserted in
      */
     public getAllTestsInOrder(): Test[] {
-        return this.sortedTestCache.getAllTestsInOrder();
+        return this.lazyCache.getAllTestsInOrder();
     }
 
 
@@ -125,7 +125,7 @@ class Suites {
     private addTestData(suite: Suite, test: Test): void {
 
         // Add to cache
-        this.sortedTestCache.addTest(test);
+        this.lazyCache.addTest(test);
 
         // If the target suite is the top-level suite, handle it directly
         if (suite === this.topLevelSuite) {

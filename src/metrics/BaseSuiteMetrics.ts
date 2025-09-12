@@ -5,28 +5,26 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import LazyCache from "../helpers/SortedTests.js";
-import StatisticsCache from "../helpers/caches/Statistics.js";
+import LazyCache from "../helpers/SortedTests.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
  */
 abstract class BaseSuiteMetrics {
 
-    // Caches for expensive values
-    private readonly sortedTestCache: LazyCache = new LazyCache();
-    private readonly statisticsCache: StatisticsCache = new StatisticsCache();
+    // Cache for expensive values
+    private readonly lazyCache: LazyCache = new LazyCache();
 
     // All suites and their directly related methods
-    protected readonly suites: Suites = new Suites(this.sortedTestCache);
+    protected readonly suites: Suites = new Suites(this.lazyCache);
 
 
     /** Queries for Tests, Suites, and their data */
     public readonly queries: Queries = new Queries(this.suites);
     /** Aggregate metrics such as test averages and total counts */
-    public readonly metrics: Metrics = new Metrics(this.suites, this.sortedTestCache);
+    public readonly metrics: Metrics = new Metrics(this.suites, this.lazyCache);
     /** Gets fastest and slowest test(s) */
-    public readonly performance: Performance = new Performance(this.suites, this.sortedTestCache);
+    public readonly performance: Performance = new Performance(this.suites, this.lazyCache);
     /** Statistical methods around Z-scores */
     public readonly statistics: Statistics = new Statistics(this.suites);
 

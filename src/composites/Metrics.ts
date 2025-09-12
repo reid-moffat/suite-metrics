@@ -12,11 +12,11 @@ class Metrics {
     private readonly suites: Suites;
 
     // Sorted test cache ref
-    private readonly sortedTestCache: LazyCache;
+    private readonly lazyCache: LazyCache;
 
-    public constructor(suites: Suites, sortedTestCache: LazyCache) {
+    public constructor(suites: Suites, lazyCache: LazyCache) {
         this.suites = suites;
-        this.sortedTestCache = sortedTestCache;
+        this.lazyCache = lazyCache;
     }
 
     /**
@@ -54,7 +54,7 @@ class Metrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        const sortedTests: Test[] = this.sortedTestCache.getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {
