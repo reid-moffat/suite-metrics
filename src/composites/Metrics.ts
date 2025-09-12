@@ -1,7 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
-import SortedTestCache from "../helpers/SortedTests.ts";
+import LazyCache from "../helpers/SortedTests.ts";
 
 /**
  * Methods for calculating overall test metrics
@@ -12,9 +12,9 @@ class Metrics {
     private readonly suites: Suites;
 
     // Sorted test cache ref
-    private readonly sortedTestCache: SortedTestCache;
+    private readonly sortedTestCache: LazyCache;
 
-    public constructor(suites: Suites, sortedTestCache: SortedTestCache) {
+    public constructor(suites: Suites, sortedTestCache: LazyCache) {
         this.suites = suites;
         this.sortedTestCache = sortedTestCache;
     }

@@ -1,6 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
-import SortedTestCache from "../helpers/SortedTests.ts";
+import LazyCache from "../helpers/SortedTests.ts";
 
 /**
  * Performance-related queries for finding slow and fast tests
@@ -11,9 +11,9 @@ class Performance {
     private readonly suites: Suites;
 
     // Sorted test cache ref
-    private readonly sortedTestCache: SortedTestCache;
+    private readonly sortedTestCache: LazyCache;
 
-    public constructor(suites: Suites, sortedTestCache: SortedTestCache) {
+    public constructor(suites: Suites, sortedTestCache: LazyCache) {
         this.suites = suites;
         this.sortedTestCache = sortedTestCache;
     }

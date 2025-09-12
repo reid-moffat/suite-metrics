@@ -5,7 +5,7 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import SortedTestCache from "../helpers/SortedTests.js";
+import LazyCache from "../helpers/SortedTests.js";
 import StatisticsCache from "../helpers/caches/Statistics.js";
 
 /**
@@ -14,7 +14,7 @@ import StatisticsCache from "../helpers/caches/Statistics.js";
 abstract class BaseSuiteMetrics {
 
     // Caches for expensive values
-    private readonly sortedTestCache: SortedTestCache = new SortedTestCache();
+    private readonly sortedTestCache: LazyCache = new LazyCache();
     private readonly statisticsCache: StatisticsCache = new StatisticsCache();
 
     // All suites and their directly related methods

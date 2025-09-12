@@ -1,6 +1,6 @@
 import { Test } from "../types/structures.ts";
 
-class SortedTestCache {
+class LazyCache {
 
     public constructor() { }
 
@@ -71,4 +71,4 @@ class SortedTestCache {
     }
 }
 
-export default SortedTestCache;
+export default LazyCache;
