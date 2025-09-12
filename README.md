@@ -99,6 +99,8 @@ await Promise.all(promises);
 
 ### Getting Test Data
 
+*Note: All internal returned data (Tests, Suites, arrays) are frozen to prevent accidental environment corruption*
+
 Both `SuiteMetrics` and `ConcurrentSuiteMetrics` have extensive methods in composite classes:
 
 - **BaseSuiteMetrics**: Base class with simple methods like `getTotalTestCount()` and `getAverageTestDuration()`
