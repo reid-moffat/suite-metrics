@@ -1,5 +1,6 @@
 import { Test } from "../types/structures.ts";
 import Suites from "../helpers/Suites.ts";
+import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Performance-related queries for finding slow and fast tests
@@ -9,8 +10,12 @@ class Performance {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    public constructor(suites: Suites) {
+    // Ref to lazy-loaded expensive values cache
+    private readonly lazyCache: LazyCache;
+
+    public constructor(suites: Suites, lazyCache: LazyCache) {
         this.suites = suites;
+        this.lazyCache = lazyCache;
     }
 
     /**
@@ -20,11 +25,11 @@ class Performance {
      * @throws Error If there are no tests in this metrics instance
      */
     public getSlowestTest(): Test {
-        if (this.suites.getNumTests() === 0) {
+        if (this.lazyCache.getNumTests() === 0) {
             throw new Error(`No tests have been completed, could not get the slowest test`);
         }
 
-        return this.suites.getAllTestsSlowestFirst()[0];
+        return this.lazyCache.getAllTestsSlowestFirst()[0];
     }
 
     /**
@@ -38,11 +43,11 @@ class Performance {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.suites.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
+        if (this.lazyCache.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.lazyCache.getNumTests()})`);
         }
 
-        return this.suites.getAllTestsSlowestFirst().slice(0, k);
+        return this.lazyCache.getAllTestsSlowestFirst().slice(0, k);
     }
 
     /**
@@ -51,7 +56,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in descending order
      */
     public getAllTestsSlowestFirst(): Test[] {
-        return this.suites.getAllTestsSlowestFirst();
+        return this.lazyCache.getAllTestsSlowestFirst();
     }
 
     /**
@@ -61,11 +66,11 @@ class Performance {
      * @throws Error If there are no tests in this metrics instance
      */
     public getFastestTest(): Test {
-        if (this.suites.getNumTests() === 0) {
+        if (this.lazyCache.getNumTests() === 0) {
             throw new Error(`No tests have been completed, could not get the fastest test`);
         }
 
-        return this.suites.getAllTestsFastestFirst()[0];
+        return this.lazyCache.getAllTestsFastestFirst()[0];
     }
 
     /**
@@ -79,11 +84,11 @@ class Performance {
         if (!Number.isInteger(k) || k <= 0) {
             throw new Error(`Desired number of tests (k) must be a positive integer, ${k} is invalid`);
         }
-        if (this.suites.getNumTests() < k) {
-            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.suites.getNumTests()})`);
+        if (this.lazyCache.getNumTests() < k) {
+            throw new Error(`Desired number of tests (k = ${k}) is greater than the total number of tests (${this.lazyCache.getNumTests()})`);
         }
 
-        return this.suites.getAllTestsFastestFirst().slice(0, k);
+        return this.lazyCache.getAllTestsFastestFirst().slice(0, k);
     }
 
     /**
@@ -92,7 +97,7 @@ class Performance {
      * @returns Array of all tests sorted by duration in ascending order
      */
     public getAllTestsFastestFirst(): Test[] {
-        return this.suites.getAllTestsFastestFirst();
+        return this.lazyCache.getAllTestsFastestFirst();
     }
 }
 

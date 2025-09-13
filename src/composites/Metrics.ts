@@ -1,6 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Methods for calculating overall test metrics
@@ -10,8 +11,12 @@ class Metrics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
-    public constructor(suites: Suites) {
+    // Ref to lazy-loaded expensive values cache
+    private readonly lazyCache: LazyCache;
+
+    public constructor(suites: Suites, lazyCache: LazyCache) {
         this.suites = suites;
+        this.lazyCache = lazyCache;
     }
 
     /**
@@ -20,7 +25,7 @@ class Metrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.suites.getNumTests();
+        return this.lazyCache.getNumTests();
     }
 
     /**
@@ -49,7 +54,7 @@ class Metrics {
             throw new Error(`There are no completed tests in this instance`);
         }
 
-        const sortedTests: Test[] = this.suites.getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {

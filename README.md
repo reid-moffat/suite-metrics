@@ -99,6 +99,8 @@ await Promise.all(promises);
 
 ### Getting Test Data
 
+*Note: All internal returned data (Tests, Suites, arrays) are frozen to prevent accidental environment corruption*
+
 Both `SuiteMetrics` and `ConcurrentSuiteMetrics` have extensive methods in composite classes:
 
 - **BaseSuiteMetrics**: Base class with simple methods like `getTotalTestCount()` and `getAverageTestDuration()`
@@ -117,9 +119,9 @@ metrics.validatePath(["Suite 1", "Test 1"], true); // -> true if that test exist
 
 metrics.pathToString(['suite 1', 'sub-suite 2', 'test 3']); // -> "[suite 1, sub-suite 2, test 3]"
 
-metrics.getTestsInOrder(); // Copy of all tests in order they were completed
+metrics.getTestsInOrder(); // -> all tests in the order they were completed
 
-metrics.getAllData(); // -> all data in this metrics as-is (deeply copied)
+metrics.getAllData(); // -> all data in this metrics as-is
 
 metrics.toJSONString(); // -> all data in this metrics, serialized to JSON
 ```
@@ -168,15 +170,15 @@ console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summar
 ```typescript
 metrics.performance.getSlowestTest(); // -> slowest test overall
 
-metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, in order
+metrics.performance.getKSlowestTests(5); // -> the 5 slowests tests overall, from slowest to fastest
 
 metrics.performance.getAllTestsSlowestFirst(); // -> all tests, slowest first
 
 metrics.performance.getFastestTest(); // -> fastest test overall
 
-metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, in order
+metrics.performance.getKFastestTests(10); // -> the 10 fastest tests overall, from fastest to slowest
 
-metrics.performance.getAllTestsFastestFirst(); // -> all tests, slowest first
+metrics.performance.getAllTestsFastestFirst(); // -> all tests, fastest first
 ```
 
 #### statistics
@@ -188,7 +190,7 @@ metrics.statistics.getTestZScore(/* <test object> */); // -> Z-score for the tes
 
 metrics.statistics.getAllTestsWithZScores(); // -> every test with their Z-score
 
-metrics.statistics.interpretZScore(2); // -> human-readable z score interpretation (e.g. below)
+metrics.statistics.interpretZScore(2); // -> human-readable z score interpretation (e.g. see below)
 result = {
     interpretation: 'Unusual performance',
     severity: 'unusual',
@@ -207,7 +209,7 @@ This package uses **lazy loading** and **caching** to optimize performance, maki
 |-------------------------------------|------------|----------------------------------------------------------------------------------------------------------|
 | **ConcurrentSuiteMetrics methods**  | `O(k)` | `k` = number of waiting operations. Very fast in practice (~few ms for 100 concurrent tests)             |
 | **Getting/Adding Suites/Tests**     | `O(k)` | `k` = depth of Suite/Test in hierarchy. Minimal for typical use cases                                    |
-| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned. Requires a deep copy to prevent reference leaks                          |
+| **Returning multiple Suites/Tests** | `O(k)` | `k` = number of items returned, except getting all items after a cache rebuild has been performed        |
 | **Performance methods**             | `O(n log n)` → `O(k)` | Cache rebuild when tests added, then `O(k)` for subsequent calls (returning `k` Tests)                   |
 | **Statistics methods**              | `O(n)` → `O(1)` | Cache rebuild (`O(m)` for `m` new tests) when tests added (except `interpretZScore()`), then `O(1)/O(k)` |
 | **Data exporting**                  | `O(n)` | Methods `toJSONString()`, `printAllSuiteMetrics()`, and `getAllData()` require a full traverse           |
