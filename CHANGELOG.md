@@ -1,5 +1,12 @@
 # suite-metrics
 
+## 2.1.2
+
+### Patch Changes
+
+- 10b1072: Optimized sorting tests by time (merge into existing sorted tests). Froze arrays of tests to prevent external array
+  mutations. Fixed documentation issues in README/API. Internal refactoring for clarity.
+
 ## 2.1.1
 
 ### Patch Changes
