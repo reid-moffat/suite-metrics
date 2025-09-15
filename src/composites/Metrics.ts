@@ -140,6 +140,7 @@ class Metrics {
      */
     public getStructureMetadata(): StructureMetadata {
 
+        // Object of helper values to be passed
         const tempValues: TmpVals = {
             totalSuites: 0,
             totalLeaves: 0,
@@ -148,18 +149,28 @@ class Metrics {
             maxDepth: -1,
             minDepth: Number.MAX_SAFE_INTEGER,
             totalDepth: 0,
-            totalDepthWeighted: 0,
+            totalDepthWeighted: 0
         };
 
+        // Recursively go through suites and collect data
         const topLevelSuite: Suite = this.suites.getTopLevelSuite();
         for (const suite of topLevelSuite.subSuites.values()) {
             this.structMetadataHelper(suite, tempValues);
         }
 
 
-        // Total time difference between last and first timestamp
+        // Calculate various remaining values
+        const testsPerSuite: number = this.lazyCache.getNumTests() / tempValues.totalSuites;
+        const testsPerNonEmptySuite: number = this.lazyCache.getNumTests() / (tempValues.totalHybrid + tempValues.totalLeaves);
+
         const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
         const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
+
+        const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;
+
+        const averageDepth: number = tempValues.totalDepth / this.lazyCache.getNumTests();
+        const averageDepthWeighted: number = tempValues.totalDepthWeighted / this.lazyCache.getNumTests();
+
 
         return {
             suites: {
@@ -167,17 +178,17 @@ class Metrics {
                 numLeaves: tempValues.totalLeaves,
                 numBranches: tempValues.totalBranches,
                 numHybrid: tempValues.totalHybrid,
-                averageTestsPerSuite: 1,
-                averageTestsPerNonEmptySuite: 1,
+                averageTestsPerSuite: testsPerSuite,
+                averageTestsPerNonEmptySuite: testsPerNonEmptySuite,
                 maxDepth: tempValues.maxDepth,
                 minDepth: tempValues.minDepth,
-                averageDepth: 1,
-                averageDepthWeighted: 1
+                averageDepth: averageDepth,
+                averageDepthWeighted: averageDepthWeighted
             },
             timing: {
                 totalTimeDiff: totalTimeDiff,
                 totalTestDuration: topLevelSuite.aggregateData.totalTestTime,
-                percentActive: topLevelSuite.aggregateData.totalTestTime / totalTimeDiff,
+                percentActive: percentActive,
                 averageDuration: this.getAverageTestDuration(),
                 medianDuration: this.getMedianTestDuration()
             }
@@ -194,6 +205,8 @@ class Metrics {
 
         if (currSuite.tests.size > 0) {
             tempValues.minDepth = Math.min(tempValues.minDepth, currSuite.path.length);
+            tempValues.totalDepth++;
+            tempValues.totalDepthWeighted += currSuite.tests.size;
 
             if (currSuite.subSuites.size > 0) {
                 tempValues.totalHybrid++;
