@@ -140,7 +140,7 @@ class Metrics {
      */
     public getStructureMetadata(): StructureMetadata {
 
-        const tempValues = {
+        const tempValues: TmpVals = {
             totalSuites: 0,
             totalLeaves: 0,
             totalBranches: 0,
@@ -163,14 +163,14 @@ class Metrics {
 
         return {
             suites: {
-                numSuites: 1,
-                numLeaves: 1,
-                numBranches: 1,
-                numHybrid: 1,
+                numSuites: tempValues.totalSuites,
+                numLeaves: tempValues.totalLeaves,
+                numBranches: tempValues.totalBranches,
+                numHybrid: tempValues.totalHybrid,
                 averageTestsPerSuite: 1,
                 averageTestsPerNonEmptySuite: 1,
-                maxDepth: 1,
-                minDepth: 1,
+                maxDepth: tempValues.maxDepth,
+                minDepth: tempValues.minDepth,
                 averageDepth: 1,
                 averageDepthWeighted: 1
             },
@@ -188,7 +188,7 @@ class Metrics {
     /**
      * Recursive helper for getStructureMetadata
      */
-    private structMetadataHelper(currSuite: Suite, tempValues: any) {
+    private structMetadataHelper(currSuite: Suite, tempValues: TmpVals) {
         tempValues.totalSuites++;
         tempValues.maxDepth = Math.max(tempValues.maxDepth, currSuite.path.length);
 
@@ -250,5 +250,16 @@ class Metrics {
         }
     }
 }
+
+type TmpVals = {
+    totalSuites: number;
+    totalLeaves: number;
+    totalBranches: number;
+    totalHybrid: number;
+    maxDepth: number;
+    minDepth: number;
+    totalDepth: number;
+    totalDepthWeighted: number;
+};
 
 export default Metrics;
