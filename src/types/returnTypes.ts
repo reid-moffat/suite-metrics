@@ -39,25 +39,41 @@ type SuiteData = {
  * Includes metrics such as number of suites, max depth, and leaf
  */
 type StructureMetadata = {
+    /** Aggregate data for suites (note: the top-level suite is excluded as this is only for navigation) */
     suites: {
+        /** Total number of suites */
         numSuites: number,
-        numEmptySuites: number;
+        /** Number of suites without any sub-suites (only tests) */
+        numLeaves: number,
+        /** Number of suites without any tests (only sub-suites) */
+        numBranches: number;
+        /** Number of suites with both sub-suite(s) and test(s) */
+        numHybrid: number
+
+        /** Average number of tests per suite */
         averageTestsPerSuite: number,
+        /** Average number of tests per suite that has tests */
         averageTestsPerNonEmptySuite: number,
+        /** Maximum suite depth (e.g. ['suite 1', 'suite 2'] -> 2) */
         maxDepth: number,
+        /** Minimum suite depth with tests (e.g. all suites at depth 1 may only be for holding other suites) */
         minDepth: number,
+        /** Average depth for suites with tests */
         averageDepth: number,
-        demographics: {
-            numLeaves: number,
-            numBranches: number,
-            numHybrid: number
-        }
+        /** Average depth for suites with tests, weighted by the number of tests per suite */
+        averageDepthWeighted: number,
     },
+    /** Aggregate data for test timings */
     timing: {
+        /** Time in microseconds between the first test starting and last test ending (includes non-testing time) */
         totalTimeDiff: number,
+        /** Total duration of all tests combined in microseconds */
         totalTestDuration: number,
+        /** Percent of the total time difference from tests running. This can show overhead or other non-test delays */
         percentActive: number,
+        /** Average duration for all tests */
         averageDuration: number,
+        /** Median duration for all tests */
         medianDuration: number
     }
 }
