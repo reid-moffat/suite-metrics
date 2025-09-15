@@ -56,6 +56,7 @@ type StructureMetadata = {
     timing: {
         totalTimeDiff: number,
         totalTestDuration: number,
+        percentActive: number,
         averageDuration: number,
         medianDuration: number
     }

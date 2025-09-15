@@ -166,6 +166,7 @@ class Metrics {
             timing: {
                 totalTimeDiff: totalTimeDiff,
                 totalTestDuration: 1,
+                percentActive: 1,
                 averageDuration: this.getAverageTestDuration(),
                 medianDuration: this.getMedianTestDuration()
             }
