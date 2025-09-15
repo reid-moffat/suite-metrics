@@ -140,9 +140,22 @@ class Metrics {
      */
     public getStructureMetadata(): StructureMetadata {
 
-        const numTests: number = this.lazyCache.getNumTests();
+        const tempValues = {
+            totalSuites: 0,
+            totalLeaves: 0,
+            totalBranches: 0,
+            totalHybrid: 0,
+            maxDepth: -1,
+            minDepth: Number.MAX_SAFE_INTEGER,
+            totalDepth: 0,
+            totalDepthWeighted: 0,
+        };
 
-        const curr: Suite = this.suites.getTopLevelSuite();
+        const topLevelSuite: Suite = this.suites.getTopLevelSuite();
+        for (const suite of topLevelSuite.subSuites.values()) {
+            this.structMetadataHelper(suite, tempValues);
+        }
+
 
         // Total time difference between last and first timestamp
         const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
@@ -151,28 +164,50 @@ class Metrics {
         return {
             suites: {
                 numSuites: 1,
-                numEmptySuites: 1,
+                numLeaves: 1,
+                numBranches: 1,
+                numHybrid: 1,
                 averageTestsPerSuite: 1,
                 averageTestsPerNonEmptySuite: 1,
                 maxDepth: 1,
                 minDepth: 1,
                 averageDepth: 1,
-                demographics: {
-                    numLeaves: 1,
-                    numBranches: 1,
-                    numHybrid: 1,
-                }
+                averageDepthWeighted: 1
             },
             timing: {
                 totalTimeDiff: totalTimeDiff,
-                totalTestDuration: 1,
-                percentActive: 1,
+                totalTestDuration: topLevelSuite.aggregateData.totalTestTime,
+                percentActive: topLevelSuite.aggregateData.totalTestTime / totalTimeDiff,
                 averageDuration: this.getAverageTestDuration(),
                 medianDuration: this.getMedianTestDuration()
             }
         };
     }
 
+
+    /**
+     * Recursive helper for getStructureMetadata
+     */
+    private structMetadataHelper(currSuite: Suite, tempValues: any) {
+        tempValues.totalSuites++;
+        tempValues.maxDepth = Math.max(tempValues.maxDepth, currSuite.path.length);
+
+        if (currSuite.tests.size > 0) {
+            tempValues.minDepth = Math.min(tempValues.minDepth, currSuite.path.length);
+
+            if (currSuite.subSuites.size > 0) {
+                tempValues.totalHybrid++;
+            } else {
+                tempValues.totalLeaves++;
+            }
+        } else {
+            tempValues.totalBranches++;
+        }
+
+        for (const suite of currSuite.subSuites.values()) {
+            this.structMetadataHelper(suite, tempValues);
+        }
+    }
 
     /**
      * Formats suite information for printing

@@ -54,9 +54,9 @@ type StructureMetadata = {
         averageTestsPerSuite: number,
         /** Average number of tests per suite that has tests */
         averageTestsPerNonEmptySuite: number,
-        /** Maximum suite depth (e.g. ['suite 1', 'suite 2'] -> 2) */
+        /** Maximum suite depth (e.g. ['suite 1', 'suite 2'] -> 2), or -1 if no suites */
         maxDepth: number,
-        /** Minimum suite depth with tests (e.g. all suites at depth 1 may only be for holding other suites) */
+        /** Minimum depth for a suite with tests, or Number.MAX_SAFE_INTEGER if no tests */
         minDepth: number,
         /** Average depth for suites with tests */
         averageDepth: number,
