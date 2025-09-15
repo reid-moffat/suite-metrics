@@ -144,6 +144,10 @@ class Metrics {
 
         const curr: Suite = this.suites.getTopLevelSuite();
 
+        // Total time difference between last and first timestamp
+        const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
+        const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
+
         return {
             suites: {
                 numSuites: 1,
@@ -160,10 +164,10 @@ class Metrics {
                 }
             },
             timing: {
-                totalTimeDiff: 1,
+                totalTimeDiff: totalTimeDiff,
                 totalTestDuration: 1,
-                averageDuration: 1,
-                medianDuration: 1
+                averageDuration: this.getAverageTestDuration(),
+                medianDuration: this.getMedianTestDuration()
             }
         };
     }
