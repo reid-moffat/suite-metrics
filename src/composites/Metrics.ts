@@ -1,6 +1,6 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
-import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import { StructureMetadata, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
 import LazyCache from "../helpers/LazyCache.ts";
 
 /**
@@ -133,6 +133,39 @@ class Metrics {
         }
 
         return lines.join('\n');
+    }
+
+    /**
+     * Gets high-level aggregate metadata about all suites e.g. max suite depth, number of suites
+     */
+    public getStructureMetadata(): StructureMetadata {
+
+        const numTests: number = this.lazyCache.getNumTests();
+
+        const curr: Suite = this.suites.getTopLevelSuite();
+
+        return {
+            suites: {
+                numSuites: 1,
+                numEmptySuites: 1,
+                averageTestsPerSuite: 1,
+                averageTestsPerNonEmptySuite: 1,
+                maxDepth: 1,
+                minDepth: 1,
+                averageDepth: 1,
+                demographics: {
+                    numLeaves: 1,
+                    numBranches: 1,
+                    numHybrid: 1,
+                }
+            },
+            timing: {
+                totalTimeDiff: 1,
+                totalTestDuration: 1,
+                averageDuration: 1,
+                medianDuration: 1
+            }
+        };
     }
 
 
