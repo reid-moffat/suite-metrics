@@ -33,4 +33,32 @@ type SuiteData = {
     readonly totalTestMetrics: SuiteTestMetrics;
 }
 
-export type { SuiteTestMetrics, SuiteData };
+/**
+ * High-level aggregate metadata regarding all suites and tests
+ *
+ * Includes metrics such as number of suites, max depth, and leaf
+ */
+type StructureMetadata = {
+    suites: {
+        numSuites: number,
+        numEmptySuites: number;
+        averageTestsPerSuite: number,
+        averageTestsPerNonEmptySuite: number,
+        maxDepth: number,
+        minDepth: number,
+        averageDepth: number,
+        demographics: {
+            numLeaves: number,
+            numBranches: number,
+            numHybrid: number
+        }
+    },
+    timing: {
+        totalTimeDiff: number,
+        totalTestDuration: number,
+        averageDuration: number,
+        medianDuration: number
+    }
+}
+
+export type { SuiteTestMetrics, SuiteData, StructureMetadata };
