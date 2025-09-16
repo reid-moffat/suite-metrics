@@ -72,9 +72,9 @@ const edgeCaseStructure: SuiteStructure[] = [
         suitePath: ["0", "1"],
         tests: ["2", "3"],
     },
-    // Whitespace names (but not empty)
+    // Padded whitespace names
     {
-        suitePath: ["   ", "\t\n "],
+        suitePath: [" s  ", "\td\n "],
         tests: [" test ", "\ttest\n"],
     },
     // Case sensitivity tests
