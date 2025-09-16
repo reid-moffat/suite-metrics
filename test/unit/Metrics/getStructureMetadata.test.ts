@@ -101,20 +101,34 @@ suite("[Metrics] getStructureMetadata", function () {
 
 
         // Check that various values make sense
-        let actual: number = obj.timing.averageDuration;
-        let expected: number = Math.round(obj.timing.totalTestDuration / obj.timing.totalTests);
-        let errMessage: string = `Expected average duration ${actual} to equal ${expected}`;
-        assert.equal(actual, expected, errMessage);
+        type ValidationCase = {
+            actual: number,
+            expected: number,
+            description: string
+        };
 
-        actual = obj.suites.numSuites;
-        expected = obj.suites.numLeaves + obj.suites.numBranches + obj.suites.numHybrid;
-        errMessage = `Expected num suites ${actual} to equal ${expected}`;
-        assert.equal(actual, expected, errMessage);
+        const testCases: ValidationCase[] = [
+            {
+                actual: obj.timing.averageDuration,
+                expected: Math.round(obj.timing.totalTestDuration / obj.timing.totalTests),
+                description: 'averageDuration'
+            },
+            {
+                actual: obj.suites.numSuites,
+                expected: obj.suites.numLeaves + obj.suites.numBranches + obj.suites.numHybrid,
+                description: 'numSuites'
+            },
+            {
+                actual: obj.suites.averageTestsPerSuite,
+                expected: obj.timing.totalTests / obj.suites.numSuites,
+                description: 'averageTestsPerSuite'
+            },
+        ];
 
-        actual = obj.suites.averageTestsPerSuite;
-        expected = obj.timing.totalTests / obj.suites.numSuites;
-        errMessage = `Expected tests per suite ${actual} to equal ${expected}`;
-        assert.equal(actual, expected, errMessage);
+        testCases.forEach((test: ValidationCase): void => {
+            const errMessage = `Expected ${test.description}: actual=${test.actual}, expected=${test.expected}`;
+            assert.equal(test.actual, test.expected, errMessage);
+        });
     }
 
     test("Simple data", function () {
