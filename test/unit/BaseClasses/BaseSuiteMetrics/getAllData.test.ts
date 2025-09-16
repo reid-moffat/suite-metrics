@@ -44,12 +44,18 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Edge cases", function() {
+    test("Normal preset concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.NORMAL) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
+
+
+    test("Edge case preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
     });
 
-    test("Edge cases concurrent", function() {
+    test("Edge case preset concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.EDGE_CASES) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
