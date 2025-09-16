@@ -1,4 +1,4 @@
-import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, StructureMetadata } from "suite-metrics";
+import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, StructureMetadata, Suite } from "suite-metrics";
 import { assert } from "chai";
 import {
     createNestedTestData,
@@ -101,6 +101,7 @@ suite("[Metrics] getStructureMetadata", function () {
 
 
         // Check that various values make sense
+        const topLevelSuite: Suite = instance.getAllData();
         type ValidationCase = {
             actual: number,
             expected: number,
@@ -132,6 +133,11 @@ suite("[Metrics] getStructureMetadata", function () {
                 actual: obj.timing.percentActive,
                 expected: obj.timing.totalTestDuration / obj.timing.totalTimeDiff,
                 description: 'percentActive'
+            },
+            {
+                actual: obj.timing.totalTests,
+                expected: topLevelSuite.aggregateData.numTests,
+                description: 'totalTests'
             }
         ];
 
