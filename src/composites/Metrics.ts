@@ -160,16 +160,17 @@ class Metrics {
 
 
         // Calculate various remaining values
-        const testsPerSuite: number = this.lazyCache.getNumTests() / tempValues.totalSuites;
-        const testsPerNonEmptySuite: number = this.lazyCache.getNumTests() / (tempValues.totalHybrid + tempValues.totalLeaves);
+        const numTests: number = this.lazyCache.getNumTests();
+        const testsPerSuite: number = numTests / tempValues.totalSuites;
+        const testsPerNonEmptySuite: number = numTests / (tempValues.totalHybrid + tempValues.totalLeaves);
 
         const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
         const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
 
         const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;
 
-        const averageDepth: number = tempValues.totalDepth / this.lazyCache.getNumTests();
-        const averageDepthWeighted: number = tempValues.totalDepthWeighted / this.lazyCache.getNumTests();
+        const averageDepth: number = tempValues.totalDepth / numTests;
+        const averageDepthWeighted: number = tempValues.totalDepthWeighted / numTests;
 
 
         return {
@@ -186,6 +187,7 @@ class Metrics {
                 averageDepthWeighted: averageDepthWeighted
             },
             timing: {
+                totalTests: numTests,
                 totalTimeDiff: totalTimeDiff,
                 totalTestDuration: topLevelSuite.aggregateData.totalTestTime,
                 percentActive: percentActive,

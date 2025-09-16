@@ -65,6 +65,8 @@ type StructureMetadata = {
     },
     /** Aggregate data for test timings */
     timing: {
+        /** Total number of tests */
+        totalTests: number,
         /** Time in microseconds between the first test starting and last test ending (includes non-testing time) */
         totalTimeDiff: number,
         /** Total duration of all tests combined in microseconds */
