@@ -6,6 +6,7 @@ import {
     createSimpleTestData,
     PRESET_TYPE
 } from "../../generators/testDataHelpers.ts";
+import exp from "node:constants";
 
 suite("[Metrics] getStructureMetadata", function () {
 
@@ -101,10 +102,15 @@ suite("[Metrics] getStructureMetadata", function () {
 
 
         // Check that various values make sense
-        const actualAverageDuration: number = obj.timing.averageDuration;
-        const expectedAverageDuration: number = Math.round(obj.timing.totalTestDuration / obj.timing.totalTests);
-        const errMessage: string = `Expected average duration ${actualAverageDuration} to equal ${expectedAverageDuration}`;
-        assert.equal(actualAverageDuration, expectedAverageDuration, errMessage);
+        let actual: number = obj.timing.averageDuration;
+        let expected: number = Math.round(obj.timing.totalTestDuration / obj.timing.totalTests);
+        let errMessage: string = `Expected average duration ${actual} to equal ${expected}`;
+        assert.equal(actual, expected, errMessage);
+
+        actual = obj.suites.numSuites;
+        expected = obj.suites.numLeaves + obj.suites.numBranches + obj.suites.numHybrid;
+        errMessage = `Expected num suites ${actual} to equal ${expected}`;
+        assert.equal(actual, expected, errMessage);
     }
 
     test("Simple data", function () {
