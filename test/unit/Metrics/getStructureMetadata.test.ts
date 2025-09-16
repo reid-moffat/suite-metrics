@@ -75,7 +75,7 @@ suite("[Metrics] getStructureMetadata", function () {
     });
 
     test("Nested data", function () {
-        const instance: SuiteMetrics = createNestedTestData(false, { numSuites: 10, testsPerSuite: 10, maxDepth: 3 }) as SuiteMetrics;
+        const instance: SuiteMetrics = createNestedTestData() as SuiteMetrics;
 
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
