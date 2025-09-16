@@ -49,6 +49,10 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
+    test("Large preset", function() {
+        const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.LARGE_SUITE) as SuiteMetrics;
+        runTest(instance);
+    });
 
     test("Edge case preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
