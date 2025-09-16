@@ -38,6 +38,12 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
+
+    test("Normal preset", function() {
+        const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.NORMAL) as SuiteMetrics;
+        runTest(instance);
+    });
+
     test("Edge cases", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
