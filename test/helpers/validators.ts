@@ -131,7 +131,7 @@ function validateSuiteRecursive(suite: Suite): AggregateData {
     }
 
     // Finally, validate data points
-    assert.isAtLeast(aggregateData.numTests, suite.tests.size);
+    assert.isAtLeast(aggregateData.numTests, suite.tests.size, `Num tests must be at least the number of tests directly in this suite`);
     assert.equal(aggregateData.numTests, tempAggregateData.numTests, `Expected aggregateData's numTests to match calculated value`);
     assert.equal(aggregateData.totalTestTime, tempAggregateData.totalTestTime, `Expected aggregateData's totalTestTime to match calculated value`);
 
