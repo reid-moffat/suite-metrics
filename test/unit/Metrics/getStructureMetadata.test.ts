@@ -98,6 +98,13 @@ suite("[Metrics] getStructureMetadata", function () {
             const val: number = obj.timing[key];
             assert.isAtLeast(val, 0, `Key ${key} in 'timing' must have a non-negative value (value: ${val})`);
         });
+
+
+        // Check that various values make sense
+        const actualAverageDuration: number = obj.timing.averageDuration;
+        const expectedAverageDuration: number = Math.round(obj.timing.totalTestDuration / obj.timing.totalTests);
+        const errMessage: string = `Expected average duration ${actualAverageDuration} to equal ${expectedAverageDuration}`;
+        assert.equal(actualAverageDuration, expectedAverageDuration, errMessage);
     }
 
     test("Simple data", function () {
