@@ -23,9 +23,10 @@ suite("[Metrics] getStructureMetadata", function () {
 
         // Validate suites object
         const suites: any = obj.suites;
-        assert.isNotNull(obj, `Expected 'suites' object to not be null`);
+        assert.isNotNull(suites, `Expected 'suites' object to not be null`);
         assert.isObject(suites, `Expected 'suites' to be an object`);
         assert.isNotArray(suites, `Expected 'suites' to not be an array`);
+        assert.isNotEmpty(suites, `Expected 'suites' to not be empty`);
 
         const suitesKeys: string[] = Object.keys(suites);
         const expectedSuitesKeys: string[] = [
@@ -44,8 +45,10 @@ suite("[Metrics] getStructureMetadata", function () {
 
         // Validate timing object
         const timing: any = obj.timing;
-        assert.isObject(timing, `Expected object at timing`);
-        assert.isNotArray(timing, `Expected object (not array) at timing`);
+        assert.isNotNull(timing, `Expected 'timing' object to not be null`);
+        assert.isObject(timing, `Expected 'timing' to be an object`);
+        assert.isNotArray(timing, `Expected 'timing' object to not be an array`);
+        assert.isNotEmpty(timing, `Expected 'timing' to not be empty`);
 
         const timingKeys: string[] = Object.keys(timing);
         const expectedTimingKeys: string[] = [
