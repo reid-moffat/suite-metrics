@@ -207,7 +207,7 @@ class Metrics {
 
         if (currSuite.tests.size > 0) {
             tempValues.minDepth = Math.min(tempValues.minDepth, currSuite.path.length);
-            tempValues.totalDepth++;
+            tempValues.totalDepth += currSuite.path.length;
             tempValues.totalDepthWeighted += currSuite.tests.size;
 
             if (currSuite.subSuites.size > 0) {
