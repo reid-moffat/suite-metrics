@@ -169,7 +169,7 @@ class Metrics {
 
         const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;
 
-        const averageDepth: number = tempValues.totalDepth / numTests;
+        const averageDepth: number = tempValues.totalDepth / (tempValues.totalLeaves + tempValues.totalHybrid);
         const averageDepthWeighted: number = tempValues.totalDepthWeighted / numTests;
 
 
