@@ -110,6 +110,11 @@ suite("[Metrics] getStructureMetadata", function () {
         expected = obj.suites.numLeaves + obj.suites.numBranches + obj.suites.numHybrid;
         errMessage = `Expected num suites ${actual} to equal ${expected}`;
         assert.equal(actual, expected, errMessage);
+
+        actual = obj.suites.averageTestsPerSuite;
+        expected = obj.timing.totalTests / obj.suites.numSuites;
+        errMessage = `Expected tests per suite ${actual} to equal ${expected}`;
+        assert.equal(actual, expected, errMessage);
     }
 
     test("Simple data", function () {
