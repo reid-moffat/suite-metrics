@@ -12,7 +12,7 @@ suite("[Metrics] getStructureMetadata", function () {
     /**
      * Validates that an object exactly matches the StructureMetadata structure
      */
-    function assertStructureMetadata(obj: any) {
+    function ValidateStructureMetadata(obj: StructureMetadata) {
 
         // Top-level validation
         assert.isNotNull(obj, `Expected structure to not be null`);
@@ -70,13 +70,31 @@ suite("[Metrics] getStructureMetadata", function () {
         });
     }
 
+    /**
+     * Validates all values are in the required range
+     */
+    function ValidateStructureValues(obj: StructureMetadata) {
+        const suitesKeys: string[] = Object.keys(obj.suites);
+        const timingKeys: string[] = Object.keys(obj.timing);
+
+        suitesKeys.forEach((key: string): void => { // @ts-ignore
+            const val: number = obj.suites[key];
+            assert.isAtLeast(val, 0, `Key ${key} in 'suites' must have a non-negative value (value: ${val})`);
+        });
+        timingKeys.forEach((key: string): void => { // @ts-ignore
+            const val: number = obj.timing[key];
+            assert.isAtLeast(val, 0, `Key ${key} in 'timing' must have a non-negative value (value: ${val})`);
+        });
+    }
+
     test("Simple data", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
 
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
-        assertStructureMetadata(structureMetadata);
+        ValidateStructureMetadata(structureMetadata);
+        ValidateStructureValues(structureMetadata);
     });
 
     test("Nested data", function () {
@@ -85,7 +103,8 @@ suite("[Metrics] getStructureMetadata", function () {
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
-        assertStructureMetadata(structureMetadata);
+        ValidateStructureMetadata(structureMetadata);
+        ValidateStructureValues(structureMetadata);
     });
 
     test("Custom edge case data", function () {
@@ -94,7 +113,8 @@ suite("[Metrics] getStructureMetadata", function () {
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
-        assertStructureMetadata(structureMetadata);
+        ValidateStructureMetadata(structureMetadata);
+        ValidateStructureValues(structureMetadata);
     });
 
     test("Custom large data", function () {
@@ -103,7 +123,8 @@ suite("[Metrics] getStructureMetadata", function () {
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
-        assertStructureMetadata(structureMetadata);
+        ValidateStructureMetadata(structureMetadata);
+        ValidateStructureValues(structureMetadata);
     });
 
     test("Custom large data concurrent", function () {
@@ -112,6 +133,7 @@ suite("[Metrics] getStructureMetadata", function () {
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
-        assertStructureMetadata(structureMetadata);
+        ValidateStructureMetadata(structureMetadata);
+        ValidateStructureValues(structureMetadata);
     });
 });
