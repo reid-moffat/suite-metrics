@@ -110,6 +110,10 @@ function validateSuiteRecursive(suite: Suite) {
 
     assert.isNumber(suite.aggregateData.numTests);
     assert.isNumber(suite.aggregateData.totalTestTime);
+
+    for (const subSuite of suite.subSuites.values()) {
+        validateSuiteRecursive(subSuite);
+    }
 }
 
 export { validateSuiteData, SuiteDataValidate, validateSuiteRecursive };
