@@ -27,4 +27,9 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         const instance: SuiteMetrics = createNestedTestData() as SuiteMetrics;
         runTest(instance);
     });
+
+    test("Nested data concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createNestedTestData(true) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
 });
