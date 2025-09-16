@@ -1,4 +1,4 @@
-import { Suite, SuiteData } from "suite-metrics";
+import { Suite, Test, SuiteData } from "suite-metrics";
 import { expect } from 'chai';
 import { assert } from "chai";
 
@@ -104,16 +104,51 @@ function validateSuiteRecursive(suite: Suite) {
 
     // Validate all keys are the expected type
     assert.isString(suite.name);
-    assert.isArray(suite.path);
+    assert.isArray(suite.path); // TODO: validate each
     assert.instanceOf(suite.tests, Map);
     assert.instanceOf(suite.subSuites, Map);
 
     assert.isNumber(suite.aggregateData.numTests);
     assert.isNumber(suite.aggregateData.totalTestTime);
 
+
+    // Validate specific data
+    for (const test of suite.tests.values()) {
+        validateTest(test);
+    }
+
+
+    // Recursively validate all sub-suites
     for (const subSuite of suite.subSuites.values()) {
         validateSuiteRecursive(subSuite);
     }
 }
 
-export { validateSuiteData, SuiteDataValidate, validateSuiteRecursive };
+/**
+ * Validates a test object is valid
+ */
+function validateTest(test: Test) {
+
+    // Validate top-level object
+    assert.isNotNull(test, `Expected test to not be null`);
+    assert.isObject(test, `Expected test to be an object`);
+    assert.isNotArray(test, `Expected test to not be an array`);
+    assert.isNotEmpty(test, `Expected test to not be empty`);
+
+    // Validate top-level keys exist
+    const expectedKeys: string[] = ["name", "path", "startTimestamp", "endTimestamp", "duration", "testNumber", "suiteTestNumber"];
+    assert.hasAllKeys(test, expectedKeys, `Expected test ${JSON.stringify(test)} to contain only keys ${JSON.stringify(expectedKeys)}`);
+
+    // Validate value types
+    assert.isString(test.name);
+    assert.isArray(test.path); // TODO: full validate
+    assert.isNumber(test.startTimestamp);
+    assert.isNumber(test.endTimestamp);
+    assert.isNumber(test.duration);
+    assert.isNumber(test.testNumber);
+    assert.isNumber(test.suiteTestNumber);
+
+    // Validate specific values
+}
+
+export { validateSuiteData, SuiteDataValidate, validateSuiteRecursive, validateTest };
