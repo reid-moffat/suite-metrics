@@ -123,6 +123,11 @@ suite("[Metrics] getStructureMetadata", function () {
                 expected: obj.timing.totalTests / obj.suites.numSuites,
                 description: 'averageTestsPerSuite'
             },
+            {
+                actual: obj.suites.averageTestsPerNonEmptySuite,
+                expected: obj.timing.totalTests / (obj.suites.numLeaves + obj.suites.numHybrid),
+                description: 'averageTestsPerNonEmptySuite'
+            }
         ];
 
         testCases.forEach((test: ValidationCase): void => {
