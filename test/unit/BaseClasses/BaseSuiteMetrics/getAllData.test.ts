@@ -1,4 +1,4 @@
-import SuiteMetrics, { BaseSuiteMetrics, Suite } from "suite-metrics";
+import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, Suite } from "suite-metrics";
 import { createSimpleTestData } from "../../../generators/testDataHelpers.js";
 import { assert } from "chai";
 
@@ -15,6 +15,11 @@ suite("[BaseSuiteMetrics] getAllData", function() {
 
     test("Simple test data", function() {
         const instance: SuiteMetrics = createSimpleTestData(false) as SuiteMetrics;
+        runTest(instance);
+    });
+
+    test("Simple test data concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createSimpleTestData(true) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
 });
