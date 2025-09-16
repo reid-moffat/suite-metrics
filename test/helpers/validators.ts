@@ -113,7 +113,7 @@ function validateSuiteRecursive(suite: Suite): AggregateData {
     assert.isNumber(suite.aggregateData.totalTestTime);
 
 
-    // Validate specific data
+    // Validate tests + start calculating aggregate data manually
     const tempAggregateData: AggregateData = {
         numTests: suite.tests.size,
         totalTestTime: 0
@@ -130,6 +130,8 @@ function validateSuiteRecursive(suite: Suite): AggregateData {
         tempAggregateData.totalTestTime += data.totalTestTime;
     }
 
+    // Finally, validate data points
+    assert.isAtLeast(aggregateData.numTests, suite.tests.size);
     assert.equal(aggregateData.numTests, tempAggregateData.numTests, `Expected aggregateData's numTests to match calculated value`);
     assert.equal(aggregateData.totalTestTime, tempAggregateData.totalTestTime, `Expected aggregateData's totalTestTime to match calculated value`);
 
