@@ -1,5 +1,5 @@
 import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, Suite } from "suite-metrics";
-import { createSimpleTestData } from "../../../generators/testDataHelpers.js";
+import { createNestedTestData, createSimpleTestData } from "../../../generators/testDataHelpers.js";
 import { assert } from "chai";
 
 suite("[BaseSuiteMetrics] getAllData", function() {
@@ -13,13 +13,18 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         assert.equal(result.aggregateData.numTests, instance.metrics.getTotalTestCount());
     }
 
-    test("Simple test data", function() {
-        const instance: SuiteMetrics = createSimpleTestData(false) as SuiteMetrics;
+    test("Simple data", function() {
+        const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
         runTest(instance);
     });
 
-    test("Simple test data concurrent", function() {
+    test("Simple data concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createSimpleTestData(true) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
+
+    test("Nested data", function() {
+        const instance: SuiteMetrics = createNestedTestData() as SuiteMetrics;
         runTest(instance);
     });
 });
