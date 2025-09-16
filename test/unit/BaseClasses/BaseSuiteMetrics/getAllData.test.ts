@@ -42,4 +42,9 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
     });
+
+    test("Edge cases concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.EDGE_CASES) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
 });
