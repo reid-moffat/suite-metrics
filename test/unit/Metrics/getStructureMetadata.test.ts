@@ -7,15 +7,15 @@ suite("[Metrics] getStructureMetadata", function () {
     /**
      * Validates that an object exactly matches the StructureMetadata structure
      */
-    function assertStructureMetadata(obj: any, path = '') {
-        // Helper function to create descriptive error messages
-        const getPath = (prop: any) => path ? `${path}.${prop}` : prop;
+    function assertStructureMetadata(obj: any) {
 
-        // Check that obj is an object
-        assert.isObject(obj, `Expected object at ${path || 'root'}`);
-        assert.isNotArray(obj, `Expected object (not array) at ${path || 'root'}`);
+        // Top-level validation
+        assert.isNotNull(obj, `Expected structure to not be null`);
+        assert.isObject(obj, `Expected structure to be an object`);
+        assert.isNotArray(obj, `Expected structure to not be an array`);
+        assert.isNotEmpty(obj, `Expected structure to not be empty`);
 
-        // Check root level has exactly the expected keys
+        // Validate root-level keys
         const rootKeys = Object.keys(obj);
         const expectedRootKeys = ['suites', 'timing'];
         assert.sameMembers(rootKeys, expectedRootKeys,
@@ -23,8 +23,9 @@ suite("[Metrics] getStructureMetadata", function () {
 
         // Validate suites object
         const suites = obj.suites;
-        assert.isObject(suites, `Expected object at ${getPath('suites')}`);
-        assert.isNotArray(suites, `Expected object (not array) at ${getPath('suites')}`);
+        assert.isNotNull(obj, `Expected 'suites' object to not be null`);
+        assert.isObject(suites, `Expected 'suites' to be an object`);
+        assert.isNotArray(suites, `Expected 'suites' to not be an array`);
 
         const suitesKeys = Object.keys(suites);
         const expectedSuitesKeys = [
@@ -37,14 +38,14 @@ suite("[Metrics] getStructureMetadata", function () {
 
         // Validate all suites properties are numbers
         expectedSuitesKeys.forEach(key => {
-            assert.isNumber(suites[key], `Expected ${getPath(`suites.${key}`)} to be a number`);
-            assert.isNotNaN(suites[key], `Expected ${getPath(`suites.${key}`)} to not be NaN`);
+            assert.isNumber(suites[key], `Expected ${`suites.${key}`} to be a number`);
+            assert.isNotNaN(suites[key], `Expected ${`suites.${key}`} to not be NaN`);
         });
 
         // Validate timing object
         const timing = obj.timing;
-        assert.isObject(timing, `Expected object at ${getPath('timing')}`);
-        assert.isNotArray(timing, `Expected object (not array) at ${getPath('timing')}`);
+        assert.isObject(timing, `Expected object at timing`);
+        assert.isNotArray(timing, `Expected object (not array) at timing`);
 
         const timingKeys = Object.keys(timing);
         const expectedTimingKeys = [
@@ -56,8 +57,8 @@ suite("[Metrics] getStructureMetadata", function () {
 
         // Validate all timing properties are numbers
         expectedTimingKeys.forEach((key: string) => {
-            assert.isNumber(timing[key], `Expected ${getPath(`timing.${key}`)} to be a number`);
-            assert.isNotNaN(timing[key], `Expected ${getPath(`timing.${key}`)} to not be NaN`);
+            assert.isNumber(timing[key], `Expected timing.${key} to be a number`);
+            assert.isNotNaN(timing[key], `Expected timing.${key} to not be NaN`);
         });
     }
 
