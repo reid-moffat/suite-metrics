@@ -64,6 +64,11 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
+    test("Realistic preset concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.REALISTIC_PREMADE) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
+
     test("Edge case preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
