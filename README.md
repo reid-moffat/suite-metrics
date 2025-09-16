@@ -163,6 +163,8 @@ metrics.metrics.getMedianTestDuration(); // -> median duration for all tests (mi
 metrics.metrics.getSuiteMetrics(["Suite Name"]); // -> suite's location and test metrics (direct and sub-suites)
 
 console.log(metrics.metrics.printAllSuiteMetrics()); // -> human-readable summary of all tests
+
+metrics.metrics.getStructureMetadata(); // -> high-level aggreagate summary (depth metrics, active time, test distribution, etc)
 ```
 
 #### performance
