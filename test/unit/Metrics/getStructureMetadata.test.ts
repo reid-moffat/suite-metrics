@@ -17,7 +17,7 @@ suite("[Metrics] getStructureMetadata", function () {
 
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
         ValidateStructureMetadata(structureMetadata);
-        ValidateStructureValues(structureMetadata);
+        ValidateStructureValues(structureMetadata, instance);
     }
 
     /**
@@ -84,7 +84,7 @@ suite("[Metrics] getStructureMetadata", function () {
     /**
      * Validates all values are in the required range
      */
-    function ValidateStructureValues(obj: StructureMetadata) {
+    function ValidateStructureValues(obj: StructureMetadata, instance: BaseSuiteMetrics) {
 
         // First validate that
         const suitesKeys: string[] = Object.keys(obj.suites);
@@ -147,6 +147,15 @@ suite("[Metrics] getStructureMetadata", function () {
         const totalDiff: number = obj.timing.totalTimeDiff;
         const totalDuration: number = obj.timing.totalTestDuration;
         assert.isAtLeast(totalDiff, totalDuration, `Total test diff ${totalDiff} must be at least total test duration ${totalDuration}`);
+
+        const minDuration: number = instance.performance.getFastestTest().duration;
+        const maxDuration: number = instance.performance.getSlowestTest().duration;
+        const averageDuration: number = obj.timing.averageDuration;
+        const medianDuration: number = obj.timing.medianDuration;
+        assert.isAtLeast(averageDuration, minDuration, `Average duration ${averageDuration} must be at least the minimum duration ${minDuration}`);
+        assert.isAtLeast(medianDuration, minDuration, `Median duration ${medianDuration} must be at least the minimum duration ${minDuration}`);
+        assert.isAtMost(averageDuration, maxDuration, `Average duration ${averageDuration} must be at most the maximum duration ${maxDuration}`);
+        assert.isAtMost(medianDuration, maxDuration, `Median duration ${medianDuration} must be at most the maximum duration ${maxDuration}`);
     }
 
     test("Simple data", function () {
