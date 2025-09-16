@@ -1,6 +1,11 @@
-import SuiteMetrics, { StructureMetadata } from "suite-metrics";
+import SuiteMetrics, { ConcurrentSuiteMetrics, StructureMetadata } from "suite-metrics";
 import { assert } from "chai";
-import { createNestedTestData, createSimpleTestData } from "../../generators/testDataHelpers.ts";
+import {
+    createNestedTestData,
+    createPresetData,
+    createSimpleTestData,
+    PRESET_TYPE
+} from "../../generators/testDataHelpers.ts";
 
 suite("[Metrics] getStructureMetadata", function () {
 
@@ -76,6 +81,33 @@ suite("[Metrics] getStructureMetadata", function () {
 
     test("Nested data", function () {
         const instance: SuiteMetrics = createNestedTestData() as SuiteMetrics;
+
+        const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
+
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+        assertStructureMetadata(structureMetadata);
+    });
+
+    test("Custom edge case data", function () {
+        const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
+
+        const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
+
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+        assertStructureMetadata(structureMetadata);
+    });
+
+    test("Custom large data", function () {
+        const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.LARGE_SUITE) as SuiteMetrics;
+
+        const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
+
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+        assertStructureMetadata(structureMetadata);
+    });
+
+    test("Custom large data concurrent", function () {
+        const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.LARGE_SUITE) as ConcurrentSuiteMetrics;
 
         const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
