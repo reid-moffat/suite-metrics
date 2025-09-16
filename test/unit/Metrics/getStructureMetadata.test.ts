@@ -138,6 +138,11 @@ suite("[Metrics] getStructureMetadata", function () {
                 actual: obj.timing.totalTests,
                 expected: topLevelSuite.aggregateData.numTests,
                 description: 'totalTests'
+            },
+            {
+                actual: obj.timing.totalTestDuration,
+                expected: topLevelSuite.aggregateData.totalTestTime,
+                description: 'totalTestDuration'
             }
         ];
 
