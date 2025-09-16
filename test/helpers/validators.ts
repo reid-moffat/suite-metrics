@@ -143,7 +143,6 @@ function validateTest(test: Test) {
     // Validate value types
     assert.isString(test.name);
     assert.isArray(test.path);
-    test.path.forEach((val: string): void => assert.isString(val));
     assert.isNumber(test.startTimestamp);
     assert.isNumber(test.endTimestamp);
     assert.isNumber(test.duration);
@@ -151,6 +150,16 @@ function validateTest(test: Test) {
     assert.isNumber(test.suiteTestNumber);
 
     // Validate specific values
+    assert.isAtLeast(test.name.length, 1, `Test name must be at least 1 character long`);
+    test.path.forEach((val: string): void => {
+        assert.isString(val, `All values in test's path must strings`);
+        assert.isAtLeast(val.length, 1, `All values in test's path must be at least 1 character long`);
+    });
+    assert.isAtLeast(test.startTimestamp, 0, `Start timestamp must be positive`);
+    assert.isAtLeast(test.endTimestamp, test.startTimestamp, `End timestamp must be at least the start timestamp`);
+    assert.equal(test.duration, test.endTimestamp - test.startTimestamp, `Expected duration to be the start/end difference`);
+    assert.isAtLeast(test.testNumber, 1, `Test number must be at least 1`);
+    assert.isAtLeast(test.suiteTestNumber, 1, `Test must have a suite test # of at least 1`);
 }
 
 export { validateSuiteData, SuiteDataValidate, validateSuiteRecursive, validateTest };
