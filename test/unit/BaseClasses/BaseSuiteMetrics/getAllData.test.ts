@@ -54,6 +54,11 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
+    test("Large preset concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.LARGE_SUITE) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
+
     test("Edge case preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
