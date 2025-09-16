@@ -202,13 +202,14 @@ class Metrics {
      * Recursive helper for getStructureMetadata
      */
     private structMetadataHelper(currSuite: Suite, tempValues: TmpVals) {
+        const depth: number = currSuite.path.length;
         tempValues.totalSuites++;
-        tempValues.maxDepth = Math.max(tempValues.maxDepth, currSuite.path.length);
+        tempValues.maxDepth = Math.max(tempValues.maxDepth, depth);
 
         if (currSuite.tests.size > 0) {
-            tempValues.minDepth = Math.min(tempValues.minDepth, currSuite.path.length);
-            tempValues.totalDepth += currSuite.path.length;
-            tempValues.totalDepthWeighted += currSuite.tests.size;
+            tempValues.minDepth = Math.min(tempValues.minDepth, depth);
+            tempValues.totalDepth += depth;
+            tempValues.totalDepthWeighted += depth * currSuite.tests.size;
 
             if (currSuite.subSuites.size > 0) {
                 tempValues.totalHybrid++;
