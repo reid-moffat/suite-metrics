@@ -1,5 +1,10 @@
 import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, Suite } from "suite-metrics";
-import { createNestedTestData, createSimpleTestData } from "../../../generators/testDataHelpers.js";
+import {
+    createNestedTestData,
+    createPresetData,
+    createSimpleTestData,
+    PRESET_TYPE
+} from "../../../generators/testDataHelpers.js";
 import { assert } from "chai";
 
 suite("[BaseSuiteMetrics] getAllData", function() {
@@ -30,6 +35,11 @@ suite("[BaseSuiteMetrics] getAllData", function() {
 
     test("Nested data concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createNestedTestData(true) as ConcurrentSuiteMetrics;
+        runTest(instance);
+    });
+
+    test("Edge cases", function() {
+        const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.EDGE_CASES) as SuiteMetrics;
         runTest(instance);
     });
 });
