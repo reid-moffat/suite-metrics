@@ -139,6 +139,14 @@ suite("[Metrics] getStructureMetadata", function () {
             const errMessage = `Expected ${test.description}: actual=${test.actual}, expected=${test.expected}`;
             assert.equal(test.actual, test.expected, errMessage);
         });
+
+        const maxDepth: number = obj.suites.maxDepth;
+        const minDepth: number = obj.suites.maxDepth;
+        assert.isAtLeast(maxDepth, minDepth, `Max depth ${maxDepth} must be at least min depth ${minDepth}`);
+
+        const totalDiff: number = obj.timing.totalTimeDiff;
+        const totalDuration: number = obj.timing.totalTestDuration;
+        assert.isAtLeast(totalDiff, totalDuration, `Total test diff ${totalDiff} must be at least total test duration ${totalDuration}`);
     }
 
     test("Simple data", function () {
