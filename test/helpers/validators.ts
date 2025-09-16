@@ -104,7 +104,8 @@ function validateSuiteRecursive(suite: Suite) {
 
     // Validate all keys are the expected type
     assert.isString(suite.name);
-    assert.isArray(suite.path); // TODO: validate each
+    assert.isArray(suite.path);
+    suite.path.forEach((val: string): void => assert.isString(val));
     assert.instanceOf(suite.tests, Map);
     assert.instanceOf(suite.subSuites, Map);
 
@@ -141,7 +142,8 @@ function validateTest(test: Test) {
 
     // Validate value types
     assert.isString(test.name);
-    assert.isArray(test.path); // TODO: full validate
+    assert.isArray(test.path);
+    test.path.forEach((val: string): void => assert.isString(val));
     assert.isNumber(test.startTimestamp);
     assert.isNumber(test.endTimestamp);
     assert.isNumber(test.duration);
