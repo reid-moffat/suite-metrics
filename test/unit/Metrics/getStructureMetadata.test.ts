@@ -6,7 +6,6 @@ import {
     createSimpleTestData,
     PRESET_TYPE
 } from "../../generators/testDataHelpers.ts";
-import exp from "node:constants";
 
 suite("[Metrics] getStructureMetadata", function () {
 
