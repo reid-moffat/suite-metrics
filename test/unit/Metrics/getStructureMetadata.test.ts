@@ -1,6 +1,6 @@
 import SuiteMetrics, { StructureMetadata } from "suite-metrics";
 import { assert } from "chai";
-import { createNestedTestData } from "../../generators/testDataHelpers.ts";
+import { createNestedTestData, createSimpleTestData } from "../../generators/testDataHelpers.ts";
 
 suite("[Metrics] getStructureMetadata", function () {
 
@@ -55,18 +55,27 @@ suite("[Metrics] getStructureMetadata", function () {
             `timing object should have exactly keys: ${expectedTimingKeys.join(', ')}`);
 
         // Validate all timing properties are numbers
-        expectedTimingKeys.forEach(key => {
+        expectedTimingKeys.forEach((key: string) => {
             assert.isNumber(timing[key], `Expected ${getPath(`timing.${key}`)} to be a number`);
             assert.isNotNaN(timing[key], `Expected ${getPath(`timing.${key}`)} to not be NaN`);
         });
     }
 
     test("Simple data", function () {
+        const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
+
+        const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
+
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+        assertStructureMetadata(structureMetadata);
+    });
+
+    test("Nested data", function () {
         const instance: SuiteMetrics = createNestedTestData(false, { numSuites: 10, testsPerSuite: 10, maxDepth: 3 }) as SuiteMetrics;
 
-        const result: StructureMetadata = instance.metrics.getStructureMetadata();
+        const structureMetadata: StructureMetadata = instance.metrics.getStructureMetadata();
 
-        console.log(`Result: ${JSON.stringify(result, null, 4)}`);
-        assertStructureMetadata(result);
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+        assertStructureMetadata(structureMetadata);
     });
 });
