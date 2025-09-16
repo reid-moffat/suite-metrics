@@ -23,22 +23,22 @@ suite("[Metrics] getStructureMetadata", function () {
     /**
      * Validates that an object exactly matches the StructureMetadata structure
      */
-    function ValidateStructureMetadata(obj: StructureMetadata) {
+    function ValidateStructureMetadata(result: StructureMetadata) {
 
         // Top-level validation
-        assert.isNotNull(obj, `Expected structure to not be null`);
-        assert.isObject(obj, `Expected structure to be an object`);
-        assert.isNotArray(obj, `Expected structure to not be an array`);
-        assert.isNotEmpty(obj, `Expected structure to not be empty`);
+        assert.isNotNull(result, `Expected structure to not be null`);
+        assert.isObject(result, `Expected structure to be an object`);
+        assert.isNotArray(result, `Expected structure to not be an array`);
+        assert.isNotEmpty(result, `Expected structure to not be empty`);
 
         // Validate root-level keys
-        const rootKeys: string[] = Object.keys(obj);
+        const rootKeys: string[] = Object.keys(result);
         const expectedRootKeys: string[] = ['suites', 'timing'];
         assert.sameMembers(rootKeys, expectedRootKeys,
             `Root object should have exactly keys: ${expectedRootKeys.join(', ')}`);
 
         // Validate suites object
-        const suites: any = obj.suites;
+        const suites: any = result.suites;
         assert.isNotNull(suites, `Expected 'suites' object to not be null`);
         assert.isObject(suites, `Expected 'suites' to be an object`);
         assert.isNotArray(suites, `Expected 'suites' to not be an array`);
@@ -60,7 +60,7 @@ suite("[Metrics] getStructureMetadata", function () {
         });
 
         // Validate timing object
-        const timing: any = obj.timing;
+        const timing: any = result.timing;
         assert.isNotNull(timing, `Expected 'timing' object to not be null`);
         assert.isObject(timing, `Expected 'timing' to be an object`);
         assert.isNotArray(timing, `Expected 'timing' object to not be an array`);
@@ -84,18 +84,18 @@ suite("[Metrics] getStructureMetadata", function () {
     /**
      * Validates all values are in the required range
      */
-    function ValidateStructureValues(obj: StructureMetadata, instance: BaseSuiteMetrics) {
+    function ValidateStructureValues(result: StructureMetadata, instance: BaseSuiteMetrics) {
 
         // First validate that
-        const suitesKeys: string[] = Object.keys(obj.suites);
-        const timingKeys: string[] = Object.keys(obj.timing);
+        const suitesKeys: string[] = Object.keys(result.suites);
+        const timingKeys: string[] = Object.keys(result.timing);
 
         suitesKeys.forEach((key: string): void => { // @ts-ignore
-            const val: number = obj.suites[key];
+            const val: number = result.suites[key];
             assert.isAtLeast(val, 0, `Key ${key} in 'suites' must have a non-negative value (value: ${val})`);
         });
         timingKeys.forEach((key: string): void => { // @ts-ignore
-            const val: number = obj.timing[key];
+            const val: number = result.timing[key];
             assert.isAtLeast(val, 0, `Key ${key} in 'timing' must have a non-negative value (value: ${val})`);
         });
 
@@ -110,37 +110,37 @@ suite("[Metrics] getStructureMetadata", function () {
 
         const testCases: ValidationCase[] = [
             {
-                actual: obj.timing.averageDuration,
-                expected: Math.round(obj.timing.totalTestDuration / obj.timing.totalTests),
+                actual: result.timing.averageDuration,
+                expected: Math.round(result.timing.totalTestDuration / result.timing.totalTests),
                 description: 'averageDuration'
             },
             {
-                actual: obj.suites.numSuites,
-                expected: obj.suites.numLeaves + obj.suites.numBranches + obj.suites.numHybrid,
+                actual: result.suites.numSuites,
+                expected: result.suites.numLeaves + result.suites.numBranches + result.suites.numHybrid,
                 description: 'numSuites'
             },
             {
-                actual: obj.suites.averageTestsPerSuite,
-                expected: obj.timing.totalTests / obj.suites.numSuites,
+                actual: result.suites.averageTestsPerSuite,
+                expected: result.timing.totalTests / result.suites.numSuites,
                 description: 'averageTestsPerSuite'
             },
             {
-                actual: obj.suites.averageTestsPerNonEmptySuite,
-                expected: obj.timing.totalTests / (obj.suites.numLeaves + obj.suites.numHybrid),
+                actual: result.suites.averageTestsPerNonEmptySuite,
+                expected: result.timing.totalTests / (result.suites.numLeaves + result.suites.numHybrid),
                 description: 'averageTestsPerNonEmptySuite'
             },
             {
-                actual: obj.timing.percentActive,
-                expected: obj.timing.totalTestDuration / obj.timing.totalTimeDiff,
+                actual: result.timing.percentActive,
+                expected: result.timing.totalTestDuration / result.timing.totalTimeDiff,
                 description: 'percentActive'
             },
             {
-                actual: obj.timing.totalTests,
+                actual: result.timing.totalTests,
                 expected: topLevelSuite.aggregateData.numTests,
                 description: 'totalTests'
             },
             {
-                actual: obj.timing.totalTestDuration,
+                actual: result.timing.totalTestDuration,
                 expected: topLevelSuite.aggregateData.totalTestTime,
                 description: 'totalTestDuration'
             }
@@ -151,18 +151,18 @@ suite("[Metrics] getStructureMetadata", function () {
             assert.equal(test.actual, test.expected, errMessage);
         });
 
-        const maxDepth: number = obj.suites.maxDepth;
-        const minDepth: number = obj.suites.maxDepth;
+        const maxDepth: number = result.suites.maxDepth;
+        const minDepth: number = result.suites.maxDepth;
         assert.isAtLeast(maxDepth, minDepth, `Max depth ${maxDepth} must be at least min depth ${minDepth}`);
 
-        const totalDiff: number = obj.timing.totalTimeDiff;
-        const totalDuration: number = obj.timing.totalTestDuration;
+        const totalDiff: number = result.timing.totalTimeDiff;
+        const totalDuration: number = result.timing.totalTestDuration;
         assert.isAtLeast(totalDiff, totalDuration, `Total test diff ${totalDiff} must be at least total test duration ${totalDuration}`);
 
         const minDuration: number = instance.performance.getFastestTest().duration;
         const maxDuration: number = instance.performance.getSlowestTest().duration;
-        const averageDuration: number = obj.timing.averageDuration;
-        const medianDuration: number = obj.timing.medianDuration;
+        const averageDuration: number = result.timing.averageDuration;
+        const medianDuration: number = result.timing.medianDuration;
         assert.isAtLeast(averageDuration, minDuration, `Average duration ${averageDuration} must be at least the minimum duration ${minDuration}`);
         assert.isAtLeast(medianDuration, minDuration, `Median duration ${medianDuration} must be at least the minimum duration ${minDuration}`);
         assert.isAtMost(averageDuration, maxDuration, `Average duration ${averageDuration} must be at most the maximum duration ${maxDuration}`);
