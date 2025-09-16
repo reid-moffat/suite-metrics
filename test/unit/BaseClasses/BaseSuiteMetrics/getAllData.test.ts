@@ -6,6 +6,7 @@ import {
     PRESET_TYPE
 } from "../../../generators/testDataHelpers.js";
 import { assert } from "chai";
+import { validateSuiteRecursive } from "../../../helpers/validators.js";
 
 suite("[BaseSuiteMetrics] getAllData", function() {
 
@@ -16,6 +17,8 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         const result: Suite = instance.getAllData();
 
         assert.equal(result.aggregateData.numTests, instance.metrics.getTotalTestCount());
+
+        validateSuiteRecursive(result);
     }
 
     test("Simple data", function() {
