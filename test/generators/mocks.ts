@@ -25,7 +25,6 @@ class _MockSuiteMetrics extends SuiteMetrics {
         BaseSuiteMetrics.validatePath(path, true);
 
         this.suites.addTest(path, this.currentMockTime, this.currentMockTime + duration);
-
         this.currentMockTime += duration;
 
         // Add a slight, random delay to simulate the time between tests (e.g., framework overhead)
@@ -62,6 +61,7 @@ class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
 
         // All tests in a concurrent batch start at the same time
         this.suites.addTest(path, this.currentMockTime, this.currentMockTime + duration);
+        this.currentMockTime += duration;
 
         // Update max duration if required
         if (duration > this.maxDurationInBatch) {
