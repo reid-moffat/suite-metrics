@@ -78,7 +78,7 @@ const validateSuiteData = (data: SuiteData, expected: SuiteDataValidate) => {
 /**
  * Recursively validates a suite and all its sub-suites
  */
-function validateSuiteRecursive(suite: Suite) {
+function validateSuiteRecursive(suite: Suite): AggregateData {
 
     // Validate top-level object
     assert.isNotNull(suite, `Expected suite to not be null`);
@@ -114,15 +114,26 @@ function validateSuiteRecursive(suite: Suite) {
 
 
     // Validate specific data
+    const tempAggregateData: AggregateData = {
+        numTests: suite.tests.size,
+        totalTestTime: 0
+    };
     for (const test of suite.tests.values()) {
         validateTest(test);
+        tempAggregateData.totalTestTime += test.duration;
     }
-
 
     // Recursively validate all sub-suites
     for (const subSuite of suite.subSuites.values()) {
-        validateSuiteRecursive(subSuite);
+        const data: AggregateData = validateSuiteRecursive(subSuite);
+        tempAggregateData.numTests += data.numTests;
+        tempAggregateData.totalTestTime += data.totalTestTime;
     }
+
+    assert.equal(aggregateData.numTests, tempAggregateData.numTests, `Expected aggregateData's numTests to match calculated value`);
+    assert.equal(aggregateData.totalTestTime, tempAggregateData.totalTestTime, `Expected aggregateData's totalTestTime to match calculated value`);
+
+    return aggregateData;
 }
 
 /**
@@ -161,5 +172,10 @@ function validateTest(test: Test) {
     assert.isAtLeast(test.testNumber, 1, `Test number must be at least 1`);
     assert.isAtLeast(test.suiteTestNumber, 1, `Test must have a suite test # of at least 1`);
 }
+
+type AggregateData = {
+    numTests: number,
+    totalTestTime: number
+};
 
 export { validateSuiteData, SuiteDataValidate, validateSuiteRecursive, validateTest };
