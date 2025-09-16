@@ -57,8 +57,8 @@ suite("[Metrics] getStructureMetadata", function () {
 
         const timingKeys: string[] = Object.keys(timing);
         const expectedTimingKeys: string[] = [
-            'totalTimeDiff', 'totalTestDuration', 'percentActive',
-            'averageDuration', 'medianDuration'
+            'totalTests', 'totalTimeDiff', 'totalTestDuration',
+            'percentActive', 'averageDuration', 'medianDuration'
         ];
         assert.sameMembers(timingKeys, expectedTimingKeys,
             `timing object should have exactly keys: ${expectedTimingKeys.join(', ')}`);
