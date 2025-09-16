@@ -127,6 +127,11 @@ suite("[Metrics] getStructureMetadata", function () {
                 actual: obj.suites.averageTestsPerNonEmptySuite,
                 expected: obj.timing.totalTests / (obj.suites.numLeaves + obj.suites.numHybrid),
                 description: 'averageTestsPerNonEmptySuite'
+            },
+            {
+                actual: obj.timing.percentActive,
+                expected: obj.timing.totalTestDuration / obj.timing.totalTimeDiff,
+                description: 'percentActive'
             }
         ];
 
