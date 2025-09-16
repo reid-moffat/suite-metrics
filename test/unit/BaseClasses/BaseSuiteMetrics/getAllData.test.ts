@@ -16,8 +16,15 @@ suite("[BaseSuiteMetrics] getAllData", function() {
     function runTest(instance: BaseSuiteMetrics) {
         const result: Suite = instance.getAllData();
 
+        // Validations for the top-level suite specifically
+        assert.equal(result.name, "<Top-Level suite>", `Top-level suite must be named <Top-Level suite>`);
+        assert.deepEqual(result.path, [], `Top-level suite must have an empty path ([])`);
+        assert.equal(result.tests.size, 0, `Top-level suite can't have tests`);
         assert.equal(result.aggregateData.numTests, instance.metrics.getTotalTestCount());
+        const average: number = Math.round(result.aggregateData.totalTestTime / instance.metrics.getTotalTestCount());
+        assert.equal(average, instance.metrics.getAverageTestDuration(), `Average duration must be top-level total divided by test count rounded`);
 
+        // Then recursively validate as per normal
         validateSuiteRecursive(result);
     }
 
