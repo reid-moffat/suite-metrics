@@ -33,4 +33,51 @@ type SuiteData = {
     readonly totalTestMetrics: SuiteTestMetrics;
 }
 
-export type { SuiteTestMetrics, SuiteData };
+/**
+ * High-level aggregate metadata regarding all suites and tests
+ *
+ * Includes metrics such as number of suites, max depth, and leaf
+ */
+type StructureMetadata = {
+    /** Aggregate data for suites (note: the top-level suite is excluded as this is only for navigation) */
+    readonly suites: {
+        /** Total number of suites */
+        readonly numSuites: number,
+        /** Number of suites without any sub-suites (only tests) */
+        readonly numLeaves: number,
+        /** Number of suites without any tests (only sub-suites) */
+        readonly numBranches: number;
+        /** Number of suites with both sub-suite(s) and test(s) */
+        readonly numHybrid: number
+
+        /** Average number of tests per suite */
+        readonly averageTestsPerSuite: number,
+        /** Average number of tests per suite that has tests */
+        readonly averageTestsPerNonEmptySuite: number,
+        /** Maximum suite depth (e.g. ['suite 1', 'suite 2'] -> 2), or -1 if no suites */
+        readonly maxDepth: number,
+        /** Minimum depth for a suite with tests, or Number.MAX_SAFE_INTEGER if no tests */
+        readonly minDepth: number,
+        /** Average depth for suites with tests */
+        readonly averageDepth: number,
+        /** Average depth for suites with tests, weighted by the number of tests per suite */
+        readonly averageDepthWeighted: number,
+    },
+    /** Aggregate data for test timings */
+    readonly timing: {
+        /** Total number of tests */
+        readonly totalTests: number,
+        /** Time in microseconds between the first test starting and last test ending (includes non-testing time) */
+        readonly totalTimeDiff: number,
+        /** Total duration of all tests combined in microseconds */
+        readonly totalTestDuration: number,
+        /** Percent of the total time difference from tests running. This can show overhead or other non-test delays */
+        readonly percentActive: number,
+        /** Average duration for all tests */
+        readonly averageDuration: number,
+        /** Median duration for all tests */
+        readonly medianDuration: number
+    }
+}
+
+export type { SuiteTestMetrics, SuiteData, StructureMetadata };

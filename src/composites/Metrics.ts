@@ -1,6 +1,6 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
-import { SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import { StructureMetadata, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
 import LazyCache from "../helpers/LazyCache.ts";
 
 /**
@@ -31,12 +31,12 @@ class Metrics {
     /**
      * Gets the average completion duration (microseconds) for all tests in this metrics instance
      *
-     * @returns The average test completion duration, rounded to the nearest microsecond
-     * @throws Error If there are no completed tests in this instance
+     * @returns The average test completion duration, rounded to the nearest microsecond. Returns 0 if no tests are
+     * present
      */
     public getAverageTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
-            throw new Error(`There are no completed tests in this instance`);
+            return 0;
         }
 
         return this.suites.getAverageTestDuration();
@@ -46,12 +46,11 @@ class Metrics {
      * Gets the median duration of all tests in this instance
      *
      * @returns The median test completion duration, in microseconds. May be a decimal (x.5) when an even number of
-     *          tests are present
-     * @throws Error If there are no completed tests in this instance
+     *          tests are present. Returns 0 if no tests are present
      */
     public getMedianTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
-            throw new Error(`There are no completed tests in this instance`);
+            return 0;
         }
 
         const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
@@ -135,6 +134,95 @@ class Metrics {
         return lines.join('\n');
     }
 
+    /**
+     * Gets high-level aggregate metadata about all suites e.g. max suite depth, number of suites
+     */
+    public getStructureMetadata(): StructureMetadata {
+
+        // Object of helper values to be passed
+        const tempValues: TmpVals = {
+            totalSuites: 0,
+            totalLeaves: 0,
+            totalBranches: 0,
+            totalHybrid: 0,
+            maxDepth: -1,
+            minDepth: Number.MAX_SAFE_INTEGER,
+            totalDepth: 0,
+            totalDepthWeighted: 0
+        };
+
+        // Recursively go through suites and collect data
+        const topLevelSuite: Suite = this.suites.getTopLevelSuite();
+        for (const suite of topLevelSuite.subSuites.values()) {
+            this.structMetadataHelper(suite, tempValues);
+        }
+
+
+        // Calculate various remaining values
+        const numTests: number = this.lazyCache.getNumTests();
+        const testsPerSuite: number = numTests / tempValues.totalSuites;
+        const testsPerNonEmptySuite: number = numTests / (tempValues.totalHybrid + tempValues.totalLeaves);
+
+        const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
+        const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
+
+        const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;
+
+        const averageDepth: number = tempValues.totalDepth / (tempValues.totalLeaves + tempValues.totalHybrid);
+        const averageDepthWeighted: number = tempValues.totalDepthWeighted / numTests;
+
+
+        return {
+            suites: {
+                numSuites: tempValues.totalSuites,
+                numLeaves: tempValues.totalLeaves,
+                numBranches: tempValues.totalBranches,
+                numHybrid: tempValues.totalHybrid,
+                averageTestsPerSuite: testsPerSuite,
+                averageTestsPerNonEmptySuite: testsPerNonEmptySuite,
+                maxDepth: tempValues.maxDepth,
+                minDepth: tempValues.minDepth,
+                averageDepth: averageDepth,
+                averageDepthWeighted: averageDepthWeighted
+            },
+            timing: {
+                totalTests: numTests,
+                totalTimeDiff: totalTimeDiff,
+                totalTestDuration: topLevelSuite.aggregateData.totalTestTime,
+                percentActive: percentActive,
+                averageDuration: this.getAverageTestDuration(),
+                medianDuration: this.getMedianTestDuration()
+            }
+        };
+    }
+
+
+    /**
+     * Recursive helper for getStructureMetadata
+     */
+    private structMetadataHelper(currSuite: Suite, tempValues: TmpVals) {
+        const depth: number = currSuite.path.length;
+        tempValues.totalSuites++;
+        tempValues.maxDepth = Math.max(tempValues.maxDepth, depth);
+
+        if (currSuite.tests.size > 0) {
+            tempValues.minDepth = Math.min(tempValues.minDepth, depth);
+            tempValues.totalDepth += depth;
+            tempValues.totalDepthWeighted += depth * currSuite.tests.size;
+
+            if (currSuite.subSuites.size > 0) {
+                tempValues.totalHybrid++;
+            } else {
+                tempValues.totalLeaves++;
+            }
+        } else {
+            tempValues.totalBranches++;
+        }
+
+        for (const suite of currSuite.subSuites.values()) {
+            this.structMetadataHelper(suite, tempValues);
+        }
+    }
 
     /**
      * Formats suite information for printing
@@ -177,5 +265,16 @@ class Metrics {
         }
     }
 }
+
+type TmpVals = {
+    totalSuites: number;
+    totalLeaves: number;
+    totalBranches: number;
+    totalHybrid: number;
+    maxDepth: number;
+    minDepth: number;
+    totalDepth: number;
+    totalDepthWeighted: number;
+};
 
 export default Metrics;

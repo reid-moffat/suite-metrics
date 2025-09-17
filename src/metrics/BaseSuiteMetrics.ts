@@ -92,7 +92,7 @@ abstract class BaseSuiteMetrics {
     /**
      * Gets all data in the metrics
      *
-     * @returns A top-level Suite object that contains all suites and tests in their hierarchical order
+     * @returns The top-level Suite object that contains all suites and tests in their hierarchical order
      */
     public getAllData(): Suite {
         return this.suites.getTopLevelSuite();

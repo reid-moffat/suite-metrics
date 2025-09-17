@@ -145,9 +145,7 @@ function createPresetData(
         case PRESET_TYPE.NORMAL:
             const normalOpts = {
                 ...DEFAULT_OPTIONS,
-                addTimingDelays: true,
-                minDuration: 500,
-                maxDuration: 50_000,
+                addTimingDelays: true
             };
 
             return createNestedTestData(isConcurrent, normalOpts);

@@ -1,6 +1,7 @@
+import SuiteMetrics, { Test } from "suite-metrics";
 import { assert } from 'chai';
-import SuiteMetrics from "suite-metrics";
 import { assertThrows, sleep } from "../../helpers/helpers.ts";
+import { validateTest } from "../../helpers/validators.ts";
 
 suite("[BaseSuiteMetrics] getTest", function() {
 
@@ -78,21 +79,8 @@ suite("[BaseSuiteMetrics] getTest", function() {
             sleep(100);
             metrics.stopTest();
 
-            const testMetrics = metrics.queries.getTest(["SimpleSuite", "SimpleTest"]);
-
-            assert.isObject(testMetrics, 'Test metrics should be an object');
-            assert.strictEqual(testMetrics.name, "SimpleTest", 'Test name should match');
-            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
-            assert.isAbove(testMetrics.startTimestamp, 0, 'Start timestamp should be positive');
-            assert.isNumber(testMetrics.endTimestamp, 'End timestamp should be a number');
-            assert.isAbove(testMetrics.endTimestamp, testMetrics.startTimestamp, 'End timestamp should be after start timestamp');
-            assert.isNumber(testMetrics.duration, 'Duration should be a number');
-            assert.isAbove(testMetrics.duration, 0, 'Duration should be positive');
-            assert.strictEqual(testMetrics.duration, testMetrics.endTimestamp - testMetrics.startTimestamp, 'Duration should equal timestamp difference');
-            assert.isNumber(testMetrics.testNumber, 'Test number should be a number');
-            assert.isAbove(testMetrics.testNumber, 0, 'Test number should be positive');
-            assert.isNumber(testMetrics.suiteTestNumber, 'Suite test number should be a number');
-            assert.isAbove(testMetrics.suiteTestNumber, 0, 'Suite test number should be positive');
+            const test: Test = metrics.queries.getTest(["SimpleSuite", "SimpleTest"]);
+            validateTest(test, "SimpleTest");
         });
 
         test("Test metrics for nested test", function() {
@@ -193,26 +181,14 @@ suite("[BaseSuiteMetrics] getTest", function() {
     suite("Timing and Duration", function() {
         test("Accurate timing information", function() {
             metrics.startTest(["TimingSuite", "TimingTest"]);
-
-            // Add measurable delay
-            const delayStart = Date.now();
-            while (Date.now() - delayStart < 100) { /* busy wait */ }
-
+            sleep(100);
             metrics.stopTest();
 
-            const testMetrics = metrics.queries.getTest(["TimingSuite", "TimingTest"]);
-
-            // Verify timing properties exist and are reasonable
-            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
-            assert.isAbove(testMetrics.startTimestamp, 0, 'Start timestamp should be positive');
-            assert.isNumber(testMetrics.endTimestamp, 'End timestamp should be a number');
-            assert.isAbove(testMetrics.endTimestamp, testMetrics.startTimestamp, 'End timestamp should be after start timestamp');
-            assert.isNumber(testMetrics.duration, 'Duration should be a number');
-            assert.isAbove(testMetrics.duration, 0, 'Duration should be positive');
-            assert.strictEqual(testMetrics.duration, testMetrics.endTimestamp - testMetrics.startTimestamp, 'Duration should equal timestamp difference');
+            const test: Test = metrics.queries.getTest(["TimingSuite", "TimingTest"]);
+            validateTest(test, "TimingTest");
 
             // Verify the duration is reasonable (should be at least a few microseconds due to the delay)
-            assert.isAbove(testMetrics.duration, 1000, 'Duration should be at least 1ms in microseconds due to delay');
+            assert.isAbove(test.duration, 1000, 'Duration should be at least 1ms in microseconds due to delay');
         });
 
         test("Very short duration tests", function() {
