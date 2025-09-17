@@ -19,7 +19,6 @@ suite("[Query] getSuite", function () {
      */
     function runTest(instance: BaseSuiteMetrics, suitePath: string[]) {
         const suite: Suite = instance.queries.getSuite(suitePath);
-        console.log(`Queried suite: ${serialize(suite, 4)}`);
     }
 
     test("Simple data", function () {
