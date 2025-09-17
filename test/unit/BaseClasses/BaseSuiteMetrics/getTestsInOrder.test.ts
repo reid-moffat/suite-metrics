@@ -52,7 +52,6 @@ suite("[BaseSuiteMetrics] getTestsInOrder", function() {
         runTest(instance);
     });
 
-
     test("Normal preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.NORMAL) as SuiteMetrics;
         runTest(instance);

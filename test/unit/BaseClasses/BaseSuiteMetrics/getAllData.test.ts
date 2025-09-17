@@ -17,16 +17,27 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         const result: Suite = instance.getAllData();
 
         // Validations for the top-level suite specifically
+        const numTests: number = instance.metrics.getTotalTestCount();
         assert.equal(result.name, "<Top-Level suite>", `Top-level suite must be named <Top-Level suite>`);
         assert.deepEqual(result.path, [], `Top-level suite must have an empty path ([])`);
         assert.equal(result.tests.size, 0, `Top-level suite can't have tests`);
-        assert.equal(result.aggregateData.numTests, instance.metrics.getTotalTestCount());
-        const average: number = Math.round(result.aggregateData.totalTestTime / instance.metrics.getTotalTestCount());
+        assert.equal(result.aggregateData.numTests, numTests);
+        const average: number = numTests === 0 ? 0 : Math.round(result.aggregateData.totalTestTime / numTests);
         assert.equal(average, instance.metrics.getAverageTestDuration(), `Average duration must be top-level total divided by test count rounded`);
 
         // Then recursively validate as per normal
         validateSuiteRecursive(result);
     }
+
+    test("Empty instance", function() {
+        const instance: SuiteMetrics = new SuiteMetrics();
+        runTest(instance);
+    });
+
+    test("Empty instance - concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
+        runTest(instance);
+    });
 
     test("Simple data", function() {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
@@ -47,7 +58,6 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         const instance: ConcurrentSuiteMetrics = createNestedTestData(true) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
-
 
     test("Normal preset", function() {
         const instance: SuiteMetrics = createPresetData(false, PRESET_TYPE.NORMAL) as SuiteMetrics;
