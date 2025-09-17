@@ -31,12 +31,12 @@ class Metrics {
     /**
      * Gets the average completion duration (microseconds) for all tests in this metrics instance
      *
-     * @returns The average test completion duration, rounded to the nearest microsecond
-     * @throws Error If there are no completed tests in this instance
+     * @returns The average test completion duration, rounded to the nearest microsecond. Returns 0 if no tests are
+     * present
      */
     public getAverageTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
-            throw new Error(`There are no completed tests in this instance`);
+            return 0;
         }
 
         return this.suites.getAverageTestDuration();
