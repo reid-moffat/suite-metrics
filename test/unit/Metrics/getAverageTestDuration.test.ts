@@ -18,17 +18,13 @@ suite("[Metrics] getAverageTestDuration", function () {
 
         const allTests: Test[] = instance.getTestsInOrder();
         const calculatedTotal: number = allTests.reduce((acc: number, curr: Test): number => acc + curr.duration, 0);
-        const calculatedAverage: number = calculatedTotal / allTests.length;
+        const calculatedAverage: number = Math.round(calculatedTotal / allTests.length);
 
         assert.strictEqual(averageDuration, calculatedAverage, `Expected and calculated average don't match`);
     }
 
     test("Simple data", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
-
-        const result: number = instance.metrics.getAverageTestDuration();
-
-        assert.isAtLeast(result, DEFAULT_OPTIONS.minDuration);
-        assert.isAtMost(result, DEFAULT_OPTIONS.maxDuration);
+        runTest(instance);
     });
 });
