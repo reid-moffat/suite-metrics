@@ -40,43 +40,43 @@ type SuiteData = {
  */
 type StructureMetadata = {
     /** Aggregate data for suites (note: the top-level suite is excluded as this is only for navigation) */
-    suites: {
+    readonly suites: {
         /** Total number of suites */
-        numSuites: number,
+        readonly numSuites: number,
         /** Number of suites without any sub-suites (only tests) */
-        numLeaves: number,
+        readonly numLeaves: number,
         /** Number of suites without any tests (only sub-suites) */
-        numBranches: number;
+        readonly numBranches: number;
         /** Number of suites with both sub-suite(s) and test(s) */
-        numHybrid: number
+        readonly numHybrid: number
 
         /** Average number of tests per suite */
-        averageTestsPerSuite: number,
+        readonly averageTestsPerSuite: number,
         /** Average number of tests per suite that has tests */
-        averageTestsPerNonEmptySuite: number,
+        readonly averageTestsPerNonEmptySuite: number,
         /** Maximum suite depth (e.g. ['suite 1', 'suite 2'] -> 2), or -1 if no suites */
-        maxDepth: number,
+        readonly maxDepth: number,
         /** Minimum depth for a suite with tests, or Number.MAX_SAFE_INTEGER if no tests */
-        minDepth: number,
+        readonly minDepth: number,
         /** Average depth for suites with tests */
-        averageDepth: number,
+        readonly averageDepth: number,
         /** Average depth for suites with tests, weighted by the number of tests per suite */
-        averageDepthWeighted: number,
+        readonly averageDepthWeighted: number,
     },
     /** Aggregate data for test timings */
-    timing: {
+    readonly timing: {
         /** Total number of tests */
-        totalTests: number,
+        readonly totalTests: number,
         /** Time in microseconds between the first test starting and last test ending (includes non-testing time) */
-        totalTimeDiff: number,
+        readonly totalTimeDiff: number,
         /** Total duration of all tests combined in microseconds */
-        totalTestDuration: number,
+        readonly totalTestDuration: number,
         /** Percent of the total time difference from tests running. This can show overhead or other non-test delays */
-        percentActive: number,
+        readonly percentActive: number,
         /** Average duration for all tests */
-        averageDuration: number,
+        readonly averageDuration: number,
         /** Median duration for all tests */
-        medianDuration: number
+        readonly medianDuration: number
     }
 }
 
