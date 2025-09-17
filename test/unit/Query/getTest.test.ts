@@ -80,7 +80,7 @@ suite("[BaseSuiteMetrics] getTest", function() {
             metrics.stopTest();
 
             const test: Test = metrics.queries.getTest(["SimpleSuite", "SimpleTest"]);
-            validateTest(test);
+            validateTest(test, "SimpleTest");
         });
 
         test("Test metrics for nested test", function() {
@@ -181,15 +181,11 @@ suite("[BaseSuiteMetrics] getTest", function() {
     suite("Timing and Duration", function() {
         test("Accurate timing information", function() {
             metrics.startTest(["TimingSuite", "TimingTest"]);
-
-            // Add measurable delay
-            const delayStart = Date.now();
-            while (Date.now() - delayStart < 100) { /* busy wait */ }
-
+            sleep(100);
             metrics.stopTest();
 
             const test: Test = metrics.queries.getTest(["TimingSuite", "TimingTest"]);
-            validateTest(test);
+            validateTest(test, "TimingTest");
 
             // Verify the duration is reasonable (should be at least a few microseconds due to the delay)
             assert.isAbove(test.duration, 1000, 'Duration should be at least 1ms in microseconds due to delay');
