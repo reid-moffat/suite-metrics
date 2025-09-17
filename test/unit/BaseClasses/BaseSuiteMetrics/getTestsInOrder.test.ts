@@ -12,6 +12,10 @@ suite("[BaseSuiteMetrics] getTestsInOrder", function() {
         const results: Test[] = instance.getTestsInOrder();
 
         assert.equal(results.length, instance.metrics.getTotalTestCount());
+
+        for (let i: number = 0; i < results.length; ++i) {
+            validateTest(results[i]);
+        }
     }
 
     test("Simple test data", function() {
