@@ -46,12 +46,11 @@ class Metrics {
      * Gets the median duration of all tests in this instance
      *
      * @returns The median test completion duration, in microseconds. May be a decimal (x.5) when an even number of
-     *          tests are present
-     * @throws Error If there are no completed tests in this instance
+     *          tests are present. Returns 0 if no tests are present
      */
     public getMedianTestDuration(): number {
         if (this.getTotalTestCount() === 0) {
-            throw new Error(`There are no completed tests in this instance`);
+            return 0;
         }
 
         const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
