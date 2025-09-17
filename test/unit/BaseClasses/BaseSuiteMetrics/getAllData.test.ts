@@ -33,7 +33,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Simple data concurrent", function() {
+    test("Simple data - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createSimpleTestData(true) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
@@ -43,7 +43,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Nested data concurrent", function() {
+    test("Nested data - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createNestedTestData(true) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
@@ -54,7 +54,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Normal preset concurrent", function() {
+    test("Normal preset - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.NORMAL) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
@@ -64,7 +64,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Large preset concurrent", function() {
+    test("Large preset - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.LARGE_SUITE) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
@@ -74,7 +74,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Realistic preset concurrent", function() {
+    test("Realistic preset - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.REALISTIC_PREMADE) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
@@ -84,7 +84,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         runTest(instance);
     });
 
-    test("Edge case preset concurrent", function() {
+    test("Edge case preset - concurrent", function() {
         const instance: ConcurrentSuiteMetrics = createPresetData(true, PRESET_TYPE.EDGE_CASES) as ConcurrentSuiteMetrics;
         runTest(instance);
     });
