@@ -10,7 +10,11 @@ suite("[Metrics] getAverageTestDuration", function () {
      */
     function runTest(instance: BaseSuiteMetrics) {
         const averageDuration: number = instance.metrics.getAverageTestDuration();
+
         assert.isNumber(averageDuration, `Average duration must be a number`);
+
+        assert.isAtLeast(averageDuration, DEFAULT_OPTIONS.minDuration, `Average duration is below min test duration`);
+        assert.isAtMost(averageDuration, DEFAULT_OPTIONS.maxDuration, `Average duration is above max test duration`);
 
         const allTests: Test[] = instance.getTestsInOrder();
         const calculatedTotal: number = allTests.reduce((acc: number, curr: Test): number => acc + curr.duration, 0);
