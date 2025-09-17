@@ -139,9 +139,9 @@ function validateSuiteRecursive(suite: Suite): AggregateData {
 }
 
 /**
- * Validates a test object is valid
+ * Validates a test object is valid, optionally validating name as well
  */
-function validateTest(test: Test) {
+function validateTest(test: Test, name?: string) {
 
     // Validate top-level object
     assert.isNotNull(test, `Expected test to not be null`);
@@ -173,6 +173,10 @@ function validateTest(test: Test) {
     assert.equal(test.duration, test.endTimestamp - test.startTimestamp, `Expected duration to be the start/end difference`);
     assert.isAtLeast(test.testNumber, 1, `Test number must be at least 1`);
     assert.isAtLeast(test.suiteTestNumber, 1, `Test must have a suite test # of at least 1`);
+
+    if (name) {
+        assert.strictEqual(test.name, name, `Test name ${test.name} and expected name ${name} don't match`);
+    }
 }
 
 type AggregateData = {
