@@ -79,21 +79,8 @@ suite("[BaseSuiteMetrics] getTest", function() {
             sleep(100);
             metrics.stopTest();
 
-            const testMetrics = metrics.queries.getTest(["SimpleSuite", "SimpleTest"]);
-
-            assert.isObject(testMetrics, 'Test metrics should be an object');
-            assert.strictEqual(testMetrics.name, "SimpleTest", 'Test name should match');
-            assert.isNumber(testMetrics.startTimestamp, 'Start timestamp should be a number');
-            assert.isAbove(testMetrics.startTimestamp, 0, 'Start timestamp should be positive');
-            assert.isNumber(testMetrics.endTimestamp, 'End timestamp should be a number');
-            assert.isAbove(testMetrics.endTimestamp, testMetrics.startTimestamp, 'End timestamp should be after start timestamp');
-            assert.isNumber(testMetrics.duration, 'Duration should be a number');
-            assert.isAbove(testMetrics.duration, 0, 'Duration should be positive');
-            assert.strictEqual(testMetrics.duration, testMetrics.endTimestamp - testMetrics.startTimestamp, 'Duration should equal timestamp difference');
-            assert.isNumber(testMetrics.testNumber, 'Test number should be a number');
-            assert.isAbove(testMetrics.testNumber, 0, 'Test number should be positive');
-            assert.isNumber(testMetrics.suiteTestNumber, 'Suite test number should be a number');
-            assert.isAbove(testMetrics.suiteTestNumber, 0, 'Suite test number should be positive');
+            const test: Test = metrics.queries.getTest(["SimpleSuite", "SimpleTest"]);
+            validateTest(test);
         });
 
         test("Test metrics for nested test", function() {
