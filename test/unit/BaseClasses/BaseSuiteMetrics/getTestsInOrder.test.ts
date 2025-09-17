@@ -32,6 +32,17 @@ suite("[BaseSuiteMetrics] getTestsInOrder", function() {
         }
     }
 
+
+    test("Empty instance", function() {
+        const instance: SuiteMetrics = new SuiteMetrics();
+        runTest(instance);
+    });
+
+    test("Empty instance - concurrent", function() {
+        const instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
+        runTest(instance);
+    });
+
     test("Simple data", function() {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
         runTest(instance);

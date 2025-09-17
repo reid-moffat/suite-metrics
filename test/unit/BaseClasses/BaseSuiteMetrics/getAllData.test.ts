@@ -29,6 +29,7 @@ suite("[BaseSuiteMetrics] getAllData", function() {
         validateSuiteRecursive(result);
     }
 
+
     test("Empty instance", function() {
         const instance: SuiteMetrics = new SuiteMetrics();
         runTest(instance);
