@@ -103,7 +103,7 @@ await Promise.all(promises);
 
 Both `SuiteMetrics` and `ConcurrentSuiteMetrics` have extensive methods in composite classes:
 
-- **BaseSuiteMetrics**: Base class with simple methods like `getTotalTestCount()` and `getAverageTestDuration()`
+- **BaseSuiteMetrics**: Base class with straightforward methods like `validatePath()` and `getAllData()`
 - **queries**: Query for Suites and Tests, such as `getTest()` and `suiteExists()`
 - **metrics**: Gets aggregate metrics for single or multiple suites
 - **performance**: Gets the fastest or slowest test(s) in order
