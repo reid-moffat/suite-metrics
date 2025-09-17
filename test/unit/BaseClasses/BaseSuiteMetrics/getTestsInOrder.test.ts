@@ -19,7 +19,16 @@ suite("[BaseSuiteMetrics] getTestsInOrder", function() {
         assert.equal(results.length, instance.metrics.getTotalTestCount());
 
         for (let i: number = 0; i < results.length; ++i) {
-            validateTest(results[i]);
+            const test: Test = results[i];
+            validateTest(test);
+
+            // Ensure this test order is valid
+            if (i !== 0) {
+                assert.isAtLeast(test.startTimestamp, results[i - 1].endTimestamp);
+            }
+            if (i !== results.length - 1) {
+                assert.isAtMost(test.endTimestamp, results[i + 1].startTimestamp);
+            }
         }
     }
 
