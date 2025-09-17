@@ -168,7 +168,7 @@ function validateTest(test: Test) {
         assert.isString(val, `All values in test's path must strings`);
         assert.isAtLeast(val.length, 1, `All values in test's path must be at least 1 character long`);
     });
-    assert.isAtLeast(test.startTimestamp, 0, `Start timestamp must be positive`);
+    assert.isAbove(test.startTimestamp, 0, `Start timestamp must be positive`);
     assert.isAtLeast(test.endTimestamp, test.startTimestamp, `End timestamp must be at least the start timestamp`);
     assert.equal(test.duration, test.endTimestamp - test.startTimestamp, `Expected duration to be the start/end difference`);
     assert.isAtLeast(test.testNumber, 1, `Test number must be at least 1`);
