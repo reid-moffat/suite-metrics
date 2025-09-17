@@ -5,6 +5,16 @@ import { createSimpleTestData } from "../../generators/testDataHelpers.ts";
 suite("[Query] getSuite", function () {
 
     /**
+     * Gets tests to run for an instance
+     */
+    function runInstance(instance: BaseSuiteMetrics) {
+        const topLevelSuites: string[] = instance.queries.getSuiteNames([]);
+        for (const suiteName of topLevelSuites) {
+            runTest(instance, [suiteName]);
+        }
+    }
+
+    /**
      * Gets and deeply validates a suite
      */
     function runTest(instance: BaseSuiteMetrics, suitePath: string[]) {
@@ -14,6 +24,6 @@ suite("[Query] getSuite", function () {
 
     test("Simple data", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
-        runTest(instance, []);
+        runInstance(instance);
     });
 });
