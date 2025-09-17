@@ -1,12 +1,12 @@
 import SuiteMetrics, { BaseSuiteMetrics, ConcurrentSuiteMetrics, Test } from "suite-metrics";
+import { assert } from "chai";
 import {
     createNestedTestData,
     createPresetData,
     createSimpleTestData,
     PRESET_TYPE
-} from "../../../generators/testDataHelpers.js";
-import { assert } from "chai";
-import { validateTest } from "../../../helpers/validators.js";
+} from "../../../generators/testDataHelpers.ts";
+import { validateTest } from "../../../helpers/validators.ts";
 
 suite("[BaseSuiteMetrics] getTestsInOrder", function() {
 
