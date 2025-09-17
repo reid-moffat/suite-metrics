@@ -5,7 +5,7 @@ import {
     createSimpleTestData,
     PRESET_TYPE
 } from "../../generators/testDataHelpers.ts";
-import { validateSuiteRecursive } from "../../helpers/validators.js";
+import { validateSuiteRecursive } from "../../helpers/validators.ts";
 
 suite("[Query] getSuite", function () {
 
