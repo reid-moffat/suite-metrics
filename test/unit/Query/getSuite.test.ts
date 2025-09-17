@@ -5,6 +5,7 @@ import {
     createSimpleTestData,
     PRESET_TYPE
 } from "../../generators/testDataHelpers.ts";
+import { validateSuiteRecursive } from "../../helpers/validators.js";
 
 suite("[Query] getSuite", function () {
 
@@ -23,6 +24,7 @@ suite("[Query] getSuite", function () {
      */
     function runTest(instance: BaseSuiteMetrics, suitePath: string[]) {
         const suite: Suite = instance.queries.getSuite(suitePath);
+        validateSuiteRecursive(suite);
     }
 
 
