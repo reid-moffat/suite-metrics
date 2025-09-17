@@ -1,6 +1,6 @@
 import SuiteMetrics, { BaseSuiteMetrics, Suite } from "suite-metrics";
 import serialize from "serialize-javascript";
-import { createSimpleTestData } from "../../generators/testDataHelpers.js";
+import { createSimpleTestData } from "../../generators/testDataHelpers.ts";
 
 suite("[Query] getSuite", function () {
 
