@@ -1,7 +1,7 @@
 import SuiteMetrics, { Test } from "suite-metrics";
 import { assert } from 'chai';
 import { assertThrows, sleep } from "../../helpers/helpers.ts";
-import { validateTest } from "../../helpers/validators.js";
+import { validateTest } from "../../helpers/validators.ts";
 
 suite("[BaseSuiteMetrics] getTest", function() {
 
