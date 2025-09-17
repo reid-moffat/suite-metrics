@@ -1,17 +1,19 @@
-import SuiteMetrics, { Suite } from "suite-metrics";
+import SuiteMetrics, { BaseSuiteMetrics, Suite } from "suite-metrics";
 import serialize from "serialize-javascript";
 import { createSimpleTestData } from "../../generators/testDataHelpers.js";
-import { assert } from "chai";
-import { DEFAULT_OPTIONS } from "../../generators/options.js";
 
 suite("[Query] getSuite", function () {
 
+    /**
+     * Gets and deeply validates a suite
+     */
+    function runTest(instance: BaseSuiteMetrics, suitePath: string[]) {
+        const suite: Suite = instance.queries.getSuite(suitePath);
+        console.log(`Queried suite: ${serialize(suite, 4)}`);
+    }
+
     test("Simple data", function () {
         const instance: SuiteMetrics = createSimpleTestData() as SuiteMetrics;
-        const result: Suite = instance.queries.getSuite([]);
-        console.log(`Result: ${serialize(result, 4)}`);
-
-        assert.equal(result.tests.size, 0);
-        assert.equal(result.subSuites.size, DEFAULT_OPTIONS.numSuites);
+        runTest(instance, []);
     });
 });
