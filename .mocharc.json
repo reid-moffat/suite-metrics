@@ -7,5 +7,5 @@
   ],
   "ui": "tdd",
   "recursive": true,
-  "timeout": 30000
+  "timeout": 5000
 }
