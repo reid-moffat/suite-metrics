@@ -47,7 +47,7 @@ For running multiple tests concurrently, ConcurrentSuiteMetrics is required:
 ```typescript
 import { ConcurrentSuiteMetrics } from 'suite-metrics';
 
-// Singleton and start/stop test methods are async for thread-safe queues
+// Lazy singleton is also available, but is async to prevent multiple allocations
 const concurrentMetricsSingleton = await ConcurrentSuiteMetrics.getInstance();
 // or
 const concurrentMetrics = new ConcurrentSuiteMetrics();
