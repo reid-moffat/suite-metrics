@@ -182,6 +182,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     /**
      * Creates a unique key for a test path to track concurrent tests
      *
+     * @param testPath Path to create key for
      * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
      */
     private createTestKey(testPath: readonly string[]): string {
