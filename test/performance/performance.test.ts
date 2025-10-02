@@ -110,37 +110,49 @@ suite("Performance", function () {
         });
     });
 
-    /*
-    For 1m tests:
+    suite("1 million tests", function() {
+        // Skip if not running large tests
+        if (!process.env.RUN_LARGE) {
+            return;
+        }
 
-    Minimal Tests Per Suite:
+        test("100k suites", function() {
+            const generatorOptions = {
+                numSuites: 9,
+                testsPerSuite: 1,
+                maxDepth: 6,
+                subSuitesPerSuite: 10
+            };
 
-   {
-     numSuites: 9,
-     testsPerSuite: 1,
-     maxDepth: 6,
-     subSuitesPerSuite: 10
-   }
-   // → 999,999 tests (0.00% error)
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
 
-Balanced Structure:
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
 
-   {
-     numSuites: 5,
-     testsPerSuite: 19,
-     maxDepth: 5,
-     subSuitesPerSuite: 10
-   }
-   // → 999,995 tests (0.00% error)
+        test("Balanced", function() {
+            const generatorOptions = {
+                numSuites: 5,
+                testsPerSuite: 19,
+                maxDepth: 5,
+                subSuitesPerSuite: 10
+            };
 
-More Realistic Structure:
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
 
-   {
-     numSuites: 19,
-     testsPerSuite: 37,
-     maxDepth: 5,
-     subSuitesPerSuite: 6
-   }
-   // → 999,666 tests (0.03% error)
-     */
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
+
+        test("Mid depth", function() {
+            const generatorOptions = {
+                numSuites: 19,
+                testsPerSuite: 37,
+                maxDepth: 5,
+                subSuitesPerSuite: 6
+            };
+
+            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
+
+            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+        });
+    });
 });
