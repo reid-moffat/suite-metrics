@@ -42,6 +42,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Starts timing a new test
      *
      * Note: Only one test may be active at a time. For multiple concurrent tests, use ConcurrentSuiteMetrics
+     *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
      */
     public startTest(path: readonly string[]): void {
@@ -61,6 +62,8 @@ class SuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Stops timing the currently active test, storing the test information
+     *
+     * @returns The newly created Test object
      */
     public stopTest(): Test {
         const endTime: number = microtime.now(); // Get immediately for highest accuracy
