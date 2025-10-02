@@ -61,6 +61,9 @@ suite("Performance", function () {
     });
 
     suite("100k tests", function() {
+
+        this.timeout(30_000); // 30s max for these tests
+
         test("100k suites", function() {
             const generatorOptions = {
                 numSuites: 9,
