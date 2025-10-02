@@ -60,7 +60,6 @@ suite("Performance", function () {
         });
     });
 
-    /* TODO
     suite("100k tests", function() {
         test("100k suites", function() {
             const generatorOptions = {
@@ -110,7 +109,6 @@ suite("Performance", function () {
             console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
         });
     });
-     */
 
     /*
     For 1m tests:
