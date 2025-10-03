@@ -69,7 +69,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         try {
             release = await ConcurrentSuiteMetrics._instanceMutex.acquire();
 
-            ConcurrentSuiteMetrics._instance.reset();
             ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), 100);
             ConcurrentSuiteMetrics._instance.activeTests = new Map();
         } catch (error: any) {
