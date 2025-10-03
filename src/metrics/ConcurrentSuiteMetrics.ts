@@ -59,6 +59,9 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Resets ConcurrentSuiteMetrics' lazy singleton instance (from getInstance()), clearing all data (thread-safe)
+     *
+     * The singleton's reference is always preserved. It is created at setup time and persists through the entire
+     * program, including after resetting the instance (instance data is reset, but the reference remains)
      */
     public static async resetInstance(): Promise<void> {
         let release: (() => void) | null = null;
