@@ -41,6 +41,7 @@ class Suites {
      */
     public reset(): void {
         this.createInitialSuite();
+        this.lazyCache.reset();
     }
 
 

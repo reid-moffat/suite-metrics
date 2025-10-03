@@ -42,6 +42,26 @@ class LazyCache {
 
 
     /**
+     * Resets all data in this cache to defaults
+     */
+    public reset(): void {
+        this.testsInInsertionOrder = [];
+        this.frozenTestsInInsertionOrder = null;
+        this.allTestsSlowestFirst = freeze([]);
+        this.allTestsFastestFirst = freeze([]);
+        this.lastSortedCount = 0;
+
+        this.stdDevPopulation = 0;
+        this.stdDevSample = 0;
+        this.meanDuration = 0;
+        this.cachedCount = 0;
+        this.cachedSum = 0;
+        this.cachedSumSquares = 0;
+        this.statisticsValid = false;
+    }
+
+
+    /**
      * Adds a test to this cache (must be called after every test addition in order)
      */
     public addTest(test: Test): void {
