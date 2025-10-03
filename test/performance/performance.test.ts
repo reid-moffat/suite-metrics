@@ -38,6 +38,15 @@ suite("Performance", function () {
         assert.isAtLeast(medianDuration, DEFAULT_OPTIONS.minDuration);
         assert.isAtMost(medianDuration, DEFAULT_OPTIONS.maxDuration);
 
+
+        // Print out performance info
+        const endTime: number = performance.now();
+
+        console.log("===Performance===");
+        console.log(`Generation time: ${afterGenerate - startTime}`);
+        console.log(`Total time: ${endTime - startTime}`);
+
+        console.log('\n'); // 2x newline to separate
     }
 
     suite("10k tests", function() {
