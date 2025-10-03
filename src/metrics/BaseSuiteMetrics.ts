@@ -5,7 +5,6 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
