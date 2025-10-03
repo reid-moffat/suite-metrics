@@ -36,6 +36,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      */
     public static resetInstance(): void {
         SuiteMetrics._instance.reset();
+        SuiteMetrics._instance.activeTest = null;
     }
 
     /**
