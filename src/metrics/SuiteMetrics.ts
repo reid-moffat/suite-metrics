@@ -13,7 +13,7 @@ type TestMetadata = { testPath: readonly string[]; startTime: number; };
 class SuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance
-    private static _instance: SuiteMetrics = new SuiteMetrics();
+    private static readonly _instance: SuiteMetrics = new SuiteMetrics();
 
     // Currently running test's data (path and start time, or null if no ongoing test)
     private activeTest: TestMetadata | null = null;
