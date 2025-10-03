@@ -82,7 +82,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return this.lazyCache.getAllTestsInOrder();
+        return this.suites.getCache().getAllTestsInOrder();
     }
 
     /**
