@@ -13,7 +13,7 @@ type TestMetadata = { testPath: readonly string[]; startTime: number; };
 class SuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance
-    private static _instance: SuiteMetrics | null = null;
+    private static _instance: SuiteMetrics = new SuiteMetrics();
 
     // Currently running test's data (path and start time, or null if no ongoing test)
     private activeTest: TestMetadata | null = null;
@@ -25,9 +25,6 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * @returns The globally available SuiteMetrics instance
      */
     public static getInstance(): SuiteMetrics {
-        if (SuiteMetrics._instance === null) {
-            SuiteMetrics._instance = new SuiteMetrics();
-        }
         return SuiteMetrics._instance;
     }
 
@@ -35,7 +32,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Resets SuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
-        SuiteMetrics._instance?.reset();
+        SuiteMetrics._instance.reset();
     }
 
     /**
