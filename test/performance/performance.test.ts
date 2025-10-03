@@ -1,7 +1,7 @@
-import SuiteMetrics from "suite-metrics";
+import SuiteMetrics, { StructureMetadata } from "suite-metrics";
 import { createNestedTestData } from "../generators/testDataHelpers.ts";
 import { assert } from "chai";
-import { TestDataOptions } from "../generators/options.ts";
+import { DEFAULT_OPTIONS, TestDataOptions } from "../generators/options.ts";
 
 suite("Performance", function () {
 
@@ -22,7 +22,14 @@ suite("Performance", function () {
         console.log(`Total tests: ${totalTests} (${infoString})`);
         assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
 
-        console.log(`Structure metadata: ${JSON.stringify(metrics.metrics.getStructureMetadata(), null, 4)}`);
+        const structureMetadata: StructureMetadata = metrics.metrics.getStructureMetadata();
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+
+        // Validate various stats
+        const avgDuration: number = structureMetadata.timing.averageDuration;
+        assert.equal(metrics.metrics.getAverageTestDuration(), avgDuration);
+        assert.isAtLeast(avgDuration, DEFAULT_OPTIONS.minDuration);
+        assert.isAtMost(avgDuration, DEFAULT_OPTIONS.maxDuration);
 
         console.log();
     }
