@@ -44,10 +44,28 @@ suite("Performance", function () {
         const endTime: number = performance.now();
 
         console.log("===Performance===");
-        console.log(`Generation time: ${afterGenerate - startTime}`);
-        console.log(`Total time: ${endTime - startTime}`);
+        console.log(`Generation time: ${msToString(afterGenerate - startTime)}`);
+        console.log(`Total time: ${msToString(endTime - startTime)}`);
 
         console.log('\n'); // 2x newline to separate
+    }
+
+    /**
+     * Turns a number of ms to a readable string
+     */
+    function msToString(ms: number): string {
+        const rounded: number = Math.round(ms);
+        if (rounded < 1000) {
+            return `${rounded} ms`;
+        }
+        if (rounded < 60_000) {
+            return `${Math.floor(rounded / 1000)} seconds ${rounded % 1000} ms`;
+        }
+
+        const minutes: number = Math.floor(rounded / 60_000);
+        const seconds: number = Math.floor((rounded % 60_000) / 1000);
+        const milliseconds: number = rounded % 1000;
+        return `${minutes} minutes ${seconds} seconds ${milliseconds} ms`;
     }
 
     suite("10k tests", function() {
