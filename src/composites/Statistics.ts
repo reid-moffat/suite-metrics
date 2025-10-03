@@ -1,6 +1,6 @@
 import { Test } from "../types/structures.ts";
-import LazyCache from "../helpers/LazyCache.js";
-import Suites from "../helpers/Suites.js";
+import LazyCache from "../helpers/LazyCache.ts";
+import Suites from "../helpers/Suites.ts";
 
 /**
  * Statistical methods surrounding Tests and Suites
