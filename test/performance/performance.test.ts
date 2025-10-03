@@ -40,10 +40,7 @@ suite("Performance", function () {
                 numSuites: 9,
                 testsPerSuite: 1,
                 maxDepth: 4,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
             runTest(generatorOptions, false, 10_000);
@@ -54,10 +51,7 @@ suite("Performance", function () {
                 numSuites: 1,
                 testsPerSuite: 27,
                 maxDepth: 4,
-                subSuitesPerSuite: 7,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 7
             };
 
             runTest(generatorOptions, false, 10_000);
@@ -68,10 +62,7 @@ suite("Performance", function () {
                 numSuites: 13,
                 testsPerSuite: 9,
                 maxDepth: 3,
-                subSuitesPerSuite: 9,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 9
             };
 
             runTest(generatorOptions, false, 10_000);
@@ -87,10 +78,7 @@ suite("Performance", function () {
                 numSuites: 9,
                 testsPerSuite: 1,
                 maxDepth: 5,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
             runTest(generatorOptions, false, 100_000);
@@ -101,10 +89,7 @@ suite("Performance", function () {
                 numSuites: 5,
                 testsPerSuite: 19,
                 maxDepth: 4,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
             runTest(generatorOptions, false, 100_000);
@@ -115,10 +100,7 @@ suite("Performance", function () {
                 numSuites: 10,
                 testsPerSuite: 27,
                 maxDepth: 4,
-                subSuitesPerSuite: 7,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 7
             };
 
             runTest(generatorOptions, false, 100_000);
