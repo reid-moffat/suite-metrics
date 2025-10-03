@@ -15,9 +15,12 @@ suite("Performance", function () {
     function runTest(genOpts: Partial<TestDataOptions>, concurrent: boolean, expected: number): void {
         const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
 
+        // Print out general metrics
         const totalTests: number = metrics.metrics.getTotalTestCount();
         console.log(`Total tests: ${totalTests}`);
         assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
+
+        console.log(`Structure metadata: ${JSON.stringify(metrics.metrics.getStructureMetadata(), null, 4)}`);
 
         console.log();
     }
