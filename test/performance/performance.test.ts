@@ -81,9 +81,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
 
         test("Balanced", function() {
@@ -97,9 +95,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
 
         test("Mid depth", function() {
@@ -113,9 +109,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
     });
 
@@ -135,9 +129,7 @@ suite("Performance", function () {
                 subSuitesPerSuite: 10
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 1_000_000);
         });
 
         test("Balanced", function() {
@@ -148,9 +140,7 @@ suite("Performance", function () {
                 subSuitesPerSuite: 10
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 1_000_000);
         });
 
         test("Mid depth", function() {
@@ -161,9 +151,7 @@ suite("Performance", function () {
                 subSuitesPerSuite: 6
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 1_000_000);
         });
     });
 });
