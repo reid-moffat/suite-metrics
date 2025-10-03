@@ -1,5 +1,6 @@
 import { Test } from "../types/structures.ts";
 import LazyCache from "../helpers/LazyCache.js";
+import Suites from "../helpers/Suites.js";
 
 /**
  * Statistical methods surrounding Tests and Suites
@@ -7,10 +8,10 @@ import LazyCache from "../helpers/LazyCache.js";
 class Statistics {
 
     // Ref to lazy-loaded expensive values cache
-    private readonly lazyCache: LazyCache;
+    private readonly cache: LazyCache;
 
-    public constructor(lazyCache: LazyCache) {
-        this.lazyCache = lazyCache;
+    public constructor(suites: Suites) {
+        this.cache = suites.getCache();
     }
 
     /**
@@ -22,7 +23,7 @@ class Statistics {
      * @throws Error If there is insufficient data (less than two total tests)
      */
     public getStandardDeviation(usePopulation: boolean = true): number {
-        return this.lazyCache.getStdDev(usePopulation);
+        return this.cache.getStdDev(usePopulation);
     }
 
     /**
@@ -49,13 +50,13 @@ class Statistics {
      * the same duration)
      */
     public getTestZScore(test: Test, usePopulation: boolean = true): number {
-        const stdDev: number = this.lazyCache.getStdDev(usePopulation);
+        const stdDev: number = this.cache.getStdDev(usePopulation);
         if (stdDev === 0) {
             throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
         }
 
         // Calculate Z-score: (X - μ) / σ
-        return (test.duration - this.lazyCache.getMeanDuration()) / stdDev;
+        return (test.duration - this.cache.getMeanDuration()) / stdDev;
     }
 
     /**
@@ -68,17 +69,17 @@ class Statistics {
      * @throws Error If there is insufficient data for calculation (<2 total tests, or all tests have the same duration)
      */
     public getAllTestsWithZScores(usePopulation: boolean = true): { test: Test, zScore: number }[] {
-        const stdDev: number = this.lazyCache.getStdDev(usePopulation);
+        const stdDev: number = this.cache.getStdDev(usePopulation);
         if (stdDev === 0) {
             throw new Error('Cannot calculate Z-score: standard deviation is zero (all tests have same duration)');
         }
 
         // Calculate Z scores
-        const allTests: Test[] = this.lazyCache.getAllTestsInOrder();
+        const allTests: Test[] = this.cache.getAllTestsInOrder();
         return allTests.map((test: Test) => {
             return {
                 test: test,
-                zScore: (test.duration - this.lazyCache.getMeanDuration()) / stdDev
+                zScore: (test.duration - this.cache.getMeanDuration()) / stdDev
             };
         });
     }
