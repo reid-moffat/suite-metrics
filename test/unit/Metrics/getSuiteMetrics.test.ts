@@ -4,7 +4,7 @@ import { createSimpleTestData, createNestedTestData } from "../../generators/tes
 import { _MockSuiteMetrics } from "../../generators/mocks.js";
 import { assertThrows, sleep } from "../../helpers/helpers.js";
 
-suite("[BaseSuiteMetrics] getSuiteMetrics", function() {
+suite("[Metrics] getSuiteMetrics", function() {
 
     let metrics: SuiteMetrics;
 
