@@ -39,10 +39,6 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
         try {
             release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
-
-            if (ConcurrentSuiteMetrics._instance === null) {
-                ConcurrentSuiteMetrics._instance = new ConcurrentSuiteMetrics();
-            }
             return ConcurrentSuiteMetrics._instance;
         } catch (error: any) {
             // Handle specific mutex errors
