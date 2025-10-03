@@ -35,7 +35,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * Resets SuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
      */
     public static resetInstance(): void {
-        SuiteMetrics._instance = null;
+        SuiteMetrics._instance?.reset();
     }
 
     /**
