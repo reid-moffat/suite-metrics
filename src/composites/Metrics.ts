@@ -1,6 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { StructureMetadata, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
+import LazyCache from "../helpers/LazyCache.js";
 
 /**
  * Methods for calculating overall test metrics
@@ -10,8 +11,12 @@ class Metrics {
     // Ref to suites instance with all this metrics' data
     private readonly suites: Suites;
 
+    // Ref to lazy-loaded expensive values cache
+    private readonly cache: LazyCache;
+
     public constructor(suites: Suites) {
         this.suites = suites;
+        this.cache = suites.getCache();
     }
 
     /**
@@ -20,7 +25,7 @@ class Metrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.suites.getCache().getNumTests();
+        return this.cache.getNumTests();
     }
 
     /**
@@ -48,7 +53,7 @@ class Metrics {
             return 0;
         }
 
-        const sortedTests: Test[] = this.suites.getCache().getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.cache.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {
@@ -154,11 +159,11 @@ class Metrics {
 
 
         // Calculate various remaining values
-        const numTests: number = this.suites.getCache().getNumTests();
+        const numTests: number = this.cache.getNumTests();
         const testsPerSuite: number = numTests / tempValues.totalSuites;
         const testsPerNonEmptySuite: number = numTests / (tempValues.totalHybrid + tempValues.totalLeaves);
 
-        const testInOrder: Test[] = this.suites.getCache().getAllTestsInOrder();
+        const testInOrder: Test[] = this.cache.getAllTestsInOrder();
         const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
 
         const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;
