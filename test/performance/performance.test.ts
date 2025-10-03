@@ -34,11 +34,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
 
         test("Balanced", function() {
@@ -52,11 +48,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
 
         test("Wide & shallow", function() {
@@ -70,11 +62,7 @@ suite("Performance", function () {
                 maxDuration: 50_000
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
     });
 
