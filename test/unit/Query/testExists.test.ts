@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import SuiteMetrics from "suite-metrics";
 import { assertThrows } from "../../helpers/helpers.js";
 
-suite("[BaseSuiteMetrics] testExists", function() {
+suite("[Query] testExists", function() {
 
     let metrics: SuiteMetrics;
 

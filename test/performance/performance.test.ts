@@ -1,8 +1,97 @@
-import SuiteMetrics from "suite-metrics";
-import { createNestedTestData } from "../generators/testDataHelpers.js";
+import SuiteMetrics, { Test, StructureMetadata } from "suite-metrics";
+import { createNestedTestData } from "../generators/testDataHelpers.ts";
 import { assert } from "chai";
+import { DEFAULT_OPTIONS, TestDataOptions } from "../generators/options.ts";
+import { validateTest } from "../helpers/validators.ts";
 
 suite("Performance", function () {
+
+    /**
+     * Generates a suite metrics with the specified options & verifies the result
+     *
+     * @param genOpts Options for createNestedTestData
+     * @param concurrent If a ConcurrentSuiteMetrics should be used
+     * @param expected Expected number of tests (1% error is verified)
+     */
+    function runTest(genOpts: Partial<TestDataOptions>, concurrent: boolean, expected: number): void {
+        const startTime: number = performance.now();
+        const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
+        const afterGenerate: number = performance.now();
+
+
+        // Print out general metrics
+        const totalTests: number = metrics.metrics.getTotalTestCount();
+        const testDiff: number = Math.abs(expected - totalTests);
+        const infoString: string = `${(totalTests < expected ? '-' : '+')}${testDiff} from target, ${100 * (testDiff / expected)}% error`;
+        console.log(`Total tests: ${totalTests} (${infoString})`);
+        assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
+
+        const structureMetadata: StructureMetadata = metrics.metrics.getStructureMetadata();
+        console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+
+
+        // Validate various stats
+        const avgDuration: number = structureMetadata.timing.averageDuration;
+        assert.equal(metrics.metrics.getAverageTestDuration(), avgDuration);
+        assert.isAtLeast(avgDuration, DEFAULT_OPTIONS.minDuration);
+        assert.isAtMost(avgDuration, DEFAULT_OPTIONS.maxDuration);
+
+        const medianDuration: number = structureMetadata.timing.medianDuration;
+        assert.equal(metrics.metrics.getMedianTestDuration(), medianDuration);
+        assert.isAtLeast(medianDuration, DEFAULT_OPTIONS.minDuration);
+        assert.isAtMost(medianDuration, DEFAULT_OPTIONS.maxDuration);
+
+        const allTestsSlowestFirst: Test[] = metrics.performance.getAllTestsSlowestFirst();
+        for (let i: number = 0; i < allTestsSlowestFirst.length; ++i) {
+            validateTest(allTestsSlowestFirst[i]);
+        }
+        for (let i: number = 0; i < allTestsSlowestFirst.length - 1; ++i) {
+            assert.isAtLeast(allTestsSlowestFirst[i].duration, allTestsSlowestFirst[i + 1].duration);
+        }
+
+        const allTestsFastestFirst: Test[] = metrics.performance.getAllTestsFastestFirst();
+        for (let i: number = 0; i < allTestsFastestFirst.length; ++i) {
+            validateTest(allTestsFastestFirst[i]);
+        }
+        for (let i: number = 0; i < allTestsFastestFirst.length - 1; ++i) {
+            assert.isAtMost(allTestsFastestFirst[i].duration, allTestsFastestFirst[i + 1].duration);
+        }
+
+        const stDev: number = metrics.statistics.getStandardDeviation();
+        console.log(`Standard deviation: ${stDev}`);
+        assert.isAtMost(stDev, 49_750); // 50% at 500, 50% at 100k
+
+        const allZScores: { test: Test, zScore: number }[] = metrics.statistics.getAllTestsWithZScores();
+        assert.lengthOf(allZScores, totalTests);
+
+
+        // Print out performance info
+        const endTime: number = performance.now();
+
+        console.log("===Performance===");
+        console.log(`Generation time: ${msToString(afterGenerate - startTime)}`);
+        console.log(`Validation time: ${msToString(endTime - afterGenerate)}`);
+
+        console.log('\n'); // 2x newline to separate
+    }
+
+    /**
+     * Turns a number of ms to a readable string
+     */
+    function msToString(ms: number): string {
+        const rounded: number = Math.round(ms);
+        if (rounded < 1000) {
+            return `${rounded} ms`;
+        }
+        if (rounded < 60_000) {
+            return `${Math.floor(rounded / 1000)} seconds ${rounded % 1000} ms`;
+        }
+
+        const minutes: number = Math.floor(rounded / 60_000);
+        const seconds: number = Math.floor((rounded % 60_000) / 1000);
+        const milliseconds: number = rounded % 1000;
+        return `${minutes} minutes ${seconds} seconds ${milliseconds} ms`;
+    }
 
     suite("10k tests", function() {
         test("10k suites", function() {
@@ -10,17 +99,10 @@ suite("Performance", function () {
                 numSuites: 9,
                 testsPerSuite: 1,
                 maxDepth: 4,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
 
         test("Balanced", function() {
@@ -28,17 +110,10 @@ suite("Performance", function () {
                 numSuites: 1,
                 testsPerSuite: 27,
                 maxDepth: 4,
-                subSuitesPerSuite: 7,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 7
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
 
         test("Wide & shallow", function() {
@@ -46,36 +121,30 @@ suite("Performance", function () {
                 numSuites: 13,
                 testsPerSuite: 9,
                 maxDepth: 3,
-                subSuitesPerSuite: 9,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 9
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            const totalTests: number = metrics.metrics.getTotalTestCount();
-            console.log(`Total tests: ` + totalTests);
-            assert.closeTo(totalTests, 10_000, 10, "There should be 10_000 +- 10 total tests");
+            runTest(generatorOptions, false, 10_000);
         });
     });
 
-    /* TODO
     suite("100k tests", function() {
+        // Skip if not running large tests
+        if (!process.env.RUN_LARGE) {
+            return;
+        }
+
+        this.timeout(180_000); // 3 min max for these tests
+
         test("100k suites", function() {
             const generatorOptions = {
                 numSuites: 9,
                 testsPerSuite: 1,
                 maxDepth: 5,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
 
         test("Balanced", function() {
@@ -83,15 +152,10 @@ suite("Performance", function () {
                 numSuites: 5,
                 testsPerSuite: 19,
                 maxDepth: 4,
-                subSuitesPerSuite: 10,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 10
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
 
         test("Mid depth", function() {
@@ -99,50 +163,52 @@ suite("Performance", function () {
                 numSuites: 10,
                 testsPerSuite: 27,
                 maxDepth: 4,
-                subSuitesPerSuite: 7,
-
-                minDuration: 500,
-                maxDuration: 50_000
+                subSuitesPerSuite: 7
             };
 
-            const metrics = createNestedTestData(false, generatorOptions) as SuiteMetrics;
-
-            console.log(`Total tests: ` + metrics.metrics.getTotalTestCount());
+            runTest(generatorOptions, false, 100_000);
         });
     });
-     */
 
-    /*
-    For 1m tests:
+    suite("1 million tests", function() {
+        // Skip if not running large tests
+        if (!process.env.RUN_LARGE) {
+            return;
+        }
 
-    Minimal Tests Per Suite:
+        this.timeout(1_800_000); // 30 min max for these tests
 
-   {
-     numSuites: 9,
-     testsPerSuite: 1,
-     maxDepth: 6,
-     subSuitesPerSuite: 10
-   }
-   // → 999,999 tests (0.00% error)
+        test("100k suites", function() {
+            const generatorOptions = {
+                numSuites: 9,
+                testsPerSuite: 1,
+                maxDepth: 6,
+                subSuitesPerSuite: 10
+            };
 
-Balanced Structure:
+            runTest(generatorOptions, false, 1_000_000);
+        });
 
-   {
-     numSuites: 5,
-     testsPerSuite: 19,
-     maxDepth: 5,
-     subSuitesPerSuite: 10
-   }
-   // → 999,995 tests (0.00% error)
+        test("Balanced", function() {
+            const generatorOptions = {
+                numSuites: 5,
+                testsPerSuite: 19,
+                maxDepth: 5,
+                subSuitesPerSuite: 10
+            };
 
-More Realistic Structure:
+            runTest(generatorOptions, false, 1_000_000);
+        });
 
-   {
-     numSuites: 19,
-     testsPerSuite: 37,
-     maxDepth: 5,
-     subSuitesPerSuite: 6
-   }
-   // → 999,666 tests (0.03% error)
-     */
+        test("Mid depth", function() {
+            const generatorOptions = {
+                numSuites: 19,
+                testsPerSuite: 37,
+                maxDepth: 5,
+                subSuitesPerSuite: 6
+            };
+
+            runTest(generatorOptions, false, 1_000_000);
+        });
+    });
 });

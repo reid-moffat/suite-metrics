@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { assertThrows, sleep } from "../../helpers/helpers.ts";
 import { validateTest } from "../../helpers/validators.ts";
 
-suite("[BaseSuiteMetrics] getTest", function() {
+suite("[Query] getTest", function() {
 
     let metrics: SuiteMetrics;
 
@@ -216,12 +216,12 @@ suite("[BaseSuiteMetrics] getTest", function() {
             sleep(100);
             metrics.stopTest();
 
-            const fastTest = metrics.queries.getTest(["DurationSuite", "FastTest"]);
-            const slowTest = metrics.queries.getTest(["DurationSuite", "SlowTest"]);
+            const fastTest: Test = metrics.queries.getTest(["DurationSuite", "FastTest"]);
+            const slowTest: Test = metrics.queries.getTest(["DurationSuite", "SlowTest"]);
 
             assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
-            assert.isAbove(fastTest.duration, 10_000, 'Fast test should have at least 10ms duration');
-            assert.isAbove(slowTest.duration, 100_000, 'Slow test should have at least 100ms duration');
+            assert.isAbove(fastTest.duration, 10_000, `Fast test should have at least 10ms duration (actual: ${fastTest.duration})`);
+            assert.isAbove(slowTest.duration, 100_000, `Slow test should have at least 100ms duration (actual: ${slowTest.duration})`);
         });
     });
 

@@ -138,6 +138,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      * test timing accuracy
      *
      * @param path Path of suites to this test. E.g. ['suite 1', 'sub-suite 2', 'test 3']
+     * @returns The newly created Test object (as a Promise)
      */
     public async stopTest(path: readonly string[]): Promise<Test> {
         const endTime: number = microtime.now(); // Get immediately for highest accuracy
@@ -182,6 +183,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     /**
      * Creates a unique key for a test path to track concurrent tests
      *
+     * @param testPath Path to create key for
      * @returns String value of the test path joined with "::". E.g. ['suite1', 'suite2', 'test1'] -> "suite1::suite2::test1"
      */
     private createTestKey(testPath: readonly string[]): string {
