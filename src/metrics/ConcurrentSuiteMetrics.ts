@@ -20,7 +20,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance & mutex
     private static readonly _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
-    private static readonly instanceMutex = withTimeout(new Mutex(), 100);
+    private static readonly _instanceMutex = withTimeout(new Mutex(), 100);
 
     // Stores key (joined path) and start time for each active test
     private activeTests: Map<TestKey, StartTime> = new Map();
@@ -38,7 +38,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         let release: (() => void) | null = null;
 
         try {
-            release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
+            release = await ConcurrentSuiteMetrics._instanceMutex.acquire();
             return ConcurrentSuiteMetrics._instance;
         } catch (error: any) {
             // Handle specific mutex errors
@@ -67,7 +67,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         let release: (() => void) | null = null;
 
         try {
-            release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
+            release = await ConcurrentSuiteMetrics._instanceMutex.acquire();
 
             ConcurrentSuiteMetrics._instance.reset();
             ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), 100);
