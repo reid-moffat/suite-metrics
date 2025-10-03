@@ -46,7 +46,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
                 throw new Error('Failed to acquire singleton lock for get: Timeout after 100ms');
             }
             if (error === E_CANCELED) {
-                throw new Error('Failed to acquire singleton lock for get: Singleton acquisition was cancelled');
+                throw new Error('Failed to acquire singleton lock for get: Lock acquisition was cancelled');
             }
 
             throw new Error(`Unexpected exception getting singleton: ${error.message}`);
@@ -74,7 +74,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
                 throw new Error('Failed to acquire singleton lock for reset: Timeout after 100ms');
             }
             if (error === E_CANCELED) {
-                throw new Error('Singleton reset was cancelled');
+                throw new Error('Failed to acquire singleton lock for reset: Lock acquisition was cancelled');
             }
 
             throw new Error(`Unexpected exception resetting singleton: ${error.message}`);
