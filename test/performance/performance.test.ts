@@ -1,4 +1,4 @@
-import SuiteMetrics, { StructureMetadata } from "suite-metrics";
+import SuiteMetrics, { Test, StructureMetadata } from "suite-metrics";
 import { createNestedTestData } from "../generators/testDataHelpers.ts";
 import { assert } from "chai";
 import { DEFAULT_OPTIONS, TestDataOptions } from "../generators/options.ts";
@@ -13,7 +13,9 @@ suite("Performance", function () {
      * @param expected Expected number of tests (1% error is verified)
      */
     function runTest(genOpts: Partial<TestDataOptions>, concurrent: boolean, expected: number): void {
+        const startTime: number = performance.now();
         const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
+        const afterGenerate: number = performance.now();
 
         // Print out general metrics
         const totalTests: number = metrics.metrics.getTotalTestCount();
@@ -31,7 +33,11 @@ suite("Performance", function () {
         assert.isAtLeast(avgDuration, DEFAULT_OPTIONS.minDuration);
         assert.isAtMost(avgDuration, DEFAULT_OPTIONS.maxDuration);
 
-        console.log();
+        const medianDuration: number = structureMetadata.timing.medianDuration;
+        assert.equal(metrics.metrics.getMedianTestDuration(), medianDuration);
+        assert.isAtLeast(medianDuration, DEFAULT_OPTIONS.minDuration);
+        assert.isAtMost(medianDuration, DEFAULT_OPTIONS.maxDuration);
+
     }
 
     suite("10k tests", function() {
