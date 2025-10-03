@@ -30,6 +30,9 @@ class SuiteMetrics extends BaseSuiteMetrics {
 
     /**
      * Resets SuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
+     *
+     * The singleton's reference is always preserved. It is created at setup time and persists through the entire
+     * program, including after resetting the instance (instance data is reset, but the reference remains)
      */
     public static resetInstance(): void {
         SuiteMetrics._instance.reset();
