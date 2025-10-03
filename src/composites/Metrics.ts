@@ -1,7 +1,7 @@
 import Suites from "../helpers/Suites.ts";
 import { Suite, Test } from "../types/structures.ts";
 import { StructureMetadata, SuiteData, SuiteTestMetrics } from "../types/returnTypes.ts";
-import LazyCache from "../helpers/LazyCache.js";
+import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Methods for calculating overall test metrics
