@@ -129,6 +129,10 @@ suite("Performance", function () {
     });
 
     suite("100k tests", function() {
+        // Skip if not running large tests
+        if (!process.env.RUN_LARGE) {
+            return;
+        }
 
         this.timeout(180_000); // 3 min max for these tests
 
