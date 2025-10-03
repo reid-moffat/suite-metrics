@@ -38,6 +38,7 @@ suite("Performance", function () {
         assert.isAtLeast(medianDuration, DEFAULT_OPTIONS.minDuration);
         assert.isAtMost(medianDuration, DEFAULT_OPTIONS.maxDuration);
 
+        const allTestsSlowestFirst: Test[] = metrics.performance.getAllTestsSlowestFirst();
 
         // Print out performance info
         const endTime: number = performance.now();
