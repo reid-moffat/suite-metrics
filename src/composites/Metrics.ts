@@ -20,7 +20,7 @@ class Metrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.lazyCache.getNumTests();
+        return this.suites.getCache().getNumTests();
     }
 
     /**
@@ -48,7 +48,7 @@ class Metrics {
             return 0;
         }
 
-        const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.suites.getCache().getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {
@@ -154,11 +154,11 @@ class Metrics {
 
 
         // Calculate various remaining values
-        const numTests: number = this.lazyCache.getNumTests();
+        const numTests: number = this.suites.getCache().getNumTests();
         const testsPerSuite: number = numTests / tempValues.totalSuites;
         const testsPerNonEmptySuite: number = numTests / (tempValues.totalHybrid + tempValues.totalLeaves);
 
-        const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
+        const testInOrder: Test[] = this.suites.getCache().getAllTestsInOrder();
         const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
 
         const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;

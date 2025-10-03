@@ -40,6 +40,13 @@ class Suites {
         this.lazyCache.reset();
     }
 
+    /**
+     * Returns a reference to this suites' cache
+     */
+    public getCache(): LazyCache {
+        return this.lazyCache;
+    }
+
 
     /**
      * Gets a reference to the top-level suite
