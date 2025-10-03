@@ -26,7 +26,7 @@ abstract class BaseSuiteMetrics {
     /** Gets fastest and slowest test(s) */
     public performance: Performance = new Performance(this.suites, this.lazyCache);
     /** Statistical methods around Z-scores */
-    public statistics: Statistics = new Statistics(this.suites, this.lazyCache);
+    public statistics: Statistics = new Statistics(this.lazyCache);
 
     /**
      * Resets all the data in this instance
@@ -38,7 +38,7 @@ abstract class BaseSuiteMetrics {
         this.queries = new Queries(this.suites);
         this.metrics = new Metrics(this.suites, this.lazyCache);
         this.performance = new Performance(this.suites, this.lazyCache);
-        this.statistics = new Statistics(this.suites, this.lazyCache);
+        this.statistics = new Statistics(this.lazyCache);
     }
 
     /**
