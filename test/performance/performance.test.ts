@@ -1,7 +1,7 @@
 import SuiteMetrics from "suite-metrics";
-import { createNestedTestData } from "../generators/testDataHelpers.js";
+import { createNestedTestData } from "../generators/testDataHelpers.ts";
 import { assert } from "chai";
-import { TestDataOptions } from "../generators/options.js";
+import { TestDataOptions } from "../generators/options.ts";
 
 suite("Performance", function () {
 
@@ -16,7 +16,7 @@ suite("Performance", function () {
         const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
 
         const totalTests: number = metrics.metrics.getTotalTestCount();
-        console.log(`Total tests: ` + totalTests);
+        console.log(`Total tests: ${totalTests}`);
         assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
 
         console.log();
