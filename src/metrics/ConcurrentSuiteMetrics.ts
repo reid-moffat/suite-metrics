@@ -68,7 +68,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
         try {
             release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
-            ConcurrentSuiteMetrics._instance?.reset();
+            ConcurrentSuiteMetrics._instance.reset();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
                 throw new Error('Failed to acquire singleton lock for reset: timeout after 100ms');
