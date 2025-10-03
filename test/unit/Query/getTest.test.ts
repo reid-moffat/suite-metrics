@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { assertThrows, sleep } from "../../helpers/helpers.ts";
 import { validateTest } from "../../helpers/validators.ts";
 
-suite("[BaseSuiteMetrics] getTest", function() {
+suite("[Query] getTest", function() {
 
     let metrics: SuiteMetrics;
 
