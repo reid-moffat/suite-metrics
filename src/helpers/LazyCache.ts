@@ -6,8 +6,6 @@ import { Test } from "../types/structures.ts";
  */
 class LazyCache {
 
-    public constructor() { }
-
     //
     // Ordered tests caches
     //
