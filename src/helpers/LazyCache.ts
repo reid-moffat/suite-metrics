@@ -40,10 +40,6 @@ class LazyCache {
 
     private statisticsValid!: boolean;
 
-    constructor() {
-        this.reset();
-    }
-
     /**
      * Resets all data in this cache to defaults
      */
