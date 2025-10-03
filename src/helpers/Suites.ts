@@ -36,6 +36,13 @@ class Suites {
         }, true);
     }
 
+    /**
+     * Resets all suite data to default
+     */
+    public reset(): void {
+        this.createInitialSuite();
+    }
+
 
     /**
      * Gets a reference to the top-level suite
