@@ -35,6 +35,7 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * program, including after resetting the instance (instance data is reset, but the reference remains)
      */
     public static resetInstance(): void {
+        SuiteMetrics._instance.suites.reset();
         SuiteMetrics._instance.activeTest = null;
     }
 
