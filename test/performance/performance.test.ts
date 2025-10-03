@@ -47,6 +47,14 @@ suite("Performance", function () {
             assert.isAtLeast(allTestsSlowestFirst[i].duration, allTestsSlowestFirst[i + 1].duration);
         }
 
+        const allTestsFastestFirst: Test[] = metrics.performance.getAllTestsFastestFirst();
+        for (let i: number = 0; i < allTestsFastestFirst.length; ++i) {
+            validateTest(allTestsFastestFirst[i]);
+        }
+        for (let i: number = 0; i < allTestsFastestFirst.length - 1; ++i) {
+            assert.isAtMost(allTestsFastestFirst[i].duration, allTestsFastestFirst[i + 1].duration);
+        }
+
         // Print out performance info
         const endTime: number = performance.now();
 
