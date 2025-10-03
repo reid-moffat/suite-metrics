@@ -76,7 +76,7 @@ class Statistics {
 
         // Calculate Z scores
         const allTests: Test[] = this.cache.getAllTestsInOrder();
-        return allTests.map((test: Test) => {
+        return allTests.map((test: Test): { test: Test, zScore: number } => {
             return {
                 test: test,
                 zScore: (test.duration - this.cache.getMeanDuration()) / stdDev
