@@ -18,15 +18,15 @@ type StartTime = number;
  */
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
-    // Lazy singleton instance
+    // Lazy singleton instance & mutex
     private static readonly _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
+    private static readonly instanceMutex = withTimeout(new Mutex(), 100);
 
     // Stores key (joined path) and start time for each active test
-    private readonly activeTests: Map<TestKey, StartTime> = new Map();
+    private activeTests: Map<TestKey, StartTime> = new Map();
 
-    // Mutexes for the lazy singleton and for any specific instance
-    private static readonly instanceMutex = withTimeout(new Mutex(), 100);
-    private readonly testMutex = withTimeout(new Mutex(), 100);
+    // Instance mutex for starting & stopping tests
+    private testMutex = withTimeout(new Mutex(), 100);
 
 
     /**
@@ -68,7 +68,10 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
         try {
             release = await ConcurrentSuiteMetrics.instanceMutex.acquire();
+
             ConcurrentSuiteMetrics._instance.reset();
+            ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), 100);
+            ConcurrentSuiteMetrics._instance.activeTests = new Map();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
                 throw new Error('Failed to acquire singleton lock for reset: Timeout after 100ms');
