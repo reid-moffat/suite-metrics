@@ -17,7 +17,9 @@ suite("Performance", function () {
 
         // Print out general metrics
         const totalTests: number = metrics.metrics.getTotalTestCount();
-        console.log(`Total tests: ${totalTests}`);
+        const testDiff: number = Math.abs(expected - totalTests);
+        const infoString: string = `${(totalTests < expected ? '-' : '+')}${testDiff} from target, ${100 * (testDiff / expected)}% error`;
+        console.log(`Total tests: ${totalTests} (${infoString})`);
         assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
 
         console.log(`Structure metadata: ${JSON.stringify(metrics.metrics.getStructureMetadata(), null, 4)}`);
