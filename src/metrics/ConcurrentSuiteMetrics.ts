@@ -19,7 +19,7 @@ type StartTime = number;
 class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance
-    private static _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
+    private static readonly _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
 
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map();
