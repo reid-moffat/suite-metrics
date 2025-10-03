@@ -43,10 +43,10 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
-                throw new Error('Failed to acquire singleton lock: Timeout after 100ms');
+                throw new Error('Failed to acquire singleton lock for get: Timeout after 100ms');
             }
             if (error === E_CANCELED) {
-                throw new Error('Failed to acquire singleton lock: Singleton acquisition was cancelled');
+                throw new Error('Failed to acquire singleton lock for get: Singleton acquisition was cancelled');
             }
 
             throw new Error(`Unexpected exception getting singleton: ${error.message}`);
@@ -71,7 +71,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
             ConcurrentSuiteMetrics._instance.reset();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
-                throw new Error('Failed to acquire singleton lock for reset: timeout after 100ms');
+                throw new Error('Failed to acquire singleton lock for reset: Timeout after 100ms');
             }
             if (error === E_CANCELED) {
                 throw new Error('Singleton reset was cancelled');
