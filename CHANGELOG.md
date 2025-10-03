@@ -1,13 +1,20 @@
 # suite-metrics
 
+## 2.2.1
+
+### Patch Changes
+
+- ee12a4d: Clarified documentation of examples in README and added missing function annotations. Improved high-load testing for 100k+ tests.
+
 ## 2.2.0
 
 ### Minor Changes
 
 ca5a90d:
-* Added metrics.getStructureMetadata() to provide high-level aggregate data about your tests as whole.
-* Return 0 for average and median test duration when no tests are present rather than throwing an error
-* Testing and minor documentation improvements
+
+- Added metrics.getStructureMetadata() to provide high-level aggregate data about your tests as whole.
+- Return 0 for average and median test duration when no tests are present rather than throwing an error
+- Testing and minor documentation improvements
 
 ## 2.1.2
 
