@@ -12,11 +12,7 @@ class Suites {
     private topLevelSuite: Suite = this.createInitialSuite();
 
     // Ref to lazy-loaded expensive values cache
-    private readonly lazyCache: LazyCache;
-
-    public constructor(lazyCache: LazyCache) {
-        this.lazyCache = lazyCache;
-    }
+    private readonly lazyCache: LazyCache = new LazyCache();
 
 
     /**
