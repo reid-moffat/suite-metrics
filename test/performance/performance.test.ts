@@ -18,6 +18,7 @@ suite("Performance", function () {
         const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
         const afterGenerate: number = performance.now();
 
+
         // Print out general metrics
         const totalTests: number = metrics.metrics.getTotalTestCount();
         const testDiff: number = Math.abs(expected - totalTests);
@@ -27,6 +28,7 @@ suite("Performance", function () {
 
         const structureMetadata: StructureMetadata = metrics.metrics.getStructureMetadata();
         console.log(`Structure metadata: ${JSON.stringify(structureMetadata, null, 4)}`);
+
 
         // Validate various stats
         const avgDuration: number = structureMetadata.timing.averageDuration;
@@ -54,6 +56,10 @@ suite("Performance", function () {
         for (let i: number = 0; i < allTestsFastestFirst.length - 1; ++i) {
             assert.isAtMost(allTestsFastestFirst[i].duration, allTestsFastestFirst[i + 1].duration);
         }
+
+        const stDev: number = metrics.statistics.getStandardDeviation();
+        console.log(`Standard deviation: ${stDev}`);
+
 
         // Print out performance info
         const endTime: number = performance.now();
