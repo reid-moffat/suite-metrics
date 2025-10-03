@@ -11,7 +11,7 @@ import Metrics from "../composites/Metrics.ts";
  */
 abstract class BaseSuiteMetrics {
 
-    // All suites and their directly related methods
+    // All data for this metrics instance. Includes suites, tests, and a cache
     protected readonly suites: Suites = new Suites();
 
 
