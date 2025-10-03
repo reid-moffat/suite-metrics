@@ -45,7 +45,7 @@ suite("Performance", function () {
 
         console.log("===Performance===");
         console.log(`Generation time: ${msToString(afterGenerate - startTime)}`);
-        console.log(`Total time: ${msToString(endTime - startTime)}`);
+        console.log(`Validation time: ${msToString(endTime - afterGenerate)}`);
 
         console.log('\n'); // 2x newline to separate
     }
