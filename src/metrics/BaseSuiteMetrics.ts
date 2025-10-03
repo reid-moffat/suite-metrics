@@ -13,20 +13,33 @@ import LazyCache from "../helpers/LazyCache.ts";
 abstract class BaseSuiteMetrics {
 
     // Cache for expensive values
-    private readonly lazyCache: LazyCache = new LazyCache();
+    private lazyCache: LazyCache = new LazyCache();
 
     // All suites and their directly related methods
-    protected readonly suites: Suites = new Suites(this.lazyCache);
+    protected suites: Suites = new Suites(this.lazyCache);
 
 
     /** Queries for Tests, Suites, and their data */
-    public readonly queries: Queries = new Queries(this.suites);
+    public queries: Queries = new Queries(this.suites);
     /** Aggregate metrics such as test averages and total counts */
-    public readonly metrics: Metrics = new Metrics(this.suites, this.lazyCache);
+    public metrics: Metrics = new Metrics(this.suites, this.lazyCache);
     /** Gets fastest and slowest test(s) */
-    public readonly performance: Performance = new Performance(this.suites, this.lazyCache);
+    public performance: Performance = new Performance(this.suites, this.lazyCache);
     /** Statistical methods around Z-scores */
-    public readonly statistics: Statistics = new Statistics(this.suites, this.lazyCache);
+    public statistics: Statistics = new Statistics(this.suites, this.lazyCache);
+
+    /**
+     * Resets all the data in this instance
+     */
+    protected reset(): void {
+        this.lazyCache = new LazyCache();
+        this.suites = new Suites(this.lazyCache);
+
+        this.queries = new Queries(this.suites);
+        this.metrics = new Metrics(this.suites, this.lazyCache);
+        this.performance = new Performance(this.suites, this.lazyCache);
+        this.statistics = new Statistics(this.suites, this.lazyCache);
+    }
 
     /**
      * Validates a test or suite path, throwing an error if invalid
