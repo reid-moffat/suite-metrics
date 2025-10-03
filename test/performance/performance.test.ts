@@ -60,6 +60,9 @@ suite("Performance", function () {
         const stDev: number = metrics.statistics.getStandardDeviation();
         console.log(`Standard deviation: ${stDev}`);
 
+        const allZScores: {test: Test, zScore: number }[] = metrics.statistics.getAllTestsWithZScores();
+        assert.lengthOf(allZScores, totalTests);
+
 
         // Print out performance info
         const endTime: number = performance.now();
