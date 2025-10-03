@@ -1,8 +1,26 @@
 import SuiteMetrics from "suite-metrics";
 import { createNestedTestData } from "../generators/testDataHelpers.js";
 import { assert } from "chai";
+import { TestDataOptions } from "../generators/options.js";
 
 suite("Performance", function () {
+
+    /**
+     * Generates a suite metrics with the specified options & verifies the result
+     *
+     * @param genOpts Options for createNestedTestData
+     * @param concurrent If a ConcurrentSuiteMetrics should be used
+     * @param expected Expected number of tests (1% error is verified)
+     */
+    function runTest(genOpts: Partial<TestDataOptions>, concurrent: boolean, expected: number): void {
+        const metrics = createNestedTestData(concurrent, genOpts) as SuiteMetrics;
+
+        const totalTests: number = metrics.metrics.getTotalTestCount();
+        console.log(`Total tests: ` + totalTests);
+        assert.closeTo(totalTests, expected, expected / 100, `There should be ${expected} +- ${expected / 100} total tests`);
+
+        console.log();
+    }
 
     suite("10k tests", function() {
         test("10k suites", function() {
