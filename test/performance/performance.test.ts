@@ -61,7 +61,7 @@ suite("Performance", function () {
         console.log(`Standard deviation: ${stDev}`);
         assert.isAtMost(stDev, 49_750); // 50% at 500, 50% at 100k
 
-        const allZScores: {test: Test, zScore: number }[] = metrics.statistics.getAllTestsWithZScores();
+        const allZScores: { test: Test, zScore: number }[] = metrics.statistics.getAllTestsWithZScores();
         assert.lengthOf(allZScores, totalTests);
 
 
