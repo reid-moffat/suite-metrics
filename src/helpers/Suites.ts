@@ -36,7 +36,7 @@ class Suites {
      * Resets all suite data to default
      */
     public reset(): void {
-        this.createInitialSuite();
+        this.topLevelSuite = this.createInitialSuite();
         this.lazyCache.reset();
     }
 
