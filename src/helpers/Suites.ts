@@ -30,6 +30,23 @@ class Suites {
 
 
     /**
+     * Resets all suite data to default
+     */
+    public reset() {
+        this.topLevelSuite = freeze({
+            name: "<Top-Level suite>",
+            path: [],
+            tests: new Map<string, Test>(),
+            subSuites: new Map<string, Suite>(),
+
+            aggregateData: {
+                numTests: 0,
+                totalTestTime: 0
+            }
+        }, true);
+    }
+
+    /**
      * Gets a reference to the top-level suite
      */
     public getTopLevelSuite(): Suite {
