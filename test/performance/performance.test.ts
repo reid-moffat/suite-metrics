@@ -2,6 +2,7 @@ import SuiteMetrics, { Test, StructureMetadata } from "suite-metrics";
 import { createNestedTestData } from "../generators/testDataHelpers.ts";
 import { assert } from "chai";
 import { DEFAULT_OPTIONS, TestDataOptions } from "../generators/options.ts";
+import { validateTest } from "../helpers/validators.ts";
 
 suite("Performance", function () {
 
@@ -39,6 +40,12 @@ suite("Performance", function () {
         assert.isAtMost(medianDuration, DEFAULT_OPTIONS.maxDuration);
 
         const allTestsSlowestFirst: Test[] = metrics.performance.getAllTestsSlowestFirst();
+        for (let i: number = 0; i < allTestsSlowestFirst.length; ++i) {
+            validateTest(allTestsSlowestFirst[i]);
+        }
+        for (let i: number = 0; i < allTestsSlowestFirst.length - 1; ++i) {
+            assert.isAtLeast(allTestsSlowestFirst[i].duration, allTestsSlowestFirst[i + 1].duration);
+        }
 
         // Print out performance info
         const endTime: number = performance.now();
