@@ -1,5 +1,4 @@
 import { Test } from "../types/structures.ts";
-import Suites from "../helpers/Suites.ts";
 import LazyCache from "../helpers/LazyCache.ts";
 
 /**
@@ -7,14 +6,10 @@ import LazyCache from "../helpers/LazyCache.ts";
  */
 class Performance {
 
-    // Ref to suites instance with all this metrics' data
-    private readonly suites: Suites;
-
     // Ref to lazy-loaded expensive values cache
     private readonly lazyCache: LazyCache;
 
-    public constructor(suites: Suites, lazyCache: LazyCache) {
-        this.suites = suites;
+    public constructor(lazyCache: LazyCache) {
         this.lazyCache = lazyCache;
     }
 
