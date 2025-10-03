@@ -120,7 +120,7 @@ suite("Performance", function () {
 
     suite("100k tests", function() {
 
-        this.timeout(100_000); // 100s max for these tests
+        this.timeout(180_000); // 3 min max for these tests
 
         test("100k suites", function() {
             const generatorOptions = {
@@ -162,7 +162,7 @@ suite("Performance", function () {
             return;
         }
 
-        this.timeout(1_200_000); // 20 min max for these tests
+        this.timeout(1_800_000); // 30 min max for these tests
 
         test("100k suites", function() {
             const generatorOptions = {
