@@ -23,7 +23,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private static readonly _instanceMutex = withTimeout(new Mutex(), 100);
 
     // Stores key (joined path) and start time for each active test
-    private activeTests: Map<TestKey, StartTime> = new Map();
+    private readonly activeTests: Map<TestKey, StartTime> = new Map();
 
     // Instance mutex for starting & stopping tests
     private testMutex = withTimeout(new Mutex(), 100);
@@ -71,7 +71,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
             ConcurrentSuiteMetrics._instance.suites.reset();
             ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), 100);
-            ConcurrentSuiteMetrics._instance.activeTests = new Map();
+            ConcurrentSuiteMetrics._instance.activeTests.clear();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
                 throw new Error('Failed to acquire singleton lock for reset: Timeout after 100ms');
