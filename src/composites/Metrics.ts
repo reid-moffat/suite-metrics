@@ -12,11 +12,11 @@ class Metrics {
     private readonly suites: Suites;
 
     // Ref to lazy-loaded expensive values cache
-    private readonly lazyCache: LazyCache;
+    private readonly cache: LazyCache;
 
-    public constructor(suites: Suites, lazyCache: LazyCache) {
+    public constructor(suites: Suites) {
         this.suites = suites;
-        this.lazyCache = lazyCache;
+        this.cache = suites.getCache();
     }
 
     /**
@@ -25,7 +25,7 @@ class Metrics {
      * @returns The total number of completed tests in this metrics instance
      */
     public getTotalTestCount(): number {
-        return this.lazyCache.getNumTests();
+        return this.cache.getNumTests();
     }
 
     /**
@@ -53,7 +53,7 @@ class Metrics {
             return 0;
         }
 
-        const sortedTests: Test[] = this.lazyCache.getAllTestsSlowestFirst();
+        const sortedTests: Test[] = this.cache.getAllTestsSlowestFirst();
         const mid: number = Math.floor(sortedTests.length / 2);
 
         if (sortedTests.length % 2 === 1) {
@@ -159,11 +159,11 @@ class Metrics {
 
 
         // Calculate various remaining values
-        const numTests: number = this.lazyCache.getNumTests();
+        const numTests: number = this.cache.getNumTests();
         const testsPerSuite: number = numTests / tempValues.totalSuites;
         const testsPerNonEmptySuite: number = numTests / (tempValues.totalHybrid + tempValues.totalLeaves);
 
-        const testInOrder: Test[] = this.lazyCache.getAllTestsInOrder();
+        const testInOrder: Test[] = this.cache.getAllTestsInOrder();
         const totalTimeDiff: number = testInOrder[testInOrder.length - 1].endTimestamp - testInOrder[0].startTimestamp;
 
         const percentActive: number = topLevelSuite.aggregateData.totalTestTime / totalTimeDiff;

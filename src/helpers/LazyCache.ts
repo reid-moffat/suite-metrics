@@ -6,41 +6,58 @@ import { Test } from "../types/structures.ts";
  */
 class LazyCache {
 
-    public constructor() { }
-
     //
     // Ordered tests caches
     //
 
     // All tests in order of insertion + cached frozen version to return
-    private testsInInsertionOrder: Test[] = [];
-    private frozenTestsInInsertionOrder: Test[] | null = null;
+    private testsInInsertionOrder!: Test[];
+    private frozenTestsInInsertionOrder!: Test[] | null;
 
     // All tests sorted from slowest to fastest (decreasing duration)
-    private allTestsSlowestFirst: Test[] = freeze([]);
+    private allTestsSlowestFirst!: Test[];
     // All tests sorted from fastest to slowest (increasing duration)
-    private allTestsFastestFirst: Test[] = freeze([]);
+    private allTestsFastestFirst!: Test[];
 
     // Tests present during the last sort
-    private lastSortedCount: number = 0;
+    private lastSortedCount!: number;
 
     //
     // Statistics caches
     //
 
     // Cached calculated standard deviation, making repeated calls without added tests O(1)
-    private stdDevPopulation: number = 0;
-    private stdDevSample: number = 0;
+    private stdDevPopulation!: number;
+    private stdDevSample!: number;
 
     // Cached mean test duration
-    private meanDuration: number = 0;
+    private meanDuration!: number;
 
     // Cached values for the calculations above (making adding m tests O(m), not O(n))
-    private cachedCount: number = 0;
-    private cachedSum: number = 0;
-    private cachedSumSquares: number = 0;
+    private cachedCount!: number;
+    private cachedSum!: number;
+    private cachedSumSquares!: number;
 
-    private statisticsValid: boolean = false;
+    private statisticsValid!: boolean;
+
+    /**
+     * Resets all data in this cache to defaults
+     */
+    public reset(): void {
+        this.testsInInsertionOrder = [];
+        this.frozenTestsInInsertionOrder = null;
+        this.allTestsSlowestFirst = freeze([]);
+        this.allTestsFastestFirst = freeze([]);
+        this.lastSortedCount = 0;
+
+        this.stdDevPopulation = 0;
+        this.stdDevSample = 0;
+        this.meanDuration = 0;
+        this.cachedCount = 0;
+        this.cachedSum = 0;
+        this.cachedSumSquares = 0;
+        this.statisticsValid = false;
+    }
 
 
     /**

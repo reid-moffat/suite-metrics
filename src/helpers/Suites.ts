@@ -9,23 +9,39 @@ import LazyCache from "./LazyCache.ts";
 class Suites {
 
     // Top-level suite makes top-level metrics and functions easier to handle
-    private topLevelSuite: Suite = freeze({
-        name: "<Top-Level suite>",
-        path: [],
-        tests: new Map<string, Test>(),
-        subSuites: new Map<string, Suite>(),
-
-        aggregateData: {
-            numTests: 0,
-            totalTestTime: 0
-        }
-    }, true);
+    private topLevelSuite!: Suite;
 
     // Ref to lazy-loaded expensive values cache
-    private readonly lazyCache: LazyCache;
+    private readonly lazyCache: LazyCache = new LazyCache();
 
-    public constructor(lazyCache: LazyCache) {
-        this.lazyCache = lazyCache;
+    public constructor() {
+        this.reset();
+    }
+
+    /**
+     * Resets all suite data to default
+     */
+    public reset(): void {
+        this.topLevelSuite = freeze({
+            name: "<Top-Level suite>",
+            path: [],
+            tests: new Map<string, Test>(),
+            subSuites: new Map<string, Suite>(),
+
+            aggregateData: {
+                numTests: 0,
+                totalTestTime: 0
+            }
+        }, true);
+
+        this.lazyCache.reset();
+    }
+
+    /**
+     * Returns a reference to this suites' cache
+     */
+    public getCache(): LazyCache {
+        return this.lazyCache;
     }
 
 

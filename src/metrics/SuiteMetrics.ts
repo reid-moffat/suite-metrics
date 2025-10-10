@@ -13,7 +13,7 @@ type TestMetadata = { testPath: readonly string[]; startTime: number; };
 class SuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance
-    private static _instance: SuiteMetrics | null = null;
+    private static readonly _instance: SuiteMetrics = new SuiteMetrics();
 
     // Currently running test's data (path and start time, or null if no ongoing test)
     private activeTest: TestMetadata | null = null;
@@ -25,17 +25,18 @@ class SuiteMetrics extends BaseSuiteMetrics {
      * @returns The globally available SuiteMetrics instance
      */
     public static getInstance(): SuiteMetrics {
-        if (SuiteMetrics._instance === null) {
-            SuiteMetrics._instance = new SuiteMetrics();
-        }
         return SuiteMetrics._instance;
     }
 
     /**
      * Resets SuiteMetrics' lazy singleton instance (from getInstance()), clearing all data
+     *
+     * The singleton's reference is always preserved. It is created at setup time and persists through the entire
+     * program, including after resetting the instance (instance data is reset, but the reference remains)
      */
     public static resetInstance(): void {
-        SuiteMetrics._instance = null;
+        SuiteMetrics._instance.suites.reset();
+        SuiteMetrics._instance.activeTest = null;
     }
 
     /**

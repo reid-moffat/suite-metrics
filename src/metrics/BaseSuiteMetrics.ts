@@ -5,28 +5,24 @@ import Suites from "../helpers/Suites.ts";
 import Queries from "../composites/Query.ts";
 import Statistics from "../composites/Statistics.ts";
 import Metrics from "../composites/Metrics.ts";
-import LazyCache from "../helpers/LazyCache.ts";
 
 /**
  * Base class providing common functionality for both suite metrics implementations
  */
 abstract class BaseSuiteMetrics {
 
-    // Cache for expensive values
-    private readonly lazyCache: LazyCache = new LazyCache();
-
-    // All suites and their directly related methods
-    protected readonly suites: Suites = new Suites(this.lazyCache);
+    // All data for this metrics instance. Includes suites, tests, and a cache
+    protected readonly suites: Suites = new Suites();
 
 
     /** Queries for Tests, Suites, and their data */
     public readonly queries: Queries = new Queries(this.suites);
     /** Aggregate metrics such as test averages and total counts */
-    public readonly metrics: Metrics = new Metrics(this.suites, this.lazyCache);
+    public readonly metrics: Metrics = new Metrics(this.suites);
     /** Gets fastest and slowest test(s) */
-    public readonly performance: Performance = new Performance(this.suites, this.lazyCache);
+    public readonly performance: Performance = new Performance(this.suites);
     /** Statistical methods around Z-scores */
-    public readonly statistics: Statistics = new Statistics(this.suites, this.lazyCache);
+    public readonly statistics: Statistics = new Statistics(this.suites);
 
     /**
      * Validates a test or suite path, throwing an error if invalid
@@ -86,7 +82,7 @@ abstract class BaseSuiteMetrics {
      * is ordered first)
      */
     public getTestsInOrder(): Test[] {
-        return this.lazyCache.getAllTestsInOrder();
+        return this.suites.getCache().getAllTestsInOrder();
     }
 
     /**
