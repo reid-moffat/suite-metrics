@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 2.3.0
+
+### Minor Changes
+
+- b8d31d5: The 'resetInstance()' method clears all data for the singleton instance instead of resetting the reference, not invalidating old references and breaking the state. Refactored code to remove unnecessary fields, improved testing, improve error messages surrounding conureent singleton mutex
+
 ## 2.2.1
 
 ### Patch Changes
