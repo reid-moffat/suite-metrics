@@ -1,6 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import { E_CANCELED, E_TIMEOUT, Mutex, withTimeout } from 'async-mutex';
+import { E_CANCELED, E_TIMEOUT, Mutex, MutexInterface, withTimeout } from 'async-mutex';
 import { Test } from "../types/structures.ts";
 
 // Path segments joined with '::'
@@ -26,7 +26,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private readonly activeTests: Map<TestKey, StartTime> = new Map();
 
     // Instance mutex for starting & stopping tests
-    private testMutex = withTimeout(new Mutex(), 100);
+    private testMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
 
     /**
