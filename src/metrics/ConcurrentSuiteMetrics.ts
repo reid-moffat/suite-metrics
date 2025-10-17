@@ -20,7 +20,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance & mutex
     private static readonly _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
-    private static readonly _instanceMutex = withTimeout(new Mutex(), 100);
+    private static readonly _instanceMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map();
