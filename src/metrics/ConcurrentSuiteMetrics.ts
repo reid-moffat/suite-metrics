@@ -27,6 +27,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Instance mutex for starting & stopping tests
     private testMutex: MutexInterface;
+    private readonly mutexTimeout: number;
 
 
     /**
@@ -38,6 +39,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     public constructor(mutexTimeoutMs: number = 100) {
         super();
         this.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
+        this.mutexTimeout = mutexTimeoutMs;
     }
 
     /**
@@ -130,7 +132,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
-                throw new Error(`Failed to acquire test mutex for starting test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+                throw new Error(`Failed to acquire test mutex for starting test ${BaseSuiteMetrics.pathToString(path)}: timeout after ${this.mutexTimeout}ms`);
             }
             if (error === E_CANCELED) {
                 throw new Error(`Test start operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);
@@ -177,7 +179,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
-                throw new Error(`Failed to acquire test mutex for stopping test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+                throw new Error(`Failed to acquire test mutex for stopping test ${BaseSuiteMetrics.pathToString(path)}: timeout after ${this.mutexTimeout}ms`);
             }
             if (error === E_CANCELED) {
                 throw new Error(`Test stop operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);
