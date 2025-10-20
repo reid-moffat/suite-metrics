@@ -89,7 +89,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
             ConcurrentSuiteMetrics._instance.suites.reset();
             ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
-            ConcurrentSuiteMetrics._instance.mutexTimeout = 100;
+            ConcurrentSuiteMetrics._instance.mutexTimeout = mutexTimeoutMs;
             ConcurrentSuiteMetrics._instance.activeTests.clear();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
