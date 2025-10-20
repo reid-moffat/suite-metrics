@@ -27,7 +27,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Instance mutex for starting & stopping tests
     private testMutex: MutexInterface;
-    private readonly mutexTimeout: number;
+    private mutexTimeout: number;
 
 
     /**
@@ -75,15 +75,21 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
      *
      * The singleton's reference is always preserved. It is created at setup time and persists through the entire
      * program, including after resetting the instance (instance data is reset, but the reference remains)
+     *
+     * @param mutexTimeoutMs Timeout in milliseconds for acquiring the test mutex (default: 100ms).
+     * If a test operation can't acquire the mutex within this time, it will throw an error.
+     *
+     * Note: This is not a limit on test execution time, only on mutex acquisition (starting or stopping a test).
      */
-    public static async resetInstance(): Promise<void> {
+    public static async resetInstance(mutexTimeoutMs: number = 100): Promise<void> {
         let release: (() => void) | null = null;
 
         try {
             release = await ConcurrentSuiteMetrics._instanceMutex.acquire();
 
             ConcurrentSuiteMetrics._instance.suites.reset();
-            ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), 100);
+            ConcurrentSuiteMetrics._instance.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
+            ConcurrentSuiteMetrics._instance.mutexTimeout = 100;
             ConcurrentSuiteMetrics._instance.activeTests.clear();
         } catch (error: any) {
             if (error === E_TIMEOUT) {
