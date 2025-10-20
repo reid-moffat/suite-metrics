@@ -1,6 +1,6 @@
 import microtime from 'microtime';
 import BaseSuiteMetrics from './BaseSuiteMetrics.ts';
-import { E_CANCELED, E_TIMEOUT, Mutex, withTimeout } from 'async-mutex';
+import { E_CANCELED, E_TIMEOUT, Mutex, MutexInterface, withTimeout } from 'async-mutex';
 import { Test } from "../types/structures.ts";
 
 // Path segments joined with '::'
@@ -20,14 +20,27 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
     // Lazy singleton instance & mutex
     private static readonly _instance: ConcurrentSuiteMetrics = new ConcurrentSuiteMetrics();
-    private static readonly _instanceMutex = withTimeout(new Mutex(), 100);
+    private static readonly _instanceMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
     // Stores key (joined path) and start time for each active test
     private readonly activeTests: Map<TestKey, StartTime> = new Map();
 
     // Instance mutex for starting & stopping tests
-    private testMutex = withTimeout(new Mutex(), 100);
+    private testMutex: MutexInterface;
+    private readonly mutexTimeout: number;
 
+
+    /**
+     * @param mutexTimeoutMs Timeout in milliseconds for acquiring the test mutex (default: 100ms).
+     * If a test operation can't acquire the mutex within this time, it will throw an error.
+     *
+     * Note: This is not a limit on test execution time, only on mutex acquisition (starting or stopping a test).
+     */
+    public constructor(mutexTimeoutMs: number = 100) {
+        super();
+        this.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
+        this.mutexTimeout = mutexTimeoutMs;
+    }
 
     /**
      * Gets the lazy singleton instance of ConcurrentSuiteMetrics (thread-safe)
@@ -119,7 +132,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
-                throw new Error(`Failed to acquire test mutex for starting test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+                throw new Error(`Failed to acquire test mutex for starting test ${BaseSuiteMetrics.pathToString(path)}: timeout after ${this.mutexTimeout}ms`);
             }
             if (error === E_CANCELED) {
                 throw new Error(`Test start operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);
@@ -166,7 +179,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
         } catch (error: any) {
             // Handle specific mutex errors
             if (error === E_TIMEOUT) {
-                throw new Error(`Failed to acquire test mutex for stopping test ${BaseSuiteMetrics.pathToString(path)}: timeout after 100ms`);
+                throw new Error(`Failed to acquire test mutex for stopping test ${BaseSuiteMetrics.pathToString(path)}: timeout after ${this.mutexTimeout}ms`);
             }
             if (error === E_CANCELED) {
                 throw new Error(`Test stop operation for ${BaseSuiteMetrics.pathToString(path)} was cancelled`);

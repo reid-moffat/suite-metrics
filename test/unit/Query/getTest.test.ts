@@ -220,8 +220,8 @@ suite("[Query] getTest", function() {
             const slowTest: Test = metrics.queries.getTest(["DurationSuite", "SlowTest"]);
 
             assert.isAbove(slowTest.duration, fastTest.duration, 'Slow test should have longer duration than fast test');
-            assert.isAbove(fastTest.duration, 10_000, `Fast test should have at least 10ms duration (actual: ${fastTest.duration})`);
-            assert.isAbove(slowTest.duration, 100_000, `Slow test should have at least 100ms duration (actual: ${slowTest.duration})`);
+            assert.isAtLeast(fastTest.duration, 10_000, `Fast test should have at least 10ms duration (actual: ${fastTest.duration})`);
+            assert.isAtLeast(slowTest.duration, 100_000, `Slow test should have at least 100ms duration (actual: ${slowTest.duration})`);
         });
     });
 
