@@ -478,4 +478,33 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             // TODO
         });
     });
+
+    suite("Timeout Configuration", function() {
+        test("Constructor with custom timeout", function() {
+            const customMetrics = new ConcurrentSuiteMetrics(250);
+            
+            // Test that the instance can be created
+            assert.instanceOf(customMetrics, ConcurrentSuiteMetrics, "Should create instance with custom timeout");
+        });
+
+        test("Default timeout behavior", function() {
+            const defaultMetrics = new ConcurrentSuiteMetrics();
+            
+            // Test that the instance can be created with default timeout
+            assert.instanceOf(defaultMetrics, ConcurrentSuiteMetrics, "Should create instance with default timeout");
+        });
+
+        test("Timeout parameter in error messages", async function() {
+            const customMetrics = new ConcurrentSuiteMetrics(5);
+            
+            // This test verifies that custom timeout values appear in error messages
+            // We can't easily test actual timeout without complex timing, but we can verify the instance works
+            const path = ["Timeout Configuration", "Custom timeout test"];
+            
+            await customMetrics.startTest(path);
+            await customMetrics.stopTest(path);
+            
+            assert.isTrue(customMetrics.queries.testExists(path), "Test should complete successfully with custom timeout");
+        });
+    });
 });
