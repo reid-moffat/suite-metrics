@@ -29,6 +29,11 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private testMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
 
+    public constructor(mutexTimeoutMs: number = 100) {
+        super();
+        this.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
+    }
+
     /**
      * Gets the lazy singleton instance of ConcurrentSuiteMetrics (thread-safe)
      *
