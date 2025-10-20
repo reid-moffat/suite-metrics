@@ -499,7 +499,7 @@ suite("[ConcurrentSuiteMetrics] Basic tests", function() {
             
             // This test verifies that custom timeout values appear in error messages
             // We can't easily test actual timeout without complex timing, but we can verify the instance works
-            const path = ["Timeout Configuration", "Custom timeout test"];
+            const path: string[] = ["Timeout Configuration", "Custom timeout test"];
             
             await customMetrics.startTest(path);
             await customMetrics.stopTest(path);
