@@ -38,6 +38,10 @@ class _MockSuiteMetrics extends SuiteMetrics {
  */
 class _MockConcurrentSuiteMetrics extends ConcurrentSuiteMetrics {
 
+    constructor(mutexTimeoutMs: number = 100) {
+        super(mutexTimeoutMs);
+    }
+
     private currentMockTime: number = microtime.now() - hourInMicrosec;
 
     // State for managing concurrent batches
