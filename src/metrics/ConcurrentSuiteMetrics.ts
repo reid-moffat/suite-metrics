@@ -26,7 +26,7 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private readonly activeTests: Map<TestKey, StartTime> = new Map();
 
     // Instance mutex for starting & stopping tests
-    private testMutex: MutexInterface = withTimeout(new Mutex(), 100);
+    private testMutex: MutexInterface;
 
 
     /**
