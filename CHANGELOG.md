@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 2.4.0
+
+### Minor Changes
+
+- 4bcc01d: Added an option to specify the mutex timeout threshold for ConcurrentSuiteMetrics instances
+
 ## 2.3.0
 
 ### Minor Changes
