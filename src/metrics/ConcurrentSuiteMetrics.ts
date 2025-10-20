@@ -30,10 +30,10 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
 
 
     /**
-     * @param mutexTimeoutMs Optionally set this metrics' test mutex timeout (default 100ms). This determines the
-     * threshold to throw an error while waiting to start or stop a test. Tests themselves can be longer than this
-     * duration; however, if the metrics is overloaded with far to many start and stop requests or the mutex stops
-     * working, an error will be thrown when attempting to start or stop a test.
+     * @param mutexTimeoutMs Timeout in milliseconds for acquiring the test mutex (default: 100ms).
+     * If a test operation can't acquire the mutex within this time, it will throw an error.
+     *
+     * Note: This is not a limit on test execution time, only on mutex acquisition (starting or stopping a test).
      */
     public constructor(mutexTimeoutMs: number = 100) {
         super();
