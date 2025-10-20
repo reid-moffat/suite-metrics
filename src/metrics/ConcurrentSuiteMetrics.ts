@@ -29,6 +29,12 @@ class ConcurrentSuiteMetrics extends BaseSuiteMetrics {
     private testMutex: MutexInterface = withTimeout(new Mutex(), 100);
 
 
+    /**
+     * @param mutexTimeoutMs Optionally set this metrics' test mutex timeout (default 100ms). This determines the
+     * threshold to throw an error while waiting to start or stop a test. Tests themselves can be longer than this
+     * duration; however, if the metrics is overloaded with far to many start and stop requests or the mutex stops
+     * working, an error will be thrown when attempting to start or stop a test.
+     */
     public constructor(mutexTimeoutMs: number = 100) {
         super();
         this.testMutex = withTimeout(new Mutex(), mutexTimeoutMs);
