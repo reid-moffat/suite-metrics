@@ -51,6 +51,9 @@ import { ConcurrentSuiteMetrics } from 'suite-metrics';
 const concurrentMetricsSingleton = await ConcurrentSuiteMetrics.getInstance();
 // or
 const concurrentMetrics = new ConcurrentSuiteMetrics();
+
+// Optionally set the start/stop test mutex timeout (default: 100ms)
+const concurrentMetricsWithCustomMutexTimeout = new ConcurrentSuiteMetrics(10);
 ```
 
 *Note: ConcurrentSuiteMetrics works fine for sequential tests; however, it is more complex (async calls, a parameter 
