@@ -88,5 +88,5 @@
     "url": "https://buymeacoffee.com/reidmoffat"
   },
   "bugs": "https://github.com/reid-moffat/suite-metrics/issues",
-  "packageManager": "pnpm@9.10.0"
+  "packageManager": "pnpm@10.18.3"
 }
