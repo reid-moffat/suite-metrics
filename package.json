@@ -71,7 +71,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.9.1",
     "@types/serialize-javascript": "^5.0.4",
-    "bias-random": "^1.0.3",
+    "bias-random": "^1.1.0",
     "chai": "^6.2.0",
     "cross-env": "^10.1.0",
     "generate-arrays": "^2.0.0",

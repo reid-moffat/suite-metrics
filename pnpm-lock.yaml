@@ -37,8 +37,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       bias-random:
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.1.0
+        version: 1.1.0
       chai:
         specifier: ^6.2.0
         version: 6.2.0
@@ -560,8 +560,9 @@ packages:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
 
-  bias-random@1.0.3:
-    resolution: {integrity: sha512-NpyxAmzN6X9ShmisJEIQQq5ACoAVPOdAMPU2wgoChhx31O8MCcihRmelq586RbOBcHRtpr5puQRPmC79d9hw7A==}
+  bias-random@1.1.0:
+    resolution: {integrity: sha512-+KMXtwbHT2vn7TofYGBuXeeO4BNHa/9Xt3WaYF61p4CVqdZfyy/kOb3cMv2TzRJ2SCvNpc7ml0rW1OgHuMkI3w==}
+    engines: {node: '>=18.0.0'}
 
   brace-expansion@2.0.1:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
@@ -1765,7 +1766,7 @@ snapshots:
     dependencies:
       is-windows: 1.0.2
 
-  bias-random@1.0.3: {}
+  bias-random@1.1.0: {}
 
   brace-expansion@2.0.1:
     dependencies:
