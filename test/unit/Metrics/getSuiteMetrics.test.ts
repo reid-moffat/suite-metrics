@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SuiteMetrics, { SuiteData } from "suite-metrics";
+import SuiteMetrics, { SuiteData, Test } from "suite-metrics";
 import { createSimpleTestData, createNestedTestData } from "../../generators/testDataHelpers.ts";
 import { _MockSuiteMetrics } from "../../generators/mocks.js";
 import { assertThrows, sleep } from "../../helpers/helpers.js";
@@ -177,13 +177,13 @@ suite("[Metrics] getSuiteMetrics", function() {
             sleep(200);
             metrics.stopTest();
 
-            const fastTest = metrics.queries.getTest(["MultiTestSuite", "FastTest"]);
-            const slowTest = metrics.queries.getTest(["MultiTestSuite", "SlowTest"]);
-            const mediumTest = metrics.queries.getTest(["MultiTestSuite", "MediumTest"]);
-            const suiteData = metrics.metrics.getSuiteMetrics(["MultiTestSuite"]);
+            const fastTest: Test = metrics.queries.getTest(["MultiTestSuite", "FastTest"]);
+            const slowTest: Test = metrics.queries.getTest(["MultiTestSuite", "SlowTest"]);
+            const mediumTest: Test = metrics.queries.getTest(["MultiTestSuite", "MediumTest"]);
+            const suiteData: SuiteData = metrics.metrics.getSuiteMetrics(["MultiTestSuite"]);
 
-            const expectedTotal = fastTest.duration + slowTest.duration + mediumTest.duration;
-            const expectedAverage = expectedTotal / 3;
+            const expectedTotal: number = fastTest.duration + slowTest.duration + mediumTest.duration;
+            const expectedAverage: number = expectedTotal / 3;
 
             assert.strictEqual(suiteData.totalTestMetrics.numTests, 3, 'Multi test suite should have three tests');
             assert.strictEqual(suiteData.totalTestMetrics.totalTime, expectedTotal, 'Multi test suite total time should equal sum of test durations');

@@ -26,6 +26,35 @@ pnpm i suite-metrics -D
 yarn add suite-metrics -D
 ```
 
+## 🌐 CDN Usage
+
+You can also use suite-metrics directly in the browser via CDN:
+```html
+<!-- Using unpkg -->
+<script src="https://unpkg.com/suite-metrics"></script>
+
+<!-- Using jsdelivr -->
+<script src="https://cdn.jsdelivr.net/npm/suite-metrics"></script>
+
+<!-- Specify version (recommended for production) -->
+<script src="https://unpkg.com/suite-metrics@2.5.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/suite-metrics@2.5.0"></script>
+```
+
+When loaded via CDN, the library is available globally:
+```html
+<script>
+  // Same usage as below
+  const metrics = new SuiteMetrics();
+  
+  metrics.startTest(["Suite Name", "Test Name"]);
+  // Test logic...
+  metrics.stopTest();
+  
+  console.log(metrics.performance.getSlowestTest());
+</script>
+```
+
 ## 🚀 Usage
 
 ### Setup

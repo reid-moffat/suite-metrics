@@ -1,0 +1,60 @@
+#
+# Configurable workflow to set up a Node environment and run desired command
+#
+
+name: Reusable Node Workflow
+on:
+  workflow_call:
+    inputs:
+      use-matrix:
+        required: true
+        type: boolean
+      run-command:
+        required: false
+        type: string
+      command-description:
+        required: false
+        type: string
+      is-publish:
+        required: false
+        type: boolean
+
+jobs:
+  matrix-job:
+    runs-on: ${{ inputs.use-matrix && matrix.os || 'ubuntu-latest' }}
+    strategy:
+      matrix:
+        node-version: ${{ inputs.use-matrix && fromJson('["18.x", "20.x", "22.x", "24.x"]') || fromJson('["24.x"]') }}
+        os: ${{ inputs.use-matrix && fromJson('["ubuntu-latest", "windows-latest", "macos-latest"]') || fromJson('["ubuntu-latest"]') }}
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm run build
+
+      - name: Link package
+        run: pnpm link --global
+
+      - name: ${{ inputs.command-description }}
+        if: ${{ inputs.run-command != '' }}
+        run: ${{ inputs.run-command }}
+
+      - name: Publish with Changeset
+        if: ${{ inputs.is-publish }}
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
