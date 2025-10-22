@@ -68,7 +68,7 @@
     "@changesets/cli": "^2.29.7",
     "@types/chai": "^5.2.3",
     "@types/microtime": "^2.1.2",
-    "@types/mocha": "^10.0.7",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.9.1",
     "@types/serialize-javascript": "^5.0.4",
     "bias-random": "^1.0.3",
