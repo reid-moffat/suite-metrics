@@ -95,6 +95,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "sideEffects": false,
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
