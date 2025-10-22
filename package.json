@@ -86,6 +86,7 @@
     "type": "git",
     "url": "https://github.com/reid-moffat/suite-metrics.git"
   },
+  "homepage": "https://www.npmjs.com/package/suite-metrics?activeTab=readme",
   "funding": {
     "type": "buymeacoffee",
     "url": "https://buymeacoffee.com/reidmoffat"
