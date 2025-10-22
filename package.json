@@ -76,7 +76,7 @@
     "cross-env": "^10.1.0",
     "generate-arrays": "^2.0.0",
     "mocha": "^11.7.4",
-    "serialize-javascript": "^7.0.0",
+    "serialize-javascript": "^6.0.2",
     "test-inputs": "^1.3.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.0",
