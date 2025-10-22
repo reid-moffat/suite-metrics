@@ -1,5 +1,11 @@
 # suite-metrics
 
+## 2.5.0
+
+### Minor Changes
+
+- b9ea844: Improved importing options, specifying a package.json import, explicit types import, and CDN usage.
+
 ## 2.4.0
 
 ### Minor Changes
